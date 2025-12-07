@@ -130,7 +130,10 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.25s ease;
+            
+            /* UBAH TRANSISI: Menggunakan efek pegas/bounce halus */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            
             text-decoration: none;
             color: inherit;
             border: 1px solid rgba(0, 0, 0, 0.05);
@@ -151,7 +154,7 @@
 
         /* EFEK HOVER & ANIMASI */
         .health-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-8px); /* Naik sedikit lebih tinggi */
             box-shadow: var(--shadow-hover);
         }
 
@@ -164,19 +167,7 @@
             50% { transform: translateY(-4px) scale(0.98); }
         }
 
-        .health-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-blue), var(--accent-purple));
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .health-card:hover::before {
-            transform: scaleX(1);
-        }
+        /* GARIS BERWARNA DIHAPUS DARI SINI */
 
         .card-icon {
             /* Perubahan: Icon diperkecil dari 80px ke 50px agar lebih proporsional */
