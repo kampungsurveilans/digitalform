@@ -9,7 +9,9 @@
         /* RESET & VARIABLES */
         :root {
             /* Warna Palet Baru yang Lebih Hidup */
-            --primary-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); /* Deep Ocean */
+            /* UPDATED: Gradasi Violet ke Royal Blue yang lebih "Eye-Catching" */
+            --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            
             --accent-color: #007AFF;
             --bg-body: #EEF2F6; /* Sedikit lebih gelap dari putih pucat agar kartu kontras */
             
@@ -64,7 +66,8 @@
         /* Elemen dekoratif background header */
         .header-bg-circle {
             position: absolute;
-            background: rgba(255, 255, 255, 0.05);
+            /* UPDATED: Opacity dinaikkan sedikit (0.05 -> 0.1) agar motif lebih terlihat */
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
         }
         .circle-1 { width: 200px; height: 200px; top: -50px; left: -50px; }
@@ -166,8 +169,8 @@
         .health-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-hover);
-            /* Border akan berubah warna via Javascript atau CSS specific variable nanti */
-            border-color: rgba(0,0,0,0.05); 
+            /* Border color dihapus agar tidak ada garis saat hover */
+            border-color: transparent; 
         }
 
         .card-icon {
@@ -213,13 +216,7 @@
         .pertusis { background: linear-gradient(135deg, #ec008c, #fc6767); box-shadow: 0 4px 15px rgba(236, 0, 140, 0.3); }
         .dbd { background: linear-gradient(135deg, #2193b0, #6dd5ed); box-shadow: 0 4px 15px rgba(33, 147, 176, 0.3); }
 
-        /* Specific Hover Borders (Agar tidak pucat) */
-        .health-card[data-color="campak"]:hover { border-color: #FF4B2B; }
-        .health-card[data-color="difteri"]:hover { border-color: #FFD200; }
-        .health-card[data-color="afp"]:hover { border-color: #38ef7d; }
-        .health-card[data-color="tetanus"]:hover { border-color: #8E2DE2; }
-        .health-card[data-color="pertusis"]:hover { border-color: #ec008c; }
-        .health-card[data-color="dbd"]:hover { border-color: #2193b0; }
+        /* Specific Hover Borders dihapus sesuai permintaan */
 
         /* MODAL STYLES (Dipercantik) */
         .modal-overlay {
