@@ -11,6 +11,7 @@
     <meta name="application-name" content="KASUR">
     <meta name="apple-mobile-web-app-title" content="KASUR">
 
+    <!-- Icon generated dynamic -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='bgCheck' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%230f172a;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%231e293b;stop-opacity:1' /%3E%3C/linearGradient%3E%3ClinearGradient id='glow' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2338bdf8;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23818cf8;stop-opacity:1' /%3E%3C/linearGradient%3E%3Cfilter id='blurMe'%3E%3CfeGaussianBlur in='SourceGraphic' stdDeviation='5' /%3E%3C/filter%3E%3Cfilter id='innerShadow'%3E%3CfeOffset dx='0' dy='4' /%3E%3CfeGaussianBlur stdDeviation='10' result='offset-blur' /%3E%3CfeComposite operator='out' in='SourceGraphic' in2='offset-blur' result='inverse' /%3E%3CfeFlood flood-color='black' flood-opacity='0.5' result='color' /%3E%3CfeComposite operator='in' in='color' in2='inverse' result='shadow' /%3E%3CfeComposite operator='over' in='shadow' in2='SourceGraphic' /%3E%3C/filter%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='url(%23bgCheck)'/%3E%3Crect x='40' y='40' width='432' height='432' rx='100' fill='none' stroke='url(%23glow)' stroke-width='8' opacity='0.5'/%3E%3Ccircle cx='256' cy='256' r='120' fill='url(%23glow)' filter='url(%23blurMe)' opacity='0.4' /%3E%3Cpath d='M360 232H280V152C280 138.7 269.3 128 256 128C242.7 128 232 138.7 232 152V232H152C138.7 232 128 242.7 128 256C128 269.3 138.7 280 152 280H232V360C232 373.3 242.7 384 256 384C269.3 384 280 373.3 280 360V280H360C373.3 280 384 269.3 384 256C384 242.7 373.3 232 360 232Z' fill='white' filter='url(%23innerShadow)'/%3E%3C/svg%3E">
     
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f172a'/%3E%3Cdefs%3E%3ClinearGradient id='glow' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2338bdf8;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23818cf8;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='%230f172a'/%3E%3Cpath d='M360 232H280V152C280 138.7 269.3 128 256 128C242.7 128 232 138.7 232 152V232H152C138.7 232 128 242.7 128 256C128 269.3 138.7 280 152 280H232V360C232 373.3 242.7 384 256 384C269.3 384 280 373.3 280 360V280H360C373.3 280 384 269.3 384 256C384 242.7 373.3 232 360 232Z' fill='white'/%3E%3C/svg%3E">
@@ -446,13 +447,21 @@
             overflow: hidden;
         }
 
-        /* COLOR UTILITIES */
+        /* COLOR UTILITIES - EXISTING */
         .campak { background: linear-gradient(135deg, #FF416C, #FF4B2B); box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3); }
         .difteri { background: linear-gradient(135deg, #F7971E, #FFD200); box-shadow: 0 4px 15px rgba(247, 151, 30, 0.3); }
         .afp { background: linear-gradient(135deg, #11998e, #38ef7d); box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3); }
         .tetanus { background: linear-gradient(135deg, #8E2DE2, #4A00E0); box-shadow: 0 4px 15px rgba(74, 0, 224, 0.3); }
         .pertusis { background: linear-gradient(135deg, #ec008c, #fc6767); box-shadow: 0 4px 15px rgba(236, 0, 140, 0.3); }
         .dbd { background: linear-gradient(135deg, #2193b0, #6dd5ed); box-shadow: 0 4px 15px rgba(33, 147, 176, 0.3); }
+
+        /* COLOR UTILITIES - NEW (Menambahkan 6 warna baru yang unik) */
+        .disentri { background: linear-gradient(135deg, #cb2d3e, #ef473a); box-shadow: 0 4px 15px rgba(203, 45, 62, 0.3); } /* Merah Tua - Darah */
+        .tifoid { background: linear-gradient(135deg, #f09819, #edde5d); box-shadow: 0 4px 15px rgba(240, 152, 25, 0.3); } /* Kuning/Amber */
+        .rabies { background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b); box-shadow: 0 4px 15px rgba(58, 28, 113, 0.3); } /* Ungu Gelap - Malam/Anjing Liar */
+        .tetanus-dewasa { background: linear-gradient(135deg, #134E5E, #71B280); box-shadow: 0 4px 15px rgba(19, 78, 94, 0.3); } /* Hijau Gelap/Teal */
+        .ili { background: linear-gradient(135deg, #00c6ff, #0072ff); box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3); } /* Biru Terang - Flu/Udara */
+        .hfmd { background: linear-gradient(135deg, #ff9966, #ff5e62); box-shadow: 0 4px 15px rgba(255, 153, 102, 0.3); } /* Pink/Coral - Ruam/Anak */
 
         /* MODAL STYLES */
         .modal-overlay {
@@ -631,6 +640,7 @@
         </div>
 
         <main class="menu-grid" id="menuGrid">
+            <!-- 1. Campak (Existing) -->
             <div class="health-card" data-disease="Campak/Rubella" data-color="campak" data-search="campak rubella measles" data-url="campak.html">
                 <div class="card-icon campak"><i class="fas fa-virus"></i></div>
                 <div class="card-content">
@@ -639,14 +649,16 @@
                 </div>
             </div>
 
+            <!-- 2. Difteri (Existing) -->
             <div class="health-card" data-disease="Difteri" data-color="difteri" data-search="difteri diphtheria" data-url="difteri.html">
                 <div class="card-icon difteri"><i class="fas fa-lungs-virus"></i></div>
                 <div class="card-content">
                     <h3>Difteri</h3>
-                    <p>Infeksi bakteri pada selaput lendir hidung/tenggorokan.</p>
+                    <p>Infeksi bakteri pada selaput lendir tenggorokan.</p>
                 </div>
             </div>
 
+            <!-- 3. AFP (Existing) -->
             <div class="health-card" data-disease="AFP" data-color="afp" data-search="afp acute flaccid paralysis polio kelumpuhan" data-url="afp.html">
                 <div class="card-icon afp"><i class="fas fa-procedures"></i></div>
                 <div class="card-content">
@@ -655,6 +667,7 @@
                 </div>
             </div>
 
+            <!-- 4. Tetanus Neonatorum (Existing) -->
             <div class="health-card" data-disease="Tetanus Neonatorum" data-color="tetanus" data-search="tetanus neonatorum kejang bayi" data-url="tetanus.html">
                 <div class="card-icon tetanus"><i class="fas fa-baby"></i></div>
                 <div class="card-content">
@@ -663,6 +676,7 @@
                 </div>
             </div>
 
+            <!-- 5. Pertusis (Existing) -->
             <div class="health-card" data-disease="Pertusis" data-color="pertusis" data-search="pertusis batuk rejan whooping cough" data-url="pertusis.html">
                 <div class="card-icon pertusis"><i class="fas fa-head-side-cough"></i></div>
                 <div class="card-content">
@@ -671,6 +685,7 @@
                 </div>
             </div>
 
+            <!-- 6. DBD (Existing) -->
             <div class="health-card" data-disease="DBD" data-color="dbd" data-search="dbd demam berdarah dengue nyamuk" data-url="dbd.html">
                 <div class="card-icon dbd"><i class="fas fa-mosquito"></i></div>
                 <div class="card-content">
@@ -678,6 +693,61 @@
                     <p>Demam berdarah dengue akibat gigitan nyamuk Aedes.</p>
                 </div>
             </div>
+
+            <!-- 7. Diare Berdarah/Disentri (NEW) -->
+            <div class="health-card" data-disease="Diare Berdarah" data-color="disentri" data-search="diare berdarah disentri diare akut" data-url="diare.html">
+                <div class="card-icon disentri"><i class="fas fa-biohazard"></i></div>
+                <div class="card-content">
+                    <h3>Diare Berdarah</h3>
+                    <p>Disentri atau infeksi usus dengan feses berdarah.</p>
+                </div>
+            </div>
+
+            <!-- 8. Demam Tifoid (NEW) -->
+            <div class="health-card" data-disease="Demam Tifoid" data-color="tifoid" data-search="demam tifoid tipes thypoid" data-url="tifoid.html">
+                <div class="card-icon tifoid"><i class="fas fa-temperature-high"></i></div>
+                <div class="card-content">
+                    <h3>Demam Tifoid</h3>
+                    <p>Infeksi bakteri Salmonella typhi dengan demam tinggi.</p>
+                </div>
+            </div>
+
+            <!-- 9. Rabies (NEW) -->
+            <div class="health-card" data-disease="Rabies" data-color="rabies" data-search="rabies anjing gila gigitan hewan" data-url="rabies.html">
+                <div class="card-icon rabies"><i class="fas fa-dog"></i></div>
+                <div class="card-content">
+                    <h3>Rabies</h3>
+                    <p>Penyakit menular akibat gigitan hewan terinfeksi.</p>
+                </div>
+            </div>
+
+            <!-- 10. Tetanus Dewasa (NEW) -->
+            <div class="health-card" data-disease="Tetanus Dewasa" data-color="tetanus-dewasa" data-search="tetanus dewasa luka tusuk" data-url="tetanus_dewasa.html">
+                <div class="card-icon tetanus-dewasa"><i class="fas fa-syringe"></i></div>
+                <div class="card-content">
+                    <h3>Tetanus Dewasa</h3>
+                    <p>Infeksi akut akibat spora bakteri Clostridium tetani.</p>
+                </div>
+            </div>
+
+            <!-- 11. ILI (NEW) -->
+            <div class="health-card" data-disease="ILI" data-color="ili" data-search="ili influenza like illness flu" data-url="ili.html">
+                <div class="card-icon ili"><i class="fas fa-head-side-mask"></i></div>
+                <div class="card-content">
+                    <h3>ILI</h3>
+                    <p>Penyakit Serupa Influenza, demam disertai batuk.</p>
+                </div>
+            </div>
+
+            <!-- 12. Suspek HFMD (NEW) -->
+            <div class="health-card" data-disease="Suspek HFMD" data-color="hfmd" data-search="hfmd flu singapura tangan kaki mulut" data-url="hfmd.html">
+                <div class="card-icon hfmd"><i class="fas fa-child"></i></div>
+                <div class="card-content">
+                    <h3>Suspek HFMD</h3>
+                    <p>Flu Singapura, lepuh pada tangan, kaki, dan mulut.</p>
+                </div>
+            </div>
+
         </main>
 
         <footer class="footer">
