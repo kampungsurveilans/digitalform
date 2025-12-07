@@ -10,6 +10,8 @@
         :root {
             --primary-blue: #007AFF;
             --secondary-blue: #5856D6;
+            --accent-purple: #AF52DE;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --bg-light: #F5F7FA;
             --card-white: #FFFFFF;
             --text-dark: #1D1D1F;
@@ -41,25 +43,95 @@
             padding: 0 15px;
         }
 
-        /* HEADER */
+        /* HEADER - DIUBAH MENJADI LEBIH MENARIK */
         .header {
-            text-align: center;
+            background: var(--bg-gradient);
+            border-radius: var(--radius);
+            padding: 30px;
             margin-bottom: 40px;
-            padding: 20px 0;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
         }
 
         .header h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin-bottom: 12px;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header p {
-            color: var(--text-light);
             font-size: 1.1rem;
             max-width: 700px;
+            margin: 0 auto 25px;
+            position: relative;
+            z-index: 1;
+            opacity: 0.95;
+        }
+
+        /* SEARCH BAR */
+        .search-container {
+            max-width: 600px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-box {
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: #999;
+        }
+
+        .search-box button {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-box button:hover {
+            background: var(--secondary-blue);
+            transform: scale(1.05);
         }
 
         /* GRID LAYOUT */
@@ -140,94 +212,6 @@
         .pertusis { background: linear-gradient(135deg, #FF2D55, #FF5A7D); }
         .dbd { background: linear-gradient(135deg, #007AFF, #3395FF); }
 
-        /* MODAL */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .modal {
-            background: var(--card-white);
-            border-radius: var(--radius);
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            transform: scale(0.95);
-            animation: modalAppear 0.3s ease forwards;
-        }
-
-        .modal-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 30px;
-            color: white;
-        }
-
-        .modal h2 {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 1.6rem;
-        }
-
-        .modal p {
-            text-align: center;
-            color: var(--text-light);
-            margin-bottom: 25px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .modal-btn {
-            padding: 12px 28px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            flex: 1;
-            max-width: 160px;
-            transition: all 0.2s;
-        }
-
-        .modal-btn.cancel {
-            background: #F2F2F7;
-            color: var(--primary-blue);
-        }
-
-        .modal-btn.confirm {
-            background: var(--primary-blue);
-            color: white;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
         /* FOOTER */
         .footer {
             text-align: center;
@@ -239,15 +223,6 @@
         }
 
         /* ANIMATIONS */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes modalAppear {
-            to { transform: scale(1); }
-        }
-
         .health-card {
             opacity: 0;
             transform: translateY(10px);
@@ -264,35 +239,44 @@
         /* RESPONSIVE */
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
             
+            .header p {
+                font-size: 1rem;
+            }
+            
+            /* UBAH KE 2 KARTU PER BARIS */
             .menu-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
             }
             
             .health-card {
-                padding: 18px;
+                padding: 16px;
+                flex-direction: column;
+                text-align: center;
             }
             
             .card-icon {
                 width: 50px;
                 height: 50px;
                 font-size: 22px;
-                margin-right: 16px;
+                margin-right: 0;
+                margin-bottom: 12px;
             }
             
-            .modal {
-                padding: 25px 20px;
+            .card-content h3 {
+                font-size: 1.1rem;
             }
             
-            .modal-actions {
-                flex-direction: column;
+            .card-content p {
+                font-size: 0.8rem;
+                margin-bottom: 10px;
             }
             
-            .modal-btn {
-                max-width: 100%;
+            .card-arrow {
+                margin-left: 0;
             }
         }
 
@@ -302,15 +286,27 @@
             }
             
             .header {
+                padding: 25px 20px;
                 margin-bottom: 30px;
             }
             
             .header h1 {
-                font-size: 1.6rem;
+                font-size: 1.7rem;
             }
             
-            .header p {
-                font-size: 1rem;
+            /* DI BAWAH 480px KEMBALI KE 1 KOLOM */
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .health-card {
+                flex-direction: row;
+                text-align: left;
+            }
+            
+            .card-icon {
+                margin-right: 16px;
+                margin-bottom: 0;
             }
         }
     </style>
@@ -318,13 +314,23 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>Sistem Informasi Kesehatan</h1>
-            <p>Pilih penyakit untuk melihat informasi detail, statistik, dan rekomendasi penanganan.</p>
+            <h1><i class="fas fa-heartbeat"></i> Sistem Informasi Kesehatan</h1>
+            <p>Akses informasi lengkap tentang penyakit menular, gejala, pencegahan, dan penanganannya</p>
+            
+            <!-- TOMBOL PENCARIAN -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Cari nama penyakit...">
+                    <button id="searchButton">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
         </header>
 
-        <main class="menu-grid">
+        <main class="menu-grid" id="menuGrid">
             <!-- Campak/Rubella -->
-            <a href="campak.html" class="health-card" data-disease="Campak/Rubella" data-color="campak">
+            <a href="campak.html" class="health-card" data-disease="Campak/Rubella" data-color="campak" data-search="campak rubella measles">
                 <div class="card-icon campak">
                     <i class="fas fa-virus"></i>
                 </div>
@@ -338,7 +344,7 @@
             </a>
 
             <!-- Difteri -->
-            <a href="difteri.html" class="health-card" data-disease="Difteri" data-color="difteri">
+            <a href="difteri.html" class="health-card" data-disease="Difteri" data-color="difteri" data-search="difteri diphtheria">
                 <div class="card-icon difteri">
                     <i class="fas fa-lungs-virus"></i>
                 </div>
@@ -352,7 +358,7 @@
             </a>
 
             <!-- AFP -->
-            <a href="afp.html" class="health-card" data-disease="AFP" data-color="afp">
+            <a href="afp.html" class="health-card" data-disease="AFP" data-color="afp" data-search="afp acute flaccid paralysis polio kelumpuhan">
                 <div class="card-icon afp">
                     <i class="fas fa-procedures"></i>
                 </div>
@@ -366,7 +372,7 @@
             </a>
 
             <!-- Tetanus Neonatorum -->
-            <a href="tetanus.html" class="health-card" data-disease="Tetanus Neonatorum" data-color="tetanus">
+            <a href="tetanus.html" class="health-card" data-disease="Tetanus Neonatorum" data-color="tetanus" data-search="tetanus neonatorum kejang bayi">
                 <div class="card-icon tetanus">
                     <i class="fas fa-baby"></i>
                 </div>
@@ -380,7 +386,7 @@
             </a>
 
             <!-- Pertusis -->
-            <a href="pertusis.html" class="health-card" data-disease="Pertusis" data-color="pertusis">
+            <a href="pertusis.html" class="health-card" data-disease="Pertusis" data-color="pertusis" data-search="pertusis batuk rejan whooping cough">
                 <div class="card-icon pertusis">
                     <i class="fas fa-head-side-cough"></i>
                 </div>
@@ -394,7 +400,7 @@
             </a>
 
             <!-- DBD -->
-            <a href="dbd.html" class="health-card" data-disease="DBD" data-color="dbd">
+            <a href="dbd.html" class="health-card" data-disease="DBD" data-color="dbd" data-search="dbd demam berdarah dengue nyamuk">
                 <div class="card-icon dbd">
                     <i class="fas fa-mosquito"></i>
                 </div>
@@ -408,85 +414,107 @@
             </a>
         </main>
 
-        <!-- Modal -->
-        <div class="modal-overlay" id="modalOverlay">
-            <div class="modal" id="modal">
-                <div class="modal-icon" id="modalIcon"></div>
-                <h2 id="modalTitle">Konfirmasi</h2>
-                <p id="modalMessage">Apakah Anda yakin ingin membuka halaman ini?</p>
-                <div class="modal-actions">
-                    <button class="modal-btn cancel" id="cancelBtn">Batal</button>
-                    <button class="modal-btn confirm" id="confirmBtn">Buka</button>
-                </div>
-            </div>
-        </div>
-
         <footer class="footer">
             <p>Sistem Informasi Kesehatan © 2023</p>
-            <p>Desain responsif untuk desktop dan mobile</p>
+            <p>Dirancang untuk kemudahan akses informasi kesehatan masyarakat</p>
         </footer>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.health-card');
-            const modalOverlay = document.getElementById('modalOverlay');
-            const modal = document.getElementById('modal');
-            const modalIcon = document.getElementById('modalIcon');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalMessage = document.getElementById('modalMessage');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const confirmBtn = document.getElementById('confirmBtn');
-            
-            let targetUrl = '';
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
             
             // Stagger animation for cards
             cards.forEach((card, index) => {
                 card.style.animationDelay = `${index * 0.1}s`;
             });
             
-            // Card click handler
-            cards.forEach(card => {
-                card.addEventListener('click', function(e) {
-                    e.preventDefault();
+            // Fungsi pencarian
+            function filterCards() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const menuGrid = document.getElementById('menuGrid');
+                
+                cards.forEach(card => {
+                    const diseaseName = card.getAttribute('data-disease').toLowerCase();
+                    const searchKeywords = card.getAttribute('data-search').toLowerCase();
+                    const cardText = card.textContent.toLowerCase();
                     
-                    const disease = this.getAttribute('data-disease');
-                    const color = this.getAttribute('data-color');
-                    targetUrl = this.getAttribute('href');
+                    // Cek apakah ada yang cocok
+                    const isMatch = diseaseName.includes(searchTerm) || 
+                                   searchKeywords.includes(searchTerm) ||
+                                   cardText.includes(searchTerm);
                     
-                    // Update modal content
-                    modalIcon.className = `modal-icon ${color}`;
-                    modalIcon.innerHTML = this.querySelector('.card-icon').innerHTML;
-                    modalTitle.textContent = disease;
-                    modalMessage.textContent = `Anda akan membuka halaman ${disease}.`;
-                    
-                    // Show modal
-                    modalOverlay.classList.add('active');
+                    if (searchTerm === '' || isMatch) {
+                        card.style.display = 'flex';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    } else {
+                        card.style.display = 'none';
+                    }
                 });
-            });
+                
+                // Animasi ulang kartu yang ditampilkan
+                setTimeout(() => {
+                    const visibleCards = document.querySelectorAll('.health-card[style*="display: flex"]');
+                    visibleCards.forEach((card, index) => {
+                        card.style.animationDelay = `${index * 0.1}s`;
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(10px)';
+                        
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 10);
+                    });
+                }, 10);
+            }
             
-            // Modal button handlers
-            cancelBtn.addEventListener('click', () => {
-                modalOverlay.classList.remove('active');
-            });
+            // Event listener untuk tombol pencarian
+            searchButton.addEventListener('click', filterCards);
             
-            confirmBtn.addEventListener('click', () => {
-                window.location.href = targetUrl;
-            });
+            // Event listener untuk input (real-time search)
+            searchInput.addEventListener('input', filterCards);
             
-            // Close modal on overlay click
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) {
-                    modalOverlay.classList.remove('active');
+            // Event listener untuk tombol Enter di input
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    filterCards();
                 }
             });
             
-            // Add keyboard support
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-                    modalOverlay.classList.remove('active');
+            // KARTU LANGSUNG DIKLIK TANPA KONFIRMASI
+            // Tidak perlu event handler khusus karena sudah menggunakan tag <a> dengan href
+            
+            // Tambahkan pesan jika tidak ada hasil pencarian
+            const originalFilter = filterCards;
+            filterCards = function() {
+                originalFilter.apply(this, arguments);
+                
+                const visibleCards = document.querySelectorAll('.health-card[style*="display: flex"]');
+                const menuGrid = document.getElementById('menuGrid');
+                
+                // Hapus pesan tidak ditemukan jika ada
+                const existingMessage = document.querySelector('.no-results');
+                if (existingMessage) {
+                    existingMessage.remove();
                 }
-            });
+                
+                // Jika tidak ada kartu yang ditampilkan dan ada kata kunci pencarian
+                if (visibleCards.length === 0 && searchInput.value.trim() !== '') {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    noResults.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-light);">
+                            <i class="fas fa-search" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <h3 style="margin-bottom: 10px;">Penyakit tidak ditemukan</h3>
+                            <p>Tidak ada penyakit yang sesuai dengan "${searchInput.value}"</p>
+                        </div>
+                    `;
+                    menuGrid.appendChild(noResults);
+                }
+            };
         });
     </script>
 </body>
