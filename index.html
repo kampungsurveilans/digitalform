@@ -2,8 +2,25 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Informasi Kesehatan</title>
+    
+    <!-- PWA & MOBILE APP CAPABILITIES -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="application-name" content="SI Kesehatan">
+
+    <!-- GENERATED APP ICON (SVG Data URI) -->
+    <!-- Icon ini menggunakan gradient yang sama dengan tema aplikasi -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236a11cb;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%232575fc;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='url(%23grad)'/%3E%3Cpath fill='white' d='M408.2 147.2c-29.4-32.3-74.8-43.2-117.2-22.7-16.3 7.8-30.8 19.8-42.3 35.1l-2.7 3.6-2.7-3.6c-11.5-15.3-26-27.3-42.3-35.1-42.4-20.5-87.8-9.6-117.2 22.7-29.6 32.5-33.3 80.6-9.6 131.5 21 45.1 63.8 99.9 153.2 173.3 5.4 4.4 12.2 6.8 19.2 6.8s13.8-2.4 19.2-6.8c89.4-73.4 132.2-128.2 153.2-173.3 23.7-50.9 20-99-9.6-131.5zm-47.5 106.1c-13.8 29.7-44.1 71.3-104.7 124.9-60.6-53.6-90.9-95.2-104.7-124.9-15.8-34-11.7-65.4 7.5-86.5 20.3-22.3 52-27.8 80.3-14.1 12.4 6 23.2 16 30.6 28.5 3.3 5.6 9.3 9 15.6 9s12.3-3.4 15.6-9c7.4-12.5 18.2-22.5 30.6-28.5 28.3-13.7 60-8.2 80.3 14.1 19.2 21.1 23.3 52.5 7.5 86.5z'/%3E%3Cpath fill='white' d='M232 248v-48h48v48h48v48h-48v48h-48v-48h-48v-48h48z'/%3E%3C/svg%3E">
+    
+    <!-- APPLE TOUCH ICON (Untuk iOS Home Screen) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='white'/%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236a11cb;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%232575fc;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='0' fill='url(%23grad)'/%3E%3Cpath fill='white' d='M256 96c88.4 0 160 71.6 160 160 0 88.4-71.6 160-160 160-88.4 0-160-71.6-160-160 0-88.4 71.6-160 160-160zM224 224v-64h64v64h64v64h-64v64h-64v-64h-64v-64h64z'/%3E%3C/svg%3E">
+
+    <!-- WEB APP MANIFEST (Embedded Data URI untuk Android) -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU0kgS2VzZWhhdGFuIiwic2hvcnRfbmFtZSI6IlNJIEtlcyIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjRUVGMkY2IiwidGhlbWVfY29sb3IiOiIjNmExMWNiIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMic%2BJTNDZGVmcyUzRSUzQ2xpbmVhckdyYWRpZW50IGlkPSdncmFkJyB4MT0nMCUyNScgeTE9JzAlMjUnIHgyPScxMDAlMjUnIHkyPScxMDAlMjUnJTNFJTNDc3RvcCBvZmZzZXQ9JzAlMjUnIHN0eWxlPSdzdG9wLWNvbG9yOiM2YTExY2I7c3RvcC1vcGFjaXR5OjEnIC8%2BJTNDc3RvcCBvZmZzZXQ9JzEwMCUyNScgc3R5bGU9J3N0b3AtY29sb3I6IzI1NzVmYztzdG9wLW9wYWNpdHk6MScgLz4lM0MvbGluZWFyR3JhZGllbnQlM0UlM0MvZGVmcyUzRSUzQ3JlY3Qgd2lkdGg9JzUxMicgaGVpZ2h0Rm09JzUxMicgcng9JzEyMCcgZmlsbD0ndXJsKCNncmFkKScvJTNFJTNDcGF0aCBmaWxsPSd3aGl0ZScgZD0nTTI1NiA5NmM4OC40IDAgMTYwIDcxLjYgMTYwIDE2MCAwIDg4LjQtNzEuNiAxNjAtMTYwIDE2MC04OC40IDAtMTYwLTcxLjYtMTYwLTE2MCAwLTg4LjQgNzEuNi0xNjAgMTYwLTE2MHpNMjI0IDIyNHYtNjRoNjR2NjRoNjR2NjRoLTY0djY0aC02NHYtNjRoLTY0di02NGg2NHonLyUzRSUzQy9zdmclM0UiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCIsInNpemVzIjoiNTEyeDUxMiJ9XX0=">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* RESET & VARIABLES */
@@ -468,7 +485,7 @@
             <div class="splash-icon-box">
                 <i class="fas fa-heartbeat splash-icon"></i>
             </div>
-            <div class="splash-title">SISTEM SURVEILANS</div>
+            <div class="splash-title">Surveilans</div>
             <div class="splash-subtitle">UPT Puskesmas Kampung Dalam</div>
             
             <div class="loading-dots">
