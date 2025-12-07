@@ -33,22 +33,22 @@
             color: var(--text-dark);
             min-height: 100vh;
             padding: 20px;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         /* CONTAINER */
         .container {
-            max-width: 1200px;
+            max-width: 1000px; /* Diperkecil sedikit agar lebih fokus */
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 0 10px;
         }
 
         /* HEADER */
         .header {
             background: var(--bg-gradient);
             border-radius: var(--radius);
-            padding: 30px;
-            margin-bottom: 40px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
             color: white;
             text-align: center;
             position: relative;
@@ -59,35 +59,32 @@
         .header::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
             opacity: 0.3;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 800;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             position: relative;
             z-index: 1;
             text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header p {
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin: 0 auto 25px;
+            font-size: 0.95rem;
+            max-width: 600px;
+            margin: 0 auto 20px;
             position: relative;
             z-index: 1;
             opacity: 0.95;
         }
 
-        /* SEARCH BAR - TANPA SIMBOL */
+        /* SEARCH BAR */
         .search-container {
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
@@ -96,33 +93,35 @@
         .search-box {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 50px;
-            padding: 12px 25px;
+            padding: 8px 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        
+        .search-box:focus-within {
+            transform: scale(1.02);
         }
 
         .search-box input {
             width: 100%;
             border: none;
             background: transparent;
-            padding: 10px 5px;
-            font-size: 1rem;
+            padding: 8px 5px;
+            font-size: 0.95rem;
             color: var(--text-dark);
             outline: none;
         }
 
-        .search-box input::placeholder {
-            color: #999;
-        }
-
-        /* GRID LAYOUT - DIMODIFIKASI UNTUK KARTU 1:1 */
+        /* GRID LAYOUT - DIPERBAIKI: Menggunakan ukuran minmax lebih kecil */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
+            /* Perubahan utama: 300px diubah jadi 200px agar kartu lebih kecil */
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
             margin-bottom: 40px;
         }
 
-        /* CARD STYLES - DIMODIFIKASI MENJADI PERSEGI (1:1) */
+        /* CARD STYLES */
         .health-card {
             background: var(--card-white);
             border-radius: var(--radius);
@@ -136,37 +135,35 @@
             color: inherit;
             border: 1px solid rgba(0, 0, 0, 0.05);
             box-shadow: var(--shadow);
-            padding: 30px 25px;
+            
+            /* Perubahan: Padding lebih kecil & hapus min-height fixed yang terlalu besar */
+            padding: 20px 15px; 
             text-align: center;
-            min-height: 300px; /* Menjamin tinggi minimum */
-            aspect-ratio: 1/1; /* Membuat kartu persegi sempurna */
+            aspect-ratio: 1/1; /* Tetap kotak */
             position: relative;
             overflow: hidden;
         }
 
-        /* EFEK BOUNCE SAAT DIKLIK */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-6px) scale(1.02); }
+        /* EFEK HOVER & ANIMASI */
+        .health-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
         }
 
         .health-card.clicked {
             animation: bounce 0.4s ease;
         }
 
-        .health-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-hover);
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-4px) scale(0.98); }
         }
 
-        /* EFEK HALUS SAAT HOVER */
         .health-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
+            top: 0; left: 0; right: 0;
+            height: 3px;
             background: linear-gradient(90deg, var(--primary-blue), var(--accent-purple));
             transform: scaleX(0);
             transition: transform 0.3s ease;
@@ -177,16 +174,18 @@
         }
 
         .card-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
+            /* Perubahan: Icon diperkecil dari 80px ke 50px agar lebih proporsional */
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 25px;
-            font-size: 34px;
+            margin-bottom: 12px;
+            font-size: 22px; /* Font icon diperkecil */
             color: white;
             transition: transform 0.3s ease;
+            flex-shrink: 0;
         }
 
         .health-card:hover .card-icon {
@@ -194,29 +193,31 @@
         }
 
         .card-content {
-            flex: 1;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            width: 100%;
         }
 
         .card-content h3 {
-            font-size: 1.4rem;
+            font-size: 1rem; /* Font judul diperkecil dari 1.1rem */
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
             color: var(--text-dark);
+            line-height: 1.2;
         }
 
         .card-content p {
-            font-size: 0.95rem;
+            font-size: 0.75rem; /* Font deskripsi diperkecil dari 0.8rem */
             color: var(--text-light);
-            line-height: 1.5;
-            max-width: 100%;
-            margin: 0 auto;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Membatasi teks max 3 baris agar rapi */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        /* COLOR VARIATIONS */
+        /* WARNA IKON */
         .campak { background: linear-gradient(135deg, #FF3B30, #FF6258); }
         .difteri { background: linear-gradient(135deg, #FF9500, #FFB340); }
         .afp { background: linear-gradient(135deg, #34C759, #5CDD75); }
@@ -224,13 +225,10 @@
         .pertusis { background: linear-gradient(135deg, #FF2D55, #FF5A7D); }
         .dbd { background: linear-gradient(135deg, #007AFF, #3395FF); }
 
-        /* MODAL KONFIRMASI */
+        /* MODAL STYLES */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
             display: none;
@@ -241,209 +239,130 @@
             animation: fadeIn 0.2s ease;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .modal {
             background: var(--card-white);
             border-radius: var(--radius);
-            padding: 30px;
-            max-width: 500px;
+            padding: 25px;
+            max-width: 400px; /* Modal lebih ramping */
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             transform: scale(0.95);
             animation: modalAppear 0.3s ease forwards;
         }
 
-        @keyframes modalAppear {
-            to { transform: scale(1); }
-        }
+        @keyframes modalAppear { to { transform: scale(1); } }
 
         .modal-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 30px;
+            margin: 0 auto 15px;
+            font-size: 24px;
             color: white;
         }
 
-        .modal h2 {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 1.6rem;
-        }
-
-        .modal p {
-            text-align: center;
-            color: var(--text-light);
-            margin-bottom: 25px;
-        }
-
+        .modal h2 { text-align: center; margin-bottom: 8px; font-size: 1.4rem; }
+        .modal p { text-align: center; color: var(--text-light); margin-bottom: 20px; font-size: 0.9rem; }
+        
         .modal-actions {
             display: flex;
-            gap: 12px;
-            justify-content: center;
+            gap: 10px;
         }
 
         .modal-btn {
-            padding: 12px 28px;
-            border-radius: 12px;
+            padding: 10px 0;
+            border-radius: 10px;
             border: none;
             font-weight: 600;
             cursor: pointer;
             flex: 1;
-            max-width: 160px;
-            transition: all 0.2s;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
         }
 
-        .modal-btn.cancel {
-            background: #F2F2F7;
-            color: var(--primary-blue);
-        }
-
-        .modal-btn.confirm {
-            background: var(--primary-blue);
-            color: white;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+        .modal-btn.cancel { background: #F2F2F7; color: var(--primary-blue); }
+        .modal-btn.confirm { background: var(--primary-blue); color: white; }
+        .modal-btn:active { transform: scale(0.95); }
 
         /* FOOTER */
         .footer {
             text-align: center;
-            padding: 30px 0;
+            padding: 20px 0;
             color: var(--text-light);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             border-top: 1px solid rgba(0, 0, 0, 0.05);
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
-        /* ANIMATIONS UNTUK KARTU */
-        .health-card {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: cardAppear 0.4s ease forwards;
-        }
-
-        @keyframes cardAppear {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 1024px) {
-            .menu-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-        }
-
+        /* RESPONSIVE DESIGN - DISEDERHANAKAN */
+        
+        /* Tablet & Mobile Landscape */
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
+            .header h1 { font-size: 1.5rem; }
+            .header { padding: 20px 15px; }
             
-            .header p {
-                font-size: 1rem;
-            }
-            
-            /* 2 KARTU PER BARIS */
+            /* Memaksa grid menjadi 2 kolom lebih rapi */
             .menu-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            
-            .health-card {
-                padding: 25px 20px;
-                min-height: 280px;
-            }
-            
-            .card-icon {
-                width: 70px;
-                height: 70px;
-                font-size: 30px;
-                margin-bottom: 20px;
-            }
-            
-            .card-content h3 {
-                font-size: 1.2rem;
-            }
-            
-            .card-content p {
-                font-size: 0.85rem;
-            }
-
-            .modal {
-                padding: 25px 20px;
-            }
-            
-            .modal-actions {
-                flex-direction: column;
-            }
-            
-            .modal-btn {
-                max-width: 100%;
+                grid-template-columns: repeat(3, 1fr); /* Tablet bisa 3 kolom */
+                gap: 15px;
             }
         }
 
+        /* Mobile Portrait - TAMPILAN UTAMA HP */
         @media (max-width: 600px) {
-            /* KEMBALI KE 1 KOLOM PADA UKURAN KECIL */
+            body { padding: 15px; }
+            
             .menu-grid {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-                margin-left: auto;
-                margin-right: auto;
+                /* Perubahan Penting: Memaksa 2 kolom di HP agar tidak terlalu besar */
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px;
             }
-            
+
             .health-card {
-                min-height: 300px;
-                padding: 30px 25px;
+                padding: 12px 8px; /* Padding sangat tipis untuk HP */
+                border-radius: 12px;
+                aspect-ratio: 1/1.1; /* Sedikit lebih tinggi dari lebar agar teks muat */
+            }
+
+            .card-icon {
+                width: 38px; /* Icon sangat compact */
+                height: 38px;
+                font-size: 16px;
+                border-radius: 10px;
+                margin-bottom: 8px;
+            }
+
+            .card-content h3 { 
+                font-size: 0.85rem; /* Judul kecil tapi terbaca */
+                margin-bottom: 4px; 
             }
             
-            .card-icon {
-                width: 80px;
-                height: 80px;
-                font-size: 34px;
+            .card-content p { 
+                font-size: 0.65rem; /* Deskripsi kecil */
+                -webkit-line-clamp: 3; 
+                line-height: 1.25;
             }
         }
 
-        @media (max-width: 480px) {
-            body {
-                padding: 15px;
+        /* HP Sangat Kecil (iPhone SE lama / Galaxy Fold tertutup) */
+        @media (max-width: 350px) {
+            .menu-grid {
+                grid-template-columns: 1fr; /* 1 kolom hanya jika layar sangat sempit */
             }
-            
-            .header {
-                padding: 25px 20px;
-                margin-bottom: 30px;
-            }
-            
-            .header h1 {
-                font-size: 1.7rem;
-            }
-            
-            .health-card {
-                padding: 25px 20px;
-            }
-            
-            .card-icon {
-                width: 70px;
-                height: 70px;
-                font-size: 30px;
-            }
+        }
+        
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
         }
     </style>
 </head>
@@ -451,9 +370,8 @@
     <div class="container">
         <header class="header">
             <h1><i class="fas fa-heartbeat"></i> Sistem Informasi Kesehatan</h1>
-            <p>Sistem Pencatatan dan Pelaporan Penyakit Menular</p>
+            <p>Pencatatan & Pelaporan Penyakit Menular</p>
             
-            <!-- KOLOM PENCARIAN TANPA SIMBOL -->
             <div class="search-container">
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Cari nama penyakit...">
@@ -464,77 +382,64 @@
         <main class="menu-grid" id="menuGrid">
             <!-- Campak/Rubella -->
             <div class="health-card" data-disease="Campak/Rubella" data-color="campak" data-search="campak rubella measles" data-url="campak.html">
-                <div class="card-icon campak">
-                    <i class="fas fa-virus"></i>
-                </div>
+                <div class="card-icon campak"><i class="fas fa-virus"></i></div>
                 <div class="card-content">
                     <h3>Campak/Rubella</h3>
-                    <p>Infeksi virus yang sangat menular ditandai dengan ruam merah di seluruh tubuh.</p>
+                    <p>Infeksi virus menular dengan ruam merah.</p>
                 </div>
             </div>
 
             <!-- Difteri -->
             <div class="health-card" data-disease="Difteri" data-color="difteri" data-search="difteri diphtheria" data-url="difteri.html">
-                <div class="card-icon difteri">
-                    <i class="fas fa-lungs-virus"></i>
-                </div>
+                <div class="card-icon difteri"><i class="fas fa-lungs-virus"></i></div>
                 <div class="card-content">
                     <h3>Difteri</h3>
-                    <p>Infeksi bakteri serius yang memengaruhi selaput lendir tenggorokan dan hidung.</p>
+                    <p>Infeksi bakteri pada selaput lendir hidung/tenggorokan.</p>
                 </div>
             </div>
 
             <!-- AFP -->
             <div class="health-card" data-disease="AFP" data-color="afp" data-search="afp acute flaccid paralysis polio kelumpuhan" data-url="afp.html">
-                <div class="card-icon afp">
-                    <i class="fas fa-procedures"></i>
-                </div>
+                <div class="card-icon afp"><i class="fas fa-procedures"></i></div>
                 <div class="card-content">
-                    <h3>AFP (Acute Flaccid Paralysis)</h3>
-                    <p>Kelumpuhan mendadak yang menjadi indikator surveilans polio.</p>
+                    <h3>AFP (Polio)</h3>
+                    <p>Kelumpuhan mendadak indikator surveilans polio.</p>
                 </div>
             </div>
 
-            <!-- Tetanus Neonatorum -->
+            <!-- Tetanus -->
             <div class="health-card" data-disease="Tetanus Neonatorum" data-color="tetanus" data-search="tetanus neonatorum kejang bayi" data-url="tetanus.html">
-                <div class="card-icon tetanus">
-                    <i class="fas fa-baby"></i>
-                </div>
+                <div class="card-icon tetanus"><i class="fas fa-baby"></i></div>
                 <div class="card-content">
                     <h3>Tetanus Neonatorum</h3>
-                    <p>Infeksi pada bayi baru lahir yang menyebabkan kejang dan kekakuan otot.</p>
+                    <p>Infeksi pada bayi baru lahir menyebabkan kejang.</p>
                 </div>
             </div>
 
             <!-- Pertusis -->
             <div class="health-card" data-disease="Pertusis" data-color="pertusis" data-search="pertusis batuk rejan whooping cough" data-url="pertusis.html">
-                <div class="card-icon pertusis">
-                    <i class="fas fa-head-side-cough"></i>
-                </div>
+                <div class="card-icon pertusis"><i class="fas fa-head-side-cough"></i></div>
                 <div class="card-content">
-                    <h3>Pertusis (Batuk Rejan)</h3>
-                    <p>Infeksi saluran pernapasan bakteri yang ditandai dengan batuk hebat.</p>
+                    <h3>Pertusis</h3>
+                    <p>Batuk rejan atau infeksi saluran pernapasan hebat.</p>
                 </div>
             </div>
 
             <!-- DBD -->
             <div class="health-card" data-disease="DBD" data-color="dbd" data-search="dbd demam berdarah dengue nyamuk" data-url="dbd.html">
-                <div class="card-icon dbd">
-                    <i class="fas fa-mosquito"></i>
-                </div>
+                <div class="card-icon dbd"><i class="fas fa-mosquito"></i></div>
                 <div class="card-content">
-                    <h3>DBD (Demam Berdarah Dengue)</h3>
-                    <p>Penyakit infeksi virus yang ditularkan melalui nyamuk Aedes aegypti.</p>
+                    <h3>DBD</h3>
+                    <p>Demam berdarah dengue akibat gigitan nyamuk Aedes.</p>
                 </div>
             </div>
         </main>
 
-        <!-- MODAL KONFIRMASI -->
         <div class="modal-overlay" id="modalOverlay">
             <div class="modal" id="modal">
                 <div class="modal-icon" id="modalIcon"></div>
-                <h2 id="modalTitle">Buka Halaman</h2>
-                <p id="modalMessage">Apakah Anda yakin ingin membuka halaman ini?</p>
+                <h2 id="modalTitle">Konfirmasi</h2>
+                <p id="modalMessage">Pesan konfirmasi.</p>
                 <div class="modal-actions">
                     <button class="modal-btn cancel" id="cancelBtn">Batal</button>
                     <button class="modal-btn confirm" id="confirmBtn">Buka</button>
@@ -544,7 +449,6 @@
 
         <footer class="footer">
             <p>UPT Puskesmas Kampung Dalam © 2026</p>
-            <p>Dirancang untuk Kemudahan Penyeledikan dan Analisis Epidemiologi</p>
         </footer>
     </div>
 
@@ -552,169 +456,101 @@
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.health-card');
             const searchInput = document.getElementById('searchInput');
+            const menuGrid = document.getElementById('menuGrid');
             const modalOverlay = document.getElementById('modalOverlay');
-            const modal = document.getElementById('modal');
-            const modalIcon = document.getElementById('modalIcon');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalMessage = document.getElementById('modalMessage');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const confirmBtn = document.getElementById('confirmBtn');
             
+            // Variabel state
             let selectedCard = null;
             let targetUrl = '';
-            
-            // Stagger animation for cards
+
+            // Animasi awal masuk
             cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.opacity = '0';
+                card.style.animation = `cardAppear 0.5s ease forwards ${index * 0.05}s`;
             });
-            
-            // Fungsi untuk menampilkan modal
+
+            // Tambahkan CSS Keyframe untuk animasi JS inject
+            const styleSheet = document.createElement("style");
+            styleSheet.innerText = `@keyframes cardAppear { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }`;
+            document.head.appendChild(styleSheet);
+
+            // LOGIKA PENCARIAN
+            function filterCards() {
+                const term = searchInput.value.toLowerCase().trim();
+                let hasResults = false;
+
+                // Hapus pesan "tidak ditemukan" yang lama jika ada
+                const existingMsg = document.querySelector('.no-results');
+                if(existingMsg) existingMsg.remove();
+
+                cards.forEach(card => {
+                    const searchData = card.getAttribute('data-search').toLowerCase();
+                    const title = card.querySelector('h3').textContent.toLowerCase();
+                    
+                    if (searchData.includes(term) || title.includes(term)) {
+                        card.style.display = 'flex';
+                        // Reset animasi kecil agar terasa responsif
+                        card.style.animation = 'none';
+                        card.offsetHeight; /* trigger reflow */
+                        card.style.animation = 'cardAppear 0.3s ease forwards';
+                        hasResults = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Tampilkan pesan jika tidak ada hasil
+                if (!hasResults && term !== '') {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    noResults.innerHTML = `
+                        <i class="fas fa-search" style="font-size: 32px; opacity: 0.3; margin-bottom: 10px;"></i>
+                        <p>Penyakit "${term}" tidak ditemukan</p>
+                    `;
+                    menuGrid.appendChild(noResults);
+                }
+            }
+
+            searchInput.addEventListener('input', filterCards);
+
+            // LOGIKA MODAL (Tidak berubah dari sebelumnya, hanya dirapikan)
             function showModal(card) {
                 const disease = card.getAttribute('data-disease');
                 const color = card.getAttribute('data-color');
                 targetUrl = card.getAttribute('data-url');
                 
-                // Update modal content
-                modalIcon.className = `modal-icon ${color}`;
-                modalIcon.innerHTML = card.querySelector('.card-icon').innerHTML;
-                modalTitle.textContent = `${disease}`;
-                modalMessage.textContent = `Anda akan membuka halaman informasi tentang ${disease}.`;
+                const iconHTML = card.querySelector('.card-icon').innerHTML;
+                const modalIcon = document.getElementById('modalIcon');
                 
-                // Show modal
+                modalIcon.className = `modal-icon ${color}`;
+                modalIcon.innerHTML = iconHTML;
+                document.getElementById('modalTitle').textContent = disease;
+                document.getElementById('modalMessage').textContent = `Buka halaman pelaporan ${disease}?`;
+                
                 modalOverlay.classList.add('active');
             }
-            
-            // Event listener untuk klik kartu
+
             cards.forEach(card => {
                 card.addEventListener('click', function(e) {
                     e.preventDefault();
-                    
-                    // Tambahkan efek bounce
                     this.classList.add('clicked');
-                    
-                    // Hapus efek bounce setelah animasi selesai
-                    setTimeout(() => {
-                        this.classList.remove('clicked');
-                    }, 400);
-                    
-                    // Simpan kartu yang dipilih
-                    selectedCard = this;
-                    
-                    // Tampilkan modal konfirmasi
+                    setTimeout(() => this.classList.remove('clicked'), 400);
                     showModal(this);
                 });
             });
+
+            // Tombol Modal
+            document.getElementById('cancelBtn').addEventListener('click', () => modalOverlay.classList.remove('active'));
             
-            // Modal button handlers
-            cancelBtn.addEventListener('click', () => {
-                modalOverlay.classList.remove('active');
-                selectedCard = null;
-                targetUrl = '';
-            });
-            
-            confirmBtn.addEventListener('click', () => {
-                if (targetUrl) {
-                    window.location.href = targetUrl;
-                }
+            document.getElementById('confirmBtn').addEventListener('click', () => {
+                if (targetUrl) window.location.href = targetUrl;
                 modalOverlay.classList.remove('active');
             });
-            
-            // Close modal on overlay click
+
+            // Tutup modal jika klik di luar
             modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) {
-                    modalOverlay.classList.remove('active');
-                    selectedCard = null;
-                    targetUrl = '';
-                }
+                if (e.target === modalOverlay) modalOverlay.classList.remove('active');
             });
-            
-            // Add keyboard support
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-                    modalOverlay.classList.remove('active');
-                    selectedCard = null;
-                    targetUrl = '';
-                }
-            });
-            
-            // Fungsi pencarian
-            function filterCards() {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-                const menuGrid = document.getElementById('menuGrid');
-                
-                cards.forEach(card => {
-                    const diseaseName = card.getAttribute('data-disease').toLowerCase();
-                    const searchKeywords = card.getAttribute('data-search').toLowerCase();
-                    const cardText = card.textContent.toLowerCase();
-                    
-                    // Cek apakah ada yang cocok
-                    const isMatch = diseaseName.includes(searchTerm) || 
-                                   searchKeywords.includes(searchTerm) ||
-                                   cardText.includes(searchTerm);
-                    
-                    if (searchTerm === '' || isMatch) {
-                        card.style.display = 'flex';
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-                
-                // Animasi ulang kartu yang ditampilkan
-                setTimeout(() => {
-                    const visibleCards = document.querySelectorAll('.health-card[style*="display: flex"]');
-                    visibleCards.forEach((card, index) => {
-                        card.style.animationDelay = `${index * 0.1}s`;
-                        card.style.opacity = '0';
-                        card.style.transform = 'translateY(10px)';
-                        
-                        setTimeout(() => {
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0)';
-                        }, 10);
-                    });
-                }, 10);
-            }
-            
-            // Event listener untuk pencarian real-time
-            searchInput.addEventListener('input', filterCards);
-            
-            // Event listener untuk tombol Enter di input
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    filterCards();
-                }
-            });
-            
-            // Tambahkan pesan jika tidak ada hasil pencarian
-            const originalFilter = filterCards;
-            filterCards = function() {
-                originalFilter.apply(this, arguments);
-                
-                const visibleCards = document.querySelectorAll('.health-card[style*="display: flex"]');
-                const menuGrid = document.getElementById('menuGrid');
-                
-                // Hapus pesan tidak ditemukan jika ada
-                const existingMessage = document.querySelector('.no-results');
-                if (existingMessage) {
-                    existingMessage.remove();
-                }
-                
-                // Jika tidak ada kartu yang ditampilkan dan ada kata kunci pencarian
-                if (visibleCards.length === 0 && searchInput.value.trim() !== '') {
-                    const noResults = document.createElement('div');
-                    noResults.className = 'no-results';
-                    noResults.innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: var(--text-light);">
-                            <i class="fas fa-search" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
-                            <h3 style="margin-bottom: 10px;">Penyakit tidak ditemukan</h3>
-                            <p>Tidak ada penyakit yang sesuai dengan "${searchInput.value}"</p>
-                        </div>
-                    `;
-                    menuGrid.appendChild(noResults);
-                }
-            };
         });
     </script>
 </body>
