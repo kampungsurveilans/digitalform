@@ -46,11 +46,12 @@
             overflow: auto;
         }
 
-        /* --- SPLASH SCREEN STYLES (OPENING) --- */
+        /* --- SPLASH SCREEN STYLES (OPENING) - UPDATE: ELEGANT DARK NAVY --- */
         .splash-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--primary-gradient);
+            /* Latar belakang Biru Gelap (Navy) yang tenang dan profesional */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -66,43 +67,50 @@
 
         .splash-content {
             text-align: center;
-            color: white;
+            color: white; /* Teks putih di latar gelap */
         }
 
-        /* Icon Container mirip gaya kartu tapi lebih besar */
+        /* Icon Container - Update Style: Glassy Dark */
         .splash-icon-box {
             width: 100px;
             height: 100px;
-            background: rgba(255, 255, 255, 0.2);
+            /* Efek kaca transparan putih tipis */
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
             animation: zoomIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .splash-icon {
             font-size: 45px;
-            color: white;
+            /* Ikon Putih dengan efek Glow Biru Muda */
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
             animation: heartbeat 1.5s infinite;
         }
 
         .splash-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.8rem; 
+            font-weight: 800;
             margin-bottom: 5px;
+            color: #ffffff; /* Putih bersih */
+            letter-spacing: 0.5px;
             opacity: 0;
             transform: translateY(20px);
             animation: fadeUp 0.8s ease forwards 0.3s;
         }
 
         .splash-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            color: #94a3b8; /* Abu-abu kebiruan (Slate-400) yang elegan */
             opacity: 0;
-            font-weight: 300;
+            font-weight: 400;
             transform: translateY(20px);
             animation: fadeUp 0.8s ease forwards 0.5s;
         }
@@ -111,22 +119,24 @@
         .loading-dots {
             display: flex;
             gap: 8px;
-            margin-top: 30px;
+            margin-top: 40px;
             justify-content: center;
             opacity: 0;
             animation: fadeIn 0.5s ease forwards 0.8s;
         }
 
         .dot {
-            width: 8px;
-            height: 8px;
-            background: white;
+            width: 10px;
+            height: 10px;
+            background: #38bdf8; /* Biru Langit cerah untuk kontras */
             border-radius: 50%;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
             animation: bounceDot 1.4s infinite ease-in-out both;
         }
 
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
+        .dot:nth-child(1) { animation-delay: -0.32s; opacity: 0.6; }
+        .dot:nth-child(2) { animation-delay: -0.16s; opacity: 0.8; }
+        .dot:nth-child(3) { opacity: 1; }
 
         @keyframes zoomIn {
             from { transform: scale(0); opacity: 0; }
@@ -146,7 +156,7 @@
         }
 
         @keyframes fadeIn {
-            to { opacity: 0.7; }
+            to { opacity: 1; }
         }
 
         @keyframes bounceDot {
@@ -458,8 +468,8 @@
             <div class="splash-icon-box">
                 <i class="fas fa-heartbeat splash-icon"></i>
             </div>
-            <div class="splash-title">SURVEILANS</div>
-            <div class="splash-subtitle">UPT PUSKESMAS KAMPUNG DALAM</div>
+            <div class="splash-title">Surveilans</div>
+            <div class="splash-subtitle">UPT Puskesmas Kampung Dalam</div>
             
             <div class="loading-dots">
                 <div class="dot"></div>
