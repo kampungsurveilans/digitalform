@@ -136,6 +136,11 @@
             border: 1px solid rgba(0, 0, 0, 0.05);
             box-shadow: var(--shadow);
             
+            /* PENGATURAN MOBILE TOUCH - Menghilangkan block highlight */
+            -webkit-tap-highlight-color: transparent; /* Hilangkan kotak biru/abu saat tap */
+            user-select: none; /* Mencegah seleksi teks saat tap cepat */
+            outline: none;
+
             /* Perubahan: Padding lebih kecil & hapus min-height fixed yang terlalu besar */
             padding: 20px 15px; 
             text-align: center;
