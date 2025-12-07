@@ -16,7 +16,8 @@
     
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f172a'/%3E%3Cdefs%3E%3ClinearGradient id='glow' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2338bdf8;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23818cf8;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='%230f172a'/%3E%3Cpath d='M360 232H280V152C280 138.7 269.3 128 256 128C242.7 128 232 138.7 232 152V232H152C138.7 232 128 242.7 128 256C128 269.3 138.7 280 152 280H232V360C232 373.3 242.7 384 256 384C269.3 384 280 373.3 280 360V280H360C373.3 280 384 269.3 384 256C384 242.7 373.3 232 360 232Z' fill='white'/%3E%3C/svg%3E">
 
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiS0FTVVIgKGVtcHVuZyBTdXJ2ZWlsYW5zKSIsInNob3J0X25hbWUiOiJLQVNVUiIsImRlc2NyaXB0aW9uIjoiU2lzdGVtIEluZm9ybWFzaSBLZXNlaGF0YW4gVGVyaW50ZWdyYXNpIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMwZjE3MmEiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sOy4uLiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwic2l6ZXMiOiIxNDR4MTQ0IDE5MngxOTIgNTEyeDUxMiIs" id="manifestLink">
+    <!-- Manifest placeholder, will be updated by JS but we put a minimal valid one here -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiS0FTVVIgKGVtcHVuZyBTdXJ2ZWlsYW5zKSIsInNob3J0X25hbWUiOiJLQVNVUiIsImRlc2NyaXB0aW9uIjoiU2lzdGVtIEluZm9ybWFzaSBLZXNlaGF0YW4gVGVyaW50ZWdyYXNpIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMwZjE3MmEiLCJpY29ucyI6W119" id="manifestLink">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -90,6 +91,17 @@
             display: flex;
             transform: translateX(-50%) translateY(0);
         }
+        
+        /* Tambahan style untuk iOS instruction */
+        .install-banner.ios-mode {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .install-banner.ios-mode .install-content {
+            width: 100%;
+        }
 
         .install-content {
             display: flex;
@@ -107,10 +119,26 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
+            flex-shrink: 0;
         }
 
         .install-text h4 { font-size: 0.95rem; margin-bottom: 2px; }
         .install-text p { font-size: 0.75rem; opacity: 0.7; }
+        .install-instructions {
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            margin-top: 5px;
+            line-height: 1.4;
+            display: none;
+            padding-left: 5px;
+            border-left: 2px solid #38bdf8;
+        }
+        .install-banner.ios-mode .install-instructions {
+            display: block;
+        }
+        .install-banner.ios-mode .install-btn {
+            display: none; /* Hide button on iOS as we show text instructions */
+        }
 
         .install-btn {
             background: white;
@@ -122,6 +150,7 @@
             font-size: 0.85rem;
             cursor: pointer;
             transition: transform 0.2s;
+            white-space: nowrap;
         }
         .install-btn:active { transform: scale(0.95); }
         .close-install { 
@@ -612,8 +641,11 @@
                 <i class="fas fa-download"></i>
             </div>
             <div class="install-text">
-                <h4>Install Aplikasi KASUR</h4>
-                <p>Akses lebih cepat dari Homescreen</p>
+                <h4 id="installTitle">Install Aplikasi KASUR</h4>
+                <p id="installDesc">Akses lebih cepat dari Homescreen</p>
+                <div class="install-instructions">
+                    Tekan tombol <strong>Share</strong> (ikon kotak dengan panah) di browser, lalu pilih <strong>"Tambah ke Layar Utama"</strong> (Add to Home Screen).
+                </div>
             </div>
         </div>
         <button class="install-btn" id="installBtn">Pasang</button>
@@ -768,45 +800,53 @@
     </div>
 
     <script>
-        // --- 1. REGISTER VIRTUAL SERVICE WORKER FOR PWA INSTALLABILITY ---
+        // --- 1. REGISTER VIRTUAL SERVICE WORKER FOR PWA INSTALLABILITY (IMPROVED) ---
+        // Mencoba mendaftarkan Service Worker dari Blob. 
+        // Catatan: Beberapa browser mungkin tetap memblokir A2HS otomatis karena alasan keamanan pada Blob URL.
         if ('serviceWorker' in navigator) {
-            // Kita membuat service worker minimal secara on-the-fly agar memenuhi syarat 'Add to Homescreen'
-            // tanpa perlu file sw.js eksternal.
             const swContent = `
                 self.addEventListener('install', (e) => {
-                    console.log('[SW] Install');
                     self.skipWaiting();
                 });
+                self.addEventListener('activate', (e) => {
+                    e.waitUntil(self.clients.claim());
+                });
                 self.addEventListener('fetch', (e) => {
-                    // Caching strategy bisa ditambahkan di sini, tapi untuk sekarang kita bypass
-                    e.respondWith(fetch(e.request));
+                    e.respondWith(fetch(e.request).catch(() => {
+                        return new Response("Offline (Single File Mode)");
+                    }));
                 });
             `;
             const blob = new Blob([swContent], {type: 'text/javascript'});
             const swUrl = URL.createObjectURL(blob);
             
-            navigator.serviceWorker.register(swUrl)
-                .then(reg => console.log('SW Registered', reg))
+            navigator.serviceWorker.register(swUrl, {scope: './'})
+                .then(reg => console.log('SW Registered'))
                 .catch(err => console.log('SW Failed', err));
         }
 
-        // --- 2. UPDATE MANIFEST DYNAMICALLY (Fix Icon Data URI) ---
-        // Karena manifest Data URI panjang, kita pastikan icon yg benar dipakai
+        // --- 2. UPDATE MANIFEST DYNAMICALLY (Full Valid Manifest) ---
         const iconLink = document.querySelector("link[rel='icon']").href;
         const manifestLink = document.getElementById('manifestLink');
-        // Decode base64 manifest lama, update icon, encode ulang
-        let manifestBase64 = manifestLink.href.replace('data:application/manifest+json;base64,', '');
+
         try {
-            let manifestJson = JSON.parse(atob(manifestBase64));
-            // Update icon di manifest agar sama dengan link icon terbaru
-            manifestJson.icons = [{
-                "src": iconLink,
-                "type": "image/svg+xml",
-                "sizes": "144x144 192x192 512x512",
-                "purpose": "any maskable"
-            }];
-            manifestJson.name = "KASUR (Kampung Surveilans)";
-            manifestJson.short_name = "KASUR";
+            // Kita buat object manifest lengkap
+            const manifestJson = {
+                "name": "KASUR (Kampung Surveilans)",
+                "short_name": "KASUR",
+                "description": "Sistem Informasi Kesehatan Terintegrasi",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#0f172a",
+                "theme_color": "#0f172a",
+                "orientation": "portrait",
+                "icons": [{
+                    "src": iconLink,
+                    "type": "image/svg+xml",
+                    "sizes": "192x192 512x512",
+                    "purpose": "any maskable"
+                }]
+            };
             
             const newBase64 = btoa(JSON.stringify(manifestJson));
             manifestLink.href = 'data:application/manifest+json;base64,' + newBase64;
@@ -822,8 +862,6 @@
 
             if (isStandalone) {
                 // JIKA APLIKASI SUDAH DIINSTALL:
-                // Sembunyikan splash screen HTML segera! Karena HP sudah menampilkan native splash screen.
-                // Ini mencegah efek "Double Splash Screen".
                 splashScreen.style.display = 'none';
                 document.body.classList.add('loaded');
                 
@@ -855,20 +893,19 @@
                 }, 2800);
             }
 
-            // --- 4. INSTALL PROMPT LOGIC ---
+            // --- 4. INSTALL PROMPT LOGIC (ANDROID & iOS SUPPORT) ---
             let deferredPrompt;
             const installBanner = document.getElementById('installBanner');
             const installBtn = document.getElementById('installBtn');
             const closeInstall = document.getElementById('closeInstall');
 
+            // Deteksi iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+            // Logic Android (Chrome/Edge)
             window.addEventListener('beforeinstallprompt', (e) => {
-                // Mencegah browser menampilkan prompt default mini-infobar
                 e.preventDefault();
-                // Simpan event untuk ditrigger nanti
                 deferredPrompt = e;
-                
-                // Tampilkan banner instalasi kita yang keren
-                // Delay sedikit agar tidak menabrak splash screen
                 if (!isStandalone) {
                     setTimeout(() => {
                         installBanner.classList.add('show');
@@ -876,12 +913,18 @@
                 }
             });
 
+            // Logic iOS (Manual Instruction)
+            if (isIOS && !isStandalone) {
+                setTimeout(() => {
+                    installBanner.classList.add('show');
+                    installBanner.classList.add('ios-mode'); // Ubah tampilan untuk iOS
+                }, 4000);
+            }
+
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
                     installBanner.classList.remove('show');
-                    // Tampilkan prompt asli browser
                     deferredPrompt.prompt();
-                    // Tunggu respon user
                     const { outcome } = await deferredPrompt.userChoice;
                     console.log(`User response: ${outcome}`);
                     deferredPrompt = null;
