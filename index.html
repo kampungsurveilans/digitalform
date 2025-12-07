@@ -2,24 +2,20 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Informasi Kesehatan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>KASUR - Kampung Surveilans</title>
     
-    <!-- PWA & MOBILE APP CAPABILITIES -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <meta name="application-name" content="SI Kesehatan">
+    <meta name="application-name" content="KASUR">
+    <meta name="apple-mobile-web-app-title" content="KASUR">
 
-    <!-- GENERATED APP ICON (SVG Data URI) -->
-    <!-- Icon ini menggunakan gradient yang sama dengan tema aplikasi -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236a11cb;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%232575fc;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='url(%23grad)'/%3E%3Cpath fill='white' d='M408.2 147.2c-29.4-32.3-74.8-43.2-117.2-22.7-16.3 7.8-30.8 19.8-42.3 35.1l-2.7 3.6-2.7-3.6c-11.5-15.3-26-27.3-42.3-35.1-42.4-20.5-87.8-9.6-117.2 22.7-29.6 32.5-33.3 80.6-9.6 131.5 21 45.1 63.8 99.9 153.2 173.3 5.4 4.4 12.2 6.8 19.2 6.8s13.8-2.4 19.2-6.8c89.4-73.4 132.2-128.2 153.2-173.3 23.7-50.9 20-99-9.6-131.5zm-47.5 106.1c-13.8 29.7-44.1 71.3-104.7 124.9-60.6-53.6-90.9-95.2-104.7-124.9-15.8-34-11.7-65.4 7.5-86.5 20.3-22.3 52-27.8 80.3-14.1 12.4 6 23.2 16 30.6 28.5 3.3 5.6 9.3 9 15.6 9s12.3-3.4 15.6-9c7.4-12.5 18.2-22.5 30.6-28.5 28.3-13.7 60-8.2 80.3 14.1 19.2 21.1 23.3 52.5 7.5 86.5z'/%3E%3Cpath fill='white' d='M232 248v-48h48v48h48v48h-48v48h-48v-48h-48v-48h48z'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='bgCheck' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%230f172a;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%231e293b;stop-opacity:1' /%3E%3C/linearGradient%3E%3ClinearGradient id='glow' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2338bdf8;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23818cf8;stop-opacity:1' /%3E%3C/linearGradient%3E%3Cfilter id='blurMe'%3E%3CfeGaussianBlur in='SourceGraphic' stdDeviation='5' /%3E%3C/filter%3E%3Cfilter id='innerShadow'%3E%3CfeOffset dx='0' dy='4' /%3E%3CfeGaussianBlur stdDeviation='10' result='offset-blur' /%3E%3CfeComposite operator='out' in='SourceGraphic' in2='offset-blur' result='inverse' /%3E%3CfeFlood flood-color='black' flood-opacity='0.5' result='color' /%3E%3CfeComposite operator='in' in='color' in2='inverse' result='shadow' /%3E%3CfeComposite operator='over' in='shadow' in2='SourceGraphic' /%3E%3C/filter%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='url(%23bgCheck)'/%3E%3Crect x='40' y='40' width='432' height='432' rx='100' fill='none' stroke='url(%23glow)' stroke-width='8' opacity='0.5'/%3E%3Ccircle cx='256' cy='256' r='120' fill='url(%23glow)' filter='url(%23blurMe)' opacity='0.4' /%3E%3Cpath d='M360 232H280V152C280 138.7 269.3 128 256 128C242.7 128 232 138.7 232 152V232H152C138.7 232 128 242.7 128 256C128 269.3 138.7 280 152 280H232V360C232 373.3 242.7 384 256 384C269.3 384 280 373.3 280 360V280H360C373.3 280 384 269.3 384 256C384 242.7 373.3 232 360 232Z' fill='white' filter='url(%23innerShadow)'/%3E%3C/svg%3E">
     
-    <!-- APPLE TOUCH ICON (Untuk iOS Home Screen) -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='white'/%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236a11cb;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%232575fc;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='0' fill='url(%23grad)'/%3E%3Cpath fill='white' d='M256 96c88.4 0 160 71.6 160 160 0 88.4-71.6 160-160 160-88.4 0-160-71.6-160-160 0-88.4 71.6-160 160-160zM224 224v-64h64v64h64v64h-64v64h-64v-64h-64v-64h64z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f172a'/%3E%3Cdefs%3E%3ClinearGradient id='glow' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2338bdf8;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23818cf8;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='120' fill='%230f172a'/%3E%3Cpath d='M360 232H280V152C280 138.7 269.3 128 256 128C242.7 128 232 138.7 232 152V232H152C138.7 232 128 242.7 128 256C128 269.3 138.7 280 152 280H232V360C232 373.3 242.7 384 256 384C269.3 384 280 373.3 280 360V280H360C373.3 280 384 269.3 384 256C384 242.7 373.3 232 360 232Z' fill='white'/%3E%3C/svg%3E">
 
-    <!-- WEB APP MANIFEST (Embedded Data URI untuk Android) -->
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU0kgS2VzZWhhdGFuIiwic2hvcnRfbmFtZSI6IlNJIEtlcyIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjRUVGMkY2IiwidGhlbWVfY29sb3IiOiIjNmExMWNiIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMic%2BJTNDZGVmcyUzRSUzQ2xpbmVhckdyYWRpZW50IGlkPSdncmFkJyB4MT0nMCUyNScgeTE9JzAlMjUnIHgyPScxMDAlMjUnIHkyPScxMDAlMjUnJTNFJTNDc3RvcCBvZmZzZXQ9JzAlMjUnIHN0eWxlPSdzdG9wLWNvbG9yOiM2YTExY2I7c3RvcC1vcGFjaXR5OjEnIC8%2BJTNDc3RvcCBvZmZzZXQ9JzEwMCUyNScgc3R5bGU9J3N0b3AtY29sb3I6IzI1NzVmYztzdG9wLW9wYWNpdHk6MScgLz4lM0MvbGluZWFyR3JhZGllbnQlM0UlM0MvZGVmcyUzRSUzQ3JlY3Qgd2lkdGg9JzUxMicgaGVpZ2h0Rm09JzUxMicgcng9JzEyMCcgZmlsbD0ndXJsKCNncmFkKScvJTNFJTNDcGF0aCBmaWxsPSd3aGl0ZScgZD0nTTI1NiA5NmM4OC40IDAgMTYwIDcxLjYgMTYwIDE2MCAwIDg4LjQtNzEuNiAxNjAtMTYwIDE2MC04OC40IDAtMTYwLTcxLjYtMTYwLTE2MCAwLTg4LjQgNzEuNi0xNjAgMTYwLTE2MHpNMjI0IDIyNHYtNjRoNjR2NjRoNjR2NjRoLTY0djY0aC02NHYtNjRoLTY0di02NGg2NHonLyUzRSUzQy9zdmclM0UiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCIsInNpemVzIjoiNTEyeDUxMiJ9XX0=">
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiS0FTVVIgKGVtcHVuZyBTdXJ2ZWlsYW5zKSIsInNob3J0X25hbWUiOiJLQVNVUiIsImRlc2NyaXB0aW9uIjoiU2lzdGVtIEluZm9ybWFzaSBLZXNlaGF0YW4gVGVyaW50ZWdyYXNpIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMwZjE3MmEiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sOy4uLiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwic2l6ZXMiOiIxNDR4MTQ0IDE5MngxOTIgNTEyeDUxMiIs" id="manifestLink">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -46,6 +42,11 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%; /* Fix bug garis loading */
         }
 
         body {
@@ -54,69 +55,161 @@
             background-size: 24px 24px;
             color: var(--text-dark);
             min-height: 100vh;
-            padding-bottom: 40px;
             /* Mencegah scroll saat splash screen tampil */
             overflow: hidden; 
         }
 
         body.loaded {
             overflow: auto;
+            height: auto;
         }
 
-        /* --- SPLASH SCREEN STYLES (OPENING) - UPDATE: ELEGANT DARK NAVY --- */
+        /* --- INSTALL BANNER STYLES --- */
+        .install-banner {
+            display: none; /* Default hidden */
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 15px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 999;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .install-banner.show {
+            display: flex;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .install-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .install-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .install-text h4 { font-size: 0.95rem; margin-bottom: 2px; }
+        .install-text p { font-size: 0.75rem; opacity: 0.7; }
+
+        .install-btn {
+            background: white;
+            color: #0f172a;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .install-btn:active { transform: scale(0.95); }
+        .close-install { 
+            position: absolute; 
+            top: -10px; right: -10px; 
+            background: #ef4444; 
+            color: white; 
+            width: 24px; height: 24px; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+
+        /* --- SPLASH SCREEN STYLES (OPENING) --- */
         .splash-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             /* Latar belakang Biru Gelap (Navy) yang tenang dan profesional */
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            z-index: 9999;
+            z-index: 99999; /* Z-Index sangat tinggi */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            width: 100vw;
+            height: 100vh;
         }
 
         .splash-screen.hide {
             opacity: 0;
             visibility: hidden;
+            pointer-events: none;
         }
 
         .splash-content {
             text-align: center;
             color: white; /* Teks putih di latar gelap */
+            position: relative;
+            z-index: 2;
         }
 
         /* Icon Container - Update Style: Glassy Dark */
         .splash-icon-box {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             /* Efek kaca transparan putih tipis */
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
+            border-radius: 30px; /* Lebih rounded seperti iOS */
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
+            margin: 0 auto 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); 
             animation: zoomIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Shine effect pada icon */
+        .splash-icon-box::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
         }
 
         .splash-icon {
-            font-size: 45px;
+            font-size: 50px;
             /* Ikon Putih dengan efek Glow Biru Muda */
             color: #ffffff;
-            text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
-            animation: heartbeat 1.5s infinite;
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
+            animation: heartbeat 2s infinite;
         }
 
         .splash-title {
-            font-size: 1.8rem; 
+            font-size: 2.2rem; 
             font-weight: 800;
             margin-bottom: 5px;
-            color: #ffffff; /* Putih bersih */
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: 0.5px;
             opacity: 0;
             transform: translateY(20px);
@@ -124,30 +217,32 @@
         }
 
         .splash-subtitle {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #94a3b8; /* Abu-abu kebiruan (Slate-400) yang elegan */
             opacity: 0;
-            font-weight: 400;
+            font-weight: 500;
             transform: translateY(20px);
             animation: fadeUp 0.8s ease forwards 0.5s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         /* Loading Dots */
         .loading-dots {
             display: flex;
             gap: 8px;
-            margin-top: 40px;
+            margin-top: 50px;
             justify-content: center;
             opacity: 0;
             animation: fadeIn 0.5s ease forwards 0.8s;
         }
 
         .dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: #38bdf8; /* Biru Langit cerah untuk kontras */
             border-radius: 50%;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
             animation: bounceDot 1.4s infinite ease-in-out both;
         }
 
@@ -162,10 +257,10 @@
 
         @keyframes heartbeat {
             0% { transform: scale(1); }
-            14% { transform: scale(1.15); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.15); }
-            70% { transform: scale(1); }
+            10% { transform: scale(1.1); }
+            20% { transform: scale(1); }
+            30% { transform: scale(1.1); }
+            50% { transform: scale(1); }
         }
 
         @keyframes fadeUp {
@@ -174,6 +269,12 @@
 
         @keyframes fadeIn {
             to { opacity: 1; }
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; top: -100%; }
+            50% { left: 200%; top: 200%; }
+            100% { left: 200%; top: 200%; }
         }
 
         @keyframes bounceDot {
@@ -218,10 +319,10 @@
         }
 
         .header h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 800;
             margin-bottom: 5px;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
         }
 
         .header p {
@@ -242,7 +343,7 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 50px;
-            padding: 10px 25px;
+            padding: 12px 25px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
             display: flex;
             align-items: center;
@@ -258,14 +359,14 @@
 
         .search-box i {
             color: #94a3b8;
-            margin-right: 10px;
+            margin-right: 15px;
         }
 
         .search-box input {
             width: 100%;
             border: none;
             background: transparent;
-            padding: 8px 0;
+            padding: 5px 0;
             font-size: 1rem;
             color: var(--text-dark);
             outline: none;
@@ -447,7 +548,7 @@
         /* RESPONSIVE */
         @media (max-width: 768px) {
             .header-wrapper { padding: 30px 20px 70px 20px; border-radius: 0 0 25px 25px; }
-            .header h1 { font-size: 1.6rem; }
+            .header h1 { font-size: 2rem; }
             .menu-grid { grid-template-columns: repeat(3, 1fr); gap: 15px; }
         }
 
@@ -479,14 +580,13 @@
 </head>
 <body>
 
-    <!-- SPLASH SCREEN / OPENING -->
     <div class="splash-screen" id="splashScreen">
         <div class="splash-content">
             <div class="splash-icon-box">
                 <i class="fas fa-heartbeat splash-icon"></i>
             </div>
-            <div class="splash-title">Surveilans</div>
-            <div class="splash-subtitle">UPT Puskesmas Kampung Dalam</div>
+            <div class="splash-title">KASUR</div>
+            <div class="splash-subtitle">Kampung Surveilans</div>
             
             <div class="loading-dots">
                 <div class="dot"></div>
@@ -496,30 +596,41 @@
         </div>
     </div>
 
-    <!-- Header Full Width Background -->
+    <div class="install-banner" id="installBanner">
+        <div class="close-install" id="closeInstall">x</div>
+        <div class="install-content">
+            <div class="install-icon">
+                <i class="fas fa-download"></i>
+            </div>
+            <div class="install-text">
+                <h4>Install Aplikasi KASUR</h4>
+                <p>Akses lebih cepat dari Homescreen</p>
+            </div>
+        </div>
+        <button class="install-btn" id="installBtn">Pasang</button>
+    </div>
+
     <div class="header-wrapper">
         <div class="header-bg-circle circle-1"></div>
         <div class="header-bg-circle circle-2"></div>
         
         <div class="container header-content">
             <header class="header">
-                <h1>Sistem Informasi Kesehatan</h1>
-                <p>Portal Pelaporan & Surveilans Penyakit Menular</p>
+                <h1>KASUR</h1>
+                <p>Kampung Surveilans Terintegrasi</p>
             </header>
         </div>
     </div>
 
     <div class="container">
-        <!-- Search Container Melayang -->
         <div class="search-container">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama penyakit (Cth: DBD, Campak)...">
+                <input type="text" id="searchInput" placeholder="Cari laporan penyakit...">
             </div>
         </div>
 
         <main class="menu-grid" id="menuGrid">
-            <!-- Campak/Rubella -->
             <div class="health-card" data-disease="Campak/Rubella" data-color="campak" data-search="campak rubella measles" data-url="campak.html">
                 <div class="card-icon campak"><i class="fas fa-virus"></i></div>
                 <div class="card-content">
@@ -528,7 +639,6 @@
                 </div>
             </div>
 
-            <!-- Difteri -->
             <div class="health-card" data-disease="Difteri" data-color="difteri" data-search="difteri diphtheria" data-url="difteri.html">
                 <div class="card-icon difteri"><i class="fas fa-lungs-virus"></i></div>
                 <div class="card-content">
@@ -537,7 +647,6 @@
                 </div>
             </div>
 
-            <!-- AFP -->
             <div class="health-card" data-disease="AFP" data-color="afp" data-search="afp acute flaccid paralysis polio kelumpuhan" data-url="afp.html">
                 <div class="card-icon afp"><i class="fas fa-procedures"></i></div>
                 <div class="card-content">
@@ -546,7 +655,6 @@
                 </div>
             </div>
 
-            <!-- Tetanus -->
             <div class="health-card" data-disease="Tetanus Neonatorum" data-color="tetanus" data-search="tetanus neonatorum kejang bayi" data-url="tetanus.html">
                 <div class="card-icon tetanus"><i class="fas fa-baby"></i></div>
                 <div class="card-content">
@@ -555,7 +663,6 @@
                 </div>
             </div>
 
-            <!-- Pertusis -->
             <div class="health-card" data-disease="Pertusis" data-color="pertusis" data-search="pertusis batuk rejan whooping cough" data-url="pertusis.html">
                 <div class="card-icon pertusis"><i class="fas fa-head-side-cough"></i></div>
                 <div class="card-content">
@@ -564,7 +671,6 @@
                 </div>
             </div>
 
-            <!-- DBD -->
             <div class="health-card" data-disease="DBD" data-color="dbd" data-search="dbd demam berdarah dengue nyamuk" data-url="dbd.html">
                 <div class="card-icon dbd"><i class="fas fa-mosquito"></i></div>
                 <div class="card-content">
@@ -579,7 +685,6 @@
         </footer>
     </div>
 
-    <!-- Modal Layout -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modal">
             <div class="modal-icon" id="modalIcon"></div>
@@ -593,34 +698,138 @@
     </div>
 
     <script>
+        // --- 1. REGISTER VIRTUAL SERVICE WORKER FOR PWA INSTALLABILITY ---
+        if ('serviceWorker' in navigator) {
+            // Kita membuat service worker minimal secara on-the-fly agar memenuhi syarat 'Add to Homescreen'
+            // tanpa perlu file sw.js eksternal.
+            const swContent = `
+                self.addEventListener('install', (e) => {
+                    console.log('[SW] Install');
+                    self.skipWaiting();
+                });
+                self.addEventListener('fetch', (e) => {
+                    // Caching strategy bisa ditambahkan di sini, tapi untuk sekarang kita bypass
+                    e.respondWith(fetch(e.request));
+                });
+            `;
+            const blob = new Blob([swContent], {type: 'text/javascript'});
+            const swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl)
+                .then(reg => console.log('SW Registered', reg))
+                .catch(err => console.log('SW Failed', err));
+        }
+
+        // --- 2. UPDATE MANIFEST DYNAMICALLY (Fix Icon Data URI) ---
+        // Karena manifest Data URI panjang, kita pastikan icon yg benar dipakai
+        const iconLink = document.querySelector("link[rel='icon']").href;
+        const manifestLink = document.getElementById('manifestLink');
+        // Decode base64 manifest lama, update icon, encode ulang
+        let manifestBase64 = manifestLink.href.replace('data:application/manifest+json;base64,', '');
+        try {
+            let manifestJson = JSON.parse(atob(manifestBase64));
+            // Update icon di manifest agar sama dengan link icon terbaru
+            manifestJson.icons = [{
+                "src": iconLink,
+                "type": "image/svg+xml",
+                "sizes": "144x144 192x192 512x512",
+                "purpose": "any maskable"
+            }];
+            manifestJson.name = "KASUR (Kampung Surveilans)";
+            manifestJson.short_name = "KASUR";
+            
+            const newBase64 = btoa(JSON.stringify(manifestJson));
+            manifestLink.href = 'data:application/manifest+json;base64,' + newBase64;
+        } catch (e) { console.error("Manifest update error", e); }
+
+
         document.addEventListener('DOMContentLoaded', function() {
-            // --- SPLASH SCREEN LOGIC ---
+            // --- 3. SPLASH SCREEN LOGIC & DOUBLE SPLASH FIX ---
             const splashScreen = document.getElementById('splashScreen');
             
-            // Simulasikan loading aplikasi selama 3 detik
-            setTimeout(() => {
-                splashScreen.classList.add('hide');
-                document.body.classList.add('loaded'); // Aktifkan scroll kembali
-            }, 3000);
+            // Cek apakah aplikasi berjalan dalam mode Standalone (Sudah diinstall)
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-            // --- MAIN APP LOGIC ---
-            const cards = document.querySelectorAll('.health-card');
+            if (isStandalone) {
+                // JIKA APLIKASI SUDAH DIINSTALL:
+                // Sembunyikan splash screen HTML segera! Karena HP sudah menampilkan native splash screen.
+                // Ini mencegah efek "Double Splash Screen".
+                splashScreen.style.display = 'none';
+                document.body.classList.add('loaded');
+                
+                // Pastikan kartu-kartu langsung muncul tanpa animasi delay
+                const cards = document.querySelectorAll('.health-card');
+                cards.forEach(card => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                });
+
+            } else {
+                // JIKA DI BROWSER:
+                // Tampilkan animasi splash screen normal
+                setTimeout(() => {
+                    splashScreen.classList.add('hide');
+                    document.body.classList.add('loaded'); // Aktifkan scroll kembali
+                }, 3000);
+
+                // Animasi Masuk Kartu
+                const cards = document.querySelectorAll('.health-card');
+                setTimeout(() => {
+                    cards.forEach((card, index) => {
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 100 * index);
+                    });
+                }, 2800);
+            }
+
+            // --- 4. INSTALL PROMPT LOGIC ---
+            let deferredPrompt;
+            const installBanner = document.getElementById('installBanner');
+            const installBtn = document.getElementById('installBtn');
+            const closeInstall = document.getElementById('closeInstall');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Mencegah browser menampilkan prompt default mini-infobar
+                e.preventDefault();
+                // Simpan event untuk ditrigger nanti
+                deferredPrompt = e;
+                
+                // Tampilkan banner instalasi kita yang keren
+                // Delay sedikit agar tidak menabrak splash screen
+                if (!isStandalone) {
+                    setTimeout(() => {
+                        installBanner.classList.add('show');
+                    }, 4000);
+                }
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    installBanner.classList.remove('show');
+                    // Tampilkan prompt asli browser
+                    deferredPrompt.prompt();
+                    // Tunggu respon user
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response: ${outcome}`);
+                    deferredPrompt = null;
+                }
+            });
+
+            closeInstall.addEventListener('click', () => {
+                installBanner.classList.remove('show');
+            });
+
+
+            // --- MAIN APP LOGIC (Search & Modal) ---
             const searchInput = document.getElementById('searchInput');
             const menuGrid = document.getElementById('menuGrid');
             const modalOverlay = document.getElementById('modalOverlay');
+            const cards = document.querySelectorAll('.health-card'); // Re-select
             
             let targetUrl = '';
-
-            // Animasi Masuk Kartu (Dijalankan setelah splash screen hilang agar smooth)
-            setTimeout(() => {
-                cards.forEach((card, index) => {
-                    card.style.opacity = '0';
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, 100 * index);
-                });
-            }, 2800); // Mulai animasi sedikit sebelum splash screen benar-benar hilang
 
             // Logic Pencarian
             function filterCards() {
@@ -644,7 +853,7 @@
                 if (!hasResults && term !== '') {
                     const noResults = document.createElement('div');
                     noResults.className = 'no-results';
-                    noResults.innerHTML = `<i class="fas fa-folder-open" style="font-size: 32px; opacity: 0.3; margin-bottom: 10px; color:var(--text-dark)"></i><p>Penyakit tidak ditemukan</p>`;
+                    noResults.innerHTML = `<i class="fas fa-folder-open" style="font-size: 32px; opacity: 0.3; margin-bottom: 10px; color:var(--text-dark)"></i><p>Data tidak ditemukan</p>`;
                     menuGrid.appendChild(noResults);
                 }
             }
@@ -665,7 +874,7 @@
                 modalIcon.innerHTML = iconHTML;
                 
                 document.getElementById('modalTitle').textContent = disease;
-                document.getElementById('modalMessage').textContent = `Lanjutkan mengisi laporan untuk ${disease}?`;
+                document.getElementById('modalMessage').textContent = `Buka formulir pelaporan untuk ${disease}?`;
                 
                 modalOverlay.classList.add('active');
             }
