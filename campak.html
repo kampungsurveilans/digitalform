@@ -377,6 +377,7 @@
                 headers = Object.keys(data[0]);
                 csvRows = data.map(item => headers.map(header => `"${String(item[header]||'').replace(/"/g, '""')}"`).join(","));
             } else {
+                // PERBAIKAN POINT 2: Format CSV sesuai urutan pertanyaan formulir
                 headers = [
                     "Nomor EPID", "Status", "Nama Kasus", "Jenis Kelamin", "Tanggal Lahir", 
                     "Alamat", "Kabupaten", "Kecamatan", "Kelurahan", "RT", "RW", 
@@ -683,26 +684,8 @@
             </div>
         );
 
+        // PERBAIKAN POINT 4: Step1 tanpa fitur membuat nomor EPID manual
         const Step1 = ({ data, onChange, onSumberChange, Icons }) => {
-            const [showManualEPID, setShowManualEPID] = useState(false);
-            const [epidValidation, setEpidValidation] = useState({ valid: true, message: '' });
-
-            const handleEPIDChange = (e) => {
-                const value = e.target.value.toUpperCase();
-                const validation = validateManualEPID(value);
-                setEpidValidation(validation);
-                onChange(e);
-            };
-
-            const toggleManualEPID = () => {
-                setShowManualEPID(!showManualEPID);
-                if (!showManualEPID) {
-                    onChange({ target: { name: 'nomorEPID', value: '' } });
-                } else {
-                    onChange({ target: { name: 'nomorEPID', value: data.nomorEPID || '' } });
-                }
-            };
-
             return (
                 <div className="animate-fadeIn">
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100 mb-8">
@@ -710,69 +693,13 @@
                             <div>
                                 <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2 text-micro">Nomor EPID</p>
                                 <p className="text-2xl font-mono font-bold text-blue-700 tracking-tight">
-                                    {data.nomorEPID || 'Akan dibuat saat formulir difinalkan'}
+                                    {data.nomorEPID || 'Akan dibuat otomatis saat formulir difinalkan'}
                                 </p>
                             </div>
                             <Icons.FileText className="text-blue-300 w-10 h-10"/>
                         </div>
-                        
-                        <div className="mt-4">
-                            <label className="flex items-center cursor-pointer mb-3">
-                                <input 
-                                    type="checkbox" 
-                                    checked={showManualEPID} 
-                                    onChange={toggleManualEPID}
-                                    className="w-4 h-4 accent-blue-600 rounded mr-2"
-                                />
-                                <span className="text-sm font-medium text-slate-700">Isi nomor EPID manual</span>
-                            </label>
-                            
-                            {showManualEPID && (
-                                <div className="bg-white p-4 rounded-lg border border-blue-200 animate-fadeIn">
-                                    <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2 text-micro">
-                                        Nomor EPID Manual
-                                    </label>
-                                    <div className="flex gap-2">
-                                        <input 
-                                            type="text" 
-                                            name="nomorEPID" 
-                                            value={data.nomorEPID || ''}
-                                            onChange={handleEPIDChange}
-                                            placeholder="C-140125001"
-                                            className={`flex-1 p-3 font-mono rounded-lg border ${
-                                                epidValidation.valid 
-                                                    ? 'border-blue-300 focus:ring-2 focus:ring-blue-500' 
-                                                    : 'border-red-300 focus:ring-2 focus:ring-red-500'
-                                            } outline-none`}
-                                        />
-                                        <button 
-                                            type="button"
-                                            onClick={() => {
-                                                onChange({ target: { name: 'nomorEPID', value: '' } });
-                                                setEpidValidation({ valid: true, message: '' });
-                                            }}
-                                            className="px-4 py-3 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition font-medium"
-                                        >
-                                            Clear
-                                        </button>
-                                    </div>
-                                    {!epidValidation.valid && (
-                                        <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                                            <Icons.AlertTriangle className="w-3 h-3" />
-                                            {epidValidation.message}
-                                        </p>
-                                    )}
-                                    <p className="text-slate-500 text-xs mt-2">
-                                        Format: C-140125XXX (contoh: C-140125001)
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                        
-                        <p className="text-sm text-slate-500 mt-2">
-                            {showManualEPID 
-                                ? 'Pastikan nomor EPID tidak duplikat dengan data lain.' 
-                                : 'Nomor EPID otomatis akan dibuat saat formulir diselesaikan.'}
+                        <p className="text-sm text-blue-600 font-medium">
+                            Nomor EPID akan dibuat otomatis saat formulir difinalisasi.
                         </p>
                     </div>
                     
@@ -1100,7 +1027,6 @@
                             )}
                         </button>
                     </div>
-                    <p className="text-sm text-slate-500 mt-3 ml-1">Perekam Titik Koordinasi - Pastikan Anda berada di lokasi pasien.</p>
                 </div>
 
                 <div className="mt-10 pt-6 border-t border-slate-200">
@@ -1114,7 +1040,7 @@
                                 <div>
                                     <h4 className="font-bold text-slate-800 mb-1">Simpan ke Pending Form</h4>
                                     <p className="text-sm text-slate-600">
-                                        Formulir akan masuk ke menu <strong>Pending Form</strong>.
+                                        Formulir akan masuk ke <strong>Pending Form</strong>.
                                     </p>
                                 </div>
                             </div>
@@ -1133,10 +1059,11 @@
                                     <Icons.CheckCircle className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-slate-800 mb-1">Simpan & Langsung Finalisasi</h4>
-                                    <p className="text-sm text-slate-600">
-                                        Formulir akan masuk ke menu <strong>Form Final</strong>.
+                                    <h4 className="font-bold text-slate-800 mb-1">Simpan & Langsung Finalisasi</h4> <p className="text-sm text-slate-600">
+                                        Formulir akan masuk ke <strong>Form Final</strong>.
                                     </p>
+                                    
+                                    
                                 </div>
                             </div>
                             <button 
@@ -1147,17 +1074,6 @@
                                 <Icons.Check className="w-4 h-4" /> Simpan & Finalisasi
                             </button>
                         </div>
-                    </div>
-                    
-                    <div className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <p className="text-sm text-slate-600">
-                            <span className="font-bold">Keterangan:</span> 
-                            <ul className="list-disc list-inside mt-1 space-y-1 text-xs">
-                                <li><strong>Pending Form</strong> jika data sudah diisi tapi ingin ditinjau kembali nanti atau belum yakin</li>
-                                <li><strong>Finalisasi</strong> jika data sudah lengkap dan yakin, formulir langsung masuk ke Form Final</li>
-                                
-                            </ul>
-                        </p>
                     </div>
                 </div>
             </div>
@@ -1220,12 +1136,19 @@
             const [itemToView, setItemToView] = useState(null);
             const [itemToTransfer, setItemToTransfer] = useState(null);
             
-            // PERBAIKAN POINT 1: State untuk modal konfirmasi finalisasi
             const [showFinalizeModal, setShowFinalizeModal] = useState(false);
             const [itemToFinalize, setItemToFinalize] = useState(null);
             
             const [showRejectModal, setShowRejectModal] = useState(false);
             const [itemToReject, setItemToReject] = useState(null);
+            
+            const [showUnfinalizeModal, setShowUnfinalizeModal] = useState(false);
+            const [itemToUnfinalize, setItemToUnfinalize] = useState(null);
+            
+            // PERBAIKAN POINT 3: State untuk modal edit nomor EPID
+            const [showEditEpidModal, setShowEditEpidModal] = useState(false);
+            const [itemToEditEpid, setItemToEditEpid] = useState(null);
+            const [newEpidNumber, setNewEpidNumber] = useState('');
             
             const [draftsList, setDraftsList] = useState([]);
             const [pendingList, setPendingList] = useState([]);
@@ -1290,7 +1213,6 @@
                 init(); 
             }, [view, currentUser]);
 
-            // PERBAIKAN UTAMA: Fungsi loadDataForView yang sudah diperbaiki
             const loadDataForView = async () => {
                 if (!currentUser) return;
                 
@@ -1337,8 +1259,6 @@
                         if (isCreatedByMe && hasBeenShared && notToMyself) {
                             const currentOwner = determineCurrentOwner(i);
                             
-                            // PERBAIKAN: Formulir keluar hanya jika status Dalam Proses atau Ditolak
-                            // DAN current owner masih saya (belum diterima)
                             if ((i.statusData === 'Dalam Proses' || i.statusData === 'Ditolak') && 
                                 currentOwner === currentUser.unitName) {
                                 return true;
@@ -1356,8 +1276,6 @@
                         const isInProcess = i.statusData === 'Dalam Proses';
                         const currentOwner = determineCurrentOwner(i);
                         
-                        // PERBAIKAN: Tampilkan jika ditujukan ke saya dan masih dalam proses
-                        // dan current owner BUKAN saya (artinya belum diterima)
                         if (isSharedToMe && isInProcess && currentOwner !== currentUser.unitName) {
                             return true;
                         }
@@ -1527,7 +1445,6 @@
                 setShowTransferModal(true);
             };
 
-            // PERBAIKAN UTAMA: confirmShare dengan logika chain referral yang benar
             const confirmShare = async (target) => {
                 if (!target || target === currentUser.unitName) {
                     showNotification('Tidak dapat mengirim ke diri sendiri', 'error');
@@ -1538,7 +1455,6 @@
                 setShowShareModal(false);
                 
                 try {
-                    // PERBAIKAN: Saat mengirim, ownership tetap pada pengirim saat ini
                     const transferRecord = createTransferRecord(
                         'dikirim', 
                         currentUser.unitName, 
@@ -1550,7 +1466,6 @@
                         statusData: 'Dalam Proses', 
                         sharedTo: target, 
                         updatedAt: Date.now(),
-                        // CURRENT OWNER TETAP SAMA (pengirim saat ini)
                         currentOwner: itemToShare.currentOwner || determineCurrentOwner(itemToShare),
                         transferHistory: [...(itemToShare.transferHistory || []), transferRecord]
                     };
@@ -1567,7 +1482,6 @@
                 }
             };
             
-            // PERBAIKAN UTAMA: confirmTransfer dengan logika chain referral yang benar
             const confirmTransfer = async (target) => {
                 if (!target || target === currentUser.unitName) {
                     showNotification('Tidak dapat meneruskan ke diri sendiri', 'error');
@@ -1578,7 +1492,6 @@
                 setShowTransferModal(false);
                 
                 try {
-                    // Saat meneruskan dari Inbox, current owner tetap sama (masih pengirim asli)
                     const transferRecord = createTransferRecord(
                         'diteruskan', 
                         currentUser.unitName, 
@@ -1590,7 +1503,6 @@
                         statusData: 'Dalam Proses',
                         sharedTo: target,
                         updatedAt: Date.now(),
-                        // PERBAIKAN: Current owner tetap pengirim sebelumnya
                         currentOwner: itemToTransfer.currentOwner || determineCurrentOwner(itemToTransfer),
                         transferHistory: [...(itemToTransfer.transferHistory || []), transferRecord]
                     };
@@ -1607,22 +1519,20 @@
                 }
             };
             
-            // PERBAIKAN UTAMA: handleAcceptTransfer dengan logika chain referral yang benar
             const handleAcceptTransfer = async (item) => { 
                 showLoading(true); 
                 try {
-                    // PERBAIKAN: Saat menerima, ownership berpindah ke penerima
                     const transferRecord = createTransferRecord(
                         'diterima',
                         item.currentOwner || item.createdUnit,
                         currentUser.unitName,
-                        currentUser.unitName // New owner - OWNERSHIP BERPINDAH
+                        currentUser.unitName
                     );
                     
                     const up = { 
                         ...item, 
                         statusData: 'Pending',
-                        currentOwner: currentUser.unitName, // OWNERSHIP BERPINDAH
+                        currentOwner: currentUser.unitName,
                         updatedAt: Date.now(),
                         transferHistory: [...(item.transferHistory || []), transferRecord]
                     }; 
@@ -1639,7 +1549,6 @@
                 }
             };
             
-            // PERBAIKAN UTAMA: handleRejectTransfer dengan logika chain referral yang benar
             const handleRejectTransfer = (item) => { 
                 setItemToReject(item);
                 setShowRejectModal(true);
@@ -1650,17 +1559,15 @@
                 
                 showLoading(true); 
                 try {
-                    // PERBAIKAN: Saat menolak, form kembali ke pengirim TERAKHIR
                     const transferRecord = createTransferRecord(
                         'ditolak',
                         currentUser.unitName,
-                        itemToReject.currentOwner || itemToReject.createdUnit // Kembali ke current owner sebelumnya
+                        itemToReject.currentOwner || itemToReject.createdUnit
                     );
                     
                     const up = { 
                         ...itemToReject, 
                         statusData: 'Ditolak', 
-                        // PERBAIKAN: Current owner tetap pengirim sebelumnya (tidak berubah)
                         currentOwner: itemToReject.currentOwner || determineCurrentOwner(itemToReject),
                         updatedAt: Date.now(),
                         transferHistory: [...(itemToReject.transferHistory || []), transferRecord]
@@ -1679,13 +1586,11 @@
                 }
             };
 
-            // PERBAIKAN POINT 1: Fungsi untuk membuka modal konfirmasi finalisasi
             const handleFinalizeFromPending = (item) => {
                 setItemToFinalize(item);
                 setShowFinalizeModal(true);
             };
 
-            // PERBAIKAN POINT 1: Fungsi untuk konfirmasi finalisasi
             const confirmFinalize = async () => {
                 if (!itemToFinalize) return;
                 
@@ -1693,7 +1598,6 @@
                 try {
                     let finalData = { ...itemToFinalize };
                     
-                    // Generate nomor EPID jika belum ada dan tidak manual
                     if (!finalData.nomorEPID && !finalData.epidManual) {
                         finalData.nomorEPID = await generateAutoEPID();
                         finalData.epidManual = false;
@@ -1701,7 +1605,6 @@
                         finalData.epidManual = true;
                     }
                     
-                    // Update status
                     finalData.updatedAt = Date.now();
                     finalData.statusData = 'Final';
                     finalData.sharedTo = '';
@@ -1716,6 +1619,85 @@
                 } catch (e) { 
                     showLoading(false); 
                     showNotification('Error menyimpan: ' + e.message, 'error'); 
+                } finally {
+                    showLoading(false);
+                }
+            };
+
+            const handleUnfinalizeForm = (item) => {
+                setItemToUnfinalize(item);
+                setShowUnfinalizeModal(true);
+            };
+
+            const confirmUnfinalize = async () => {
+                if (!itemToUnfinalize) return;
+                
+                showLoading(true);
+                try {
+                    const currentOwner = determineCurrentOwner(itemToUnfinalize);
+                    
+                    const transferRecord = createTransferRecord(
+                        'dibatalkan_finalisasi',
+                        'admin',
+                        currentOwner
+                    );
+                    
+                    const up = {
+                        ...itemToUnfinalize,
+                        statusData: 'Pending',
+                        updatedAt: Date.now(),
+                        currentOwner: currentOwner,
+                        transferHistory: [...(itemToUnfinalize.transferHistory || []), transferRecord]
+                    };
+                    
+                    await mockDB.save(up);
+                    await loadDataForView();
+                    setShowUnfinalizeModal(false);
+                    setItemToUnfinalize(null);
+                    showNotification('Formulir berhasil dibatalkan finalisasi! Kembali ke Pending Form ' + currentOwner, 'success');
+                } catch (e) {
+                    console.error("Error unfinalizing form:", e);
+                    showNotification('Error membatalkan finalisasi: ' + e.message, 'error');
+                } finally {
+                    showLoading(false);
+                }
+            };
+
+            // PERBAIKAN POINT 3: Fungsi untuk handle edit nomor EPID
+            const handleEditEpidForm = (item) => {
+                setItemToEditEpid(item);
+                setNewEpidNumber(item.nomorEPID || '');
+                setShowEditEpidModal(true);
+            };
+
+            // PERBAIKAN POINT 3: Fungsi untuk confirm edit nomor EPID
+            const confirmEditEpid = async () => {
+                if (!itemToEditEpid) return;
+                
+                const validation = validateManualEPID(newEpidNumber);
+                if (!validation.valid) {
+                    showNotification(validation.message, 'error');
+                    return;
+                }
+                
+                showLoading(true);
+                try {
+                    const up = {
+                        ...itemToEditEpid,
+                        nomorEPID: newEpidNumber,
+                        epidManual: true,
+                        updatedAt: Date.now()
+                    };
+                    
+                    await mockDB.save(up);
+                    await loadDataForView();
+                    setShowEditEpidModal(false);
+                    setItemToEditEpid(null);
+                    setNewEpidNumber('');
+                    showNotification('Nomor EPID berhasil diubah!', 'success');
+                } catch (e) {
+                    console.error("Error editing EPID:", e);
+                    showNotification('Error mengubah nomor EPID: ' + e.message, 'error');
                 } finally {
                     showLoading(false);
                 }
@@ -1917,14 +1899,6 @@
                     return;
                 }
                 
-                if (formData.nomorEPID && formData.epidManual) {
-                    const validation = validateManualEPID(formData.nomorEPID);
-                    if (!validation.valid) {
-                        showNotification(validation.message, 'error');
-                        return;
-                    }
-                }
-                
                 showLoading(true); 
                 try { 
                     let finalData = { ...formData };
@@ -2060,6 +2034,8 @@
                     loadDataForView={loadDataForView} 
                     ALL_SERVICES={ALL_SERVICES}
                     onViewForm={handleViewForm}
+                    onUnfinalizeForm={handleUnfinalizeForm}
+                    onEditEpidForm={handleEditEpidForm}
                     showAdminDeleteUserModal={showAdminDeleteUserModal}
                     setShowAdminDeleteUserModal={setShowAdminDeleteUserModal}
                     adminUserToDelete={adminUserToDelete}
@@ -2188,20 +2164,6 @@
                                         </div>
                                     )}
                                 </button>
-                            </div>
-                            
-                            <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                                <p className="text-blue-700 text-sm font-medium">
-                                    <span className="font-bold">Workflow Sistem Rujukan:</span> 
-                                    <ul className="list-disc list-inside mt-2 space-y-1">
-                                        <li><strong>Buat Form Baru:</strong> Pilih "Simpan ke Pending Form" atau "Simpan & Langsung Finalisasi"</li>
-                                        <li><strong>Pending Form:</strong> Area transit untuk formulir yang perlu verifikasi ulang</li>
-                                        <li><strong>Form Final:</strong> Formulir yang sudah final</li>
-                                        <li><strong>Inbox:</strong> Formulir dari unit lain HARUS melalui Pending Form terlebih dahulu</li>
-                                        <li><strong>Fast Track:</strong> Formulir buatan sendiri bisa langsung final tanpa verifikasi</li>
-                                        <li><strong>Form Ditolak:</strong> Formulir yang ditolak oleh unit lain dapat diedit dan dikirim ulang</li>
-                                    </ul>
-                                </p>
                             </div>
                             
                             <div className="mt-10 text-center">
@@ -2347,6 +2309,7 @@
                     />
                 );
                 
+                // PERBAIKAN POINT 5: Form Final List View dengan pencarian dan pagination
                 if (view === 'form-final') return (
                     <FormFinalListView 
                         title="Form Final" 
@@ -2493,7 +2456,50 @@
                         />
                     )}
                     
-                    {/* PERBAIKAN POINT 1: Modal Konfirmasi Finalisasi */}
+                    {/* PERBAIKAN POINT 3: Modal Edit Nomor EPID */}
+                    {showEditEpidModal && (
+                        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
+                                <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Icons.Edit className="w-8 h-8" />
+                                </div>
+                                <h3 className="font-bold text-xl mb-2 text-blue-600">Edit Nomor EPID</h3>
+                                <p className="text-slate-500 mb-4 text-body">
+                                    Formulir: <strong>{itemToEditEpid?.namaKasus || 'Tanpa Nama'}</strong>
+                                </p>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-semibold text-slate-600 mb-2">Nomor EPID Baru</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-center"
+                                        value={newEpidNumber}
+                                        onChange={(e) => setNewEpidNumber(e.target.value.toUpperCase())}
+                                        placeholder="C-140125001"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-1">Format: C-140125XXX</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button 
+                                        onClick={() => {
+                                            setShowEditEpidModal(false);
+                                            setItemToEditEpid(null);
+                                            setNewEpidNumber('');
+                                        }} 
+                                        className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button 
+                                        onClick={confirmEditEpid} 
+                                        className="flex-1 p-3.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                                    >
+                                        Simpan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
                     {showFinalizeModal && (
                         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
                             <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
@@ -2504,11 +2510,6 @@
                                 <p className="text-slate-500 mb-4 text-body">
                                     Apakah Anda yakin data ini sudah valid dan ingin difinalisasi?
                                 </p>
-                                <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                                    <p className="text-sm text-amber-700 font-medium">
-                                        Formulir akan dipindahkan ke <strong>Form Final</strong> dan tidak dapat diedit lagi.
-                                    </p>
-                                </div>
                                 <div className="flex gap-3">
                                     <button 
                                         onClick={() => {
@@ -2530,8 +2531,43 @@
                         </div>
                     )}
                     
-                   
-
+                    {showUnfinalizeModal && (
+                        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
+                                <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Icons.AlertTriangle className="w-8 h-8" />
+                                </div>
+                                <h3 className="font-bold text-xl mb-2 text-amber-600">Batalkan Finalisasi?</h3>
+                                <p className="text-slate-500 mb-4 text-body">
+                                    Formulir akan dikembalikan ke Pending Form current owner.
+                                </p>
+                                <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                                    <p className="text-sm text-amber-700 font-medium">
+                                        Status: <strong>Pending</strong><br/>
+                                        Current Owner: <strong>{itemToUnfinalize ? determineCurrentOwner(itemToUnfinalize) : ''}</strong>
+                                    </p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button 
+                                        onClick={() => {
+                                            setShowUnfinalizeModal(false);
+                                            setItemToUnfinalize(null);
+                                        }} 
+                                        className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button 
+                                        onClick={confirmUnfinalize} 
+                                        className="flex-1 p-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                                    >
+                                        Ya, Batalkan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
                     {showTransferModal && <SharePuskesmasModalWithSearch servicesList={ALL_SERVICES} currentUnit={currentUser?.unitName} onConfirm={confirmTransfer} onCancel={() => setShowTransferModal(false)} />}
                     
                     {showRejectModal && (
@@ -2621,7 +2657,6 @@
             </div>
         );
 
-        // PERBAIKAN POINT 2: PendingListView dengan responsivitas mobile
         const PendingListView = ({ title, data, type, onBack, onView, onEdit, onFinalize, onShare, onDelete, Icons, showDeleteModal, setShowDeleteModal, handleDelete, showShareModal, setShowShareModal, confirmShare, notification, loading, ALL_SERVICES, currentUser, count }) => {
             const getStatusBadge = (status, isFromOtherUnit = false) => {
                 const statusColors = {
@@ -2701,7 +2736,6 @@
                                                 </span>
                                             </p>
                                             
-                                            {/* PERBAIKAN POINT 2: Tombol responsif untuk mobile */}
                                             <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-4 mobile-button-group">
                                                 <button 
                                                     onClick={() => onView(item)} 
@@ -2722,7 +2756,6 @@
                                                     <Icons.Edit className="w-4 h-4"/> Edit
                                                 </button>
                                                 
-                                                {/* PERBAIKAN POINT 1: Tombol Finalisasi dengan modal konfirmasi */}
                                                 <button 
                                                     onClick={() => isCurrentOwner ? onFinalize(item) : null} 
                                                     disabled={!isCurrentOwner}
@@ -2736,16 +2769,16 @@
                                                 </button>
                                                 
                                                 <button 
-  onClick={() => isCurrentOwner ? onShare(item) : null} 
-  disabled={!isCurrentOwner || isFromOtherUnit}
-  className={`flex-1 min-w-[120px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${
-    (isCurrentOwner && !isFromOtherUnit)
-      ? 'bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-600 border border-purple-100 hover:border-purple-200 hover:bg-purple-100' 
-      : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-  }`}
->
-  <Icons.Share className="w-4 h-4"/> Bagikan
-</button>
+                                                    onClick={() => isCurrentOwner ? onShare(item) : null} 
+                                                    disabled={!isCurrentOwner || isFromOtherUnit}
+                                                    className={`flex-1 min-w-[120px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${
+                                                        (isCurrentOwner && !isFromOtherUnit)
+                                                            ? 'bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-600 border border-purple-100 hover:border-purple-200 hover:bg-purple-100' 
+                                                            : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                                                    }`}
+                                                >
+                                                    <Icons.Share className="w-4 h-4"/> Bagikan
+                                                </button>
                                                 
                                                 <button 
                                                     onClick={() => onDelete(item)} 
@@ -2754,32 +2787,11 @@
                                                     <Icons.Trash className="w-4.5 h-4.5"/>
                                                 </button>
                                             </div>
-                                            
-                                            {isFromOtherUnit && (
-                                                <div className="mt-4 pt-4 border-t border-slate-100">
-                                                    <p className="text-xs text-amber-700 font-medium">
-                                                        <span className="font-bold">Formulir dari unit lain:</span> Lakukan verifikasi/penyelidikan epidemiologi sebelum difinalkan atau dibagikan.
-                                                    </p>
-                                                </div>
-                                            )}
                                         </div>
                                     );
                                 })}
                             </div>
                         )}
-                        
-                        <div className="mt-8 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100">
-                            <p className="text-amber-700 text-sm font-medium">
-                                <span className="font-bold">Tentang Pending Form:</span> 
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Area transit untuk formulir yang perlu verifikasi ulang</li>
-                                    <li>Berisi campuran formulir buatan sendiri dan dari unit lain</li>
-                                    <li>Formulir dari unit lain HARUS melalui Pending Form sebelum difinalkan</li>
-                                    <li>Formulir buatan sendiri bisa langsung difinalkan (Fast Track) atau melalui Pending Form</li>
-                                    <li>Lakukan penyelidikan epidemiologi sebelum memfinalkan formulir dari unit lain</li>
-                                </ul>
-                            </p>
-                        </div>
                     </div>
                     
                     {showDeleteModal && <DeleteConfirmationModal onConfirm={handleDelete} onCancel={() => setShowDeleteModal(false)} />}
@@ -2790,8 +2802,32 @@
             );
         };
 
-        // PERBAIKAN POINT 2: FormFinalListView dengan responsivitas mobile
+        // PERBAIKAN POINT 5: FormFinalListView dengan pencarian dan pagination
         const FormFinalListView = ({ title, data, type, onBack, onView, onExport, Icons, notification, currentUser, count }) => {
+            const [searchTerm, setSearchTerm] = useState('');
+            const [currentPage, setCurrentPage] = useState(1);
+            const itemsPerPage = 10;
+
+            const filteredData = data.filter(item => 
+                item.namaKasus?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.nomorEPID?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.kelurahan?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.createdUnit?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            const indexOfLastItem = currentPage * itemsPerPage;
+            const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+            const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+            const nextPage = () => {
+                if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+            };
+
+            const prevPage = () => {
+                if (currentPage > 1) setCurrentPage(currentPage - 1);
+            };
+
             const getStatusBadge = (status) => {
                 return (
                     <span className={`status-badge bg-green-100 text-green-800 border border-green-200`}>
@@ -2812,86 +2848,115 @@
                                 <Icons.Download className="w-5 h-5"/>
                             </button>
                         </div>
+                        
+                        <div className="mt-4">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Cari di Form Final..."
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                />
+                                <Icons.Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                            </div>
+                            <p className="text-xs text-slate-500 mt-2">
+                                Menampilkan {Math.min(filteredData.length, itemsPerPage)} data per halaman
+                            </p>
+                        </div>
                     </div>
                     
                     <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24">
-                        {data.length === 0 ? (
+                        {filteredData.length === 0 ? (
                             <div className="text-center text-slate-400 py-20 font-medium italic">
-                                Tidak ada data untuk ditampilkan
+                                {searchTerm ? 'Tidak ada data yang sesuai dengan pencarian' : 'Tidak ada data untuk ditampilkan'}
                             </div>
                         ) : (
-                            <div className="grid gap-4">
-                                {data.map(item => {
-                                    const currentOwner = determineCurrentOwner(item);
-                                    const isFromOtherUnit = item.createdUnit !== currentUser.unitName;
-                                    
-                                    return (
-                                        <div key={item.id} className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-100 hover:border-slate-200 transition-all group">
-                                            <div className="flex justify-between items-start mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                                                        {item.nomorEPID || 'NO-EPID'}
+                            <>
+                                <div className="grid gap-4">
+                                    {currentItems.map(item => {
+                                        const currentOwner = determineCurrentOwner(item);
+                                        const isFromOtherUnit = item.createdUnit !== currentUser.unitName;
+                                        
+                                        return (
+                                            <div key={item.id} className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-100 hover:border-slate-200 transition-all group">
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                                            {item.nomorEPID || 'NO-EPID'}
+                                                        </div>
+                                                        {getStatusBadge(item.statusData)}
+                                                        {isFromOtherUnit && (
+                                                            <span className="status-badge bg-purple-100 text-purple-800 border border-purple-200">
+                                                                Rujukan
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                    {getStatusBadge(item.statusData)}
+                                                    <div className="text-xs text-slate-500 font-medium">
+                                                        {new Date(item.updatedAt).toLocaleDateString()}
+                                                    </div>
+                                                </div>
+                                                
+                                                <h3 className="font-bold text-lg text-slate-800 mb-1">{item.namaKasus || 'Tanpa Nama'}</h3>
+                                                <p className="text-sm text-slate-600 font-medium mb-1">
+                                                    {item.jenisKelamin} • {item.tanggalLahir ? new Date(item.tanggalLahir).toLocaleDateString() : '-'}
+                                                </p>
+                                                <p className="text-sm text-slate-500 mb-5">
+                                                    {item.kelurahan || 'Lokasi tidak diketahui'}
                                                     {isFromOtherUnit && (
-                                                        <span className="status-badge bg-purple-100 text-purple-800 border border-purple-200">
-                                                            Rujukan
+                                                        <span className="block text-xs text-purple-600 mt-1">
+                                                            Asal: {item.createdUnit}
                                                         </span>
                                                     )}
-                                                </div>
-                                                <div className="text-xs text-slate-500 font-medium">
-                                                    {new Date(item.updatedAt).toLocaleDateString()}
-                                                </div>
-                                            </div>
-                                            
-                                            <h3 className="font-bold text-lg text-slate-800 mb-1">{item.namaKasus || 'Tanpa Nama'}</h3>
-                                            <p className="text-sm text-slate-600 font-medium mb-1">
-                                                {item.jenisKelamin} • {item.tanggalLahir ? new Date(item.tanggalLahir).toLocaleDateString() : '-'}
-                                            </p>
-                                            <p className="text-sm text-slate-500 mb-5">
-                                                {item.kelurahan || 'Lokasi tidak diketahui'}
-                                                {isFromOtherUnit && (
-                                                    <span className="block text-xs text-purple-600 mt-1">
-                                                        Asal: {item.createdUnit}
+                                                    <span className="block text-xs text-green-600 mt-1 font-semibold">
+                                                        Current Owner: {currentOwner}
                                                     </span>
-                                                )}
-                                                <span className="block text-xs text-green-600 mt-1 font-semibold">
-                                                    Current Owner: {currentOwner}
-                                                </span>
-                                            </p>
-                                            
-                                            <div className="flex gap-2 border-t border-slate-100 pt-4">
-                                                <button 
-                                                    onClick={() => onView(item)} 
-                                                    className="w-full py-2.5 bg-slate-900 text-white rounded-lg text-sm font-bold shadow-sm hover:shadow-md transition flex items-center justify-center gap-2"
-                                                >
-                                                    <Icons.Eye className="w-4 h-4"/> Lihat Detail (Read-Only)
-                                                </button>
-                                            </div>
-                                            
-                                            <div className="mt-4 pt-4 border-t border-slate-100">
-                                                <p className="text-xs text-green-700 font-medium flex items-center gap-1">
-                                                    <Icons.CheckCircle className="w-3 h-3" /> Formulir sudah final. Hanya admin yang dapat mengedit.
                                                 </p>
+                                                
+                                                <div className="flex gap-2 border-t border-slate-100 pt-4">
+                                                    <button 
+                                                        onClick={() => onView(item)} 
+                                                        className="w-full py-2.5 bg-slate-900 text-white rounded-lg text-sm font-bold shadow-sm hover:shadow-md transition flex items-center justify-center gap-2"
+                                                    >
+                                                        <Icons.Eye className="w-4 h-4"/> Lihat Detail (Read-Only)
+                                                    </button>
+                                                </div>
                                             </div>
+                                        );
+                                    })}
+                                </div>
+                                
+                                {filteredData.length > itemsPerPage && (
+                                    <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                                        <p className="text-sm text-slate-600">
+                                            Menampilkan {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredData.length)} dari {filteredData.length} data
+                                        </p>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={prevPage}
+                                                disabled={currentPage === 1}
+                                                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200"
+                                            >
+                                                Sebelumnya
+                                            </button>
+                                            <span className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium">
+                                                Halaman {currentPage} dari {totalPages}
+                                            </span>
+                                            <button
+                                                onClick={nextPage}
+                                                disabled={currentPage === totalPages}
+                                                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200"
+                                            >
+                                                Selanjutnya
+                                            </button>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    </div>
+                                )}
+                            </>
                         )}
-                        
-                        <div className="mt-8 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
-                            <p className="text-green-700 text-sm font-medium">
-                                <span className="font-bold">✅ Tentang Form Final:</span> 
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Formulir sudah dalam status final (read-only)</li>
-                                    <li>Tidak dapat diedit kecuali oleh admin</li>
-                                    <li>Berisi formulir buatan sendiri yang langsung difinalkan (Fast Track)</li>
-                                    <li>Juga berisi formulir dari unit lain yang sudah diverifikasi dan difinalkan</li>
-                                    <li>Data siap untuk pelaporan dan analisis</li>
-                                </ul>
-                            </p>
-                        </div>
                     </div>
                     
                     <Toast notification={notification} />
@@ -2899,7 +2964,6 @@
             );
         };
 
-        // PERBAIKAN POINT 2: OutgoingListView dengan responsivitas mobile
         const OutgoingListView = ({ title, data, type, onBack, onView, Icons, notification, currentUser, count }) => {
             const getStatusBadge = (status) => {
                 const statusColors = {
@@ -2996,7 +3060,6 @@
             );
         };
 
-        // PERBAIKAN POINT 2: InboxListView dengan responsivitas mobile
         const InboxListView = ({ title, data, type, onBack, onView, onAccept, onReject, onTransfer, Icons, showReviewModal, reviewItem, setShowReviewModal, setReviewItem, showTransferModal, setShowTransferModal, confirmTransfer, notification, loading, ALL_SERVICES, currentUser, count, showRejectModal, setShowRejectModal, confirmRejectTransfer }) => {
             const getStatusBadge = (status) => {
                 const statusColors = {
@@ -3064,7 +3127,6 @@
                                                 </span>
                                             </p>
                                             
-                                            {/* PERBAIKAN POINT 2: Tombol responsif untuk mobile */}
                                             <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-4 mobile-button-group">
                                                 <button 
                                                     onClick={() => onView(item)} 
@@ -3098,30 +3160,9 @@
                                                     <Icons.Send className="w-4 h-4"/> Teruskan
                                                 </button>
                                             </div>
-                                            
-                                            <div className="mt-4 pt-4 border-t border-slate-100">
-                                                <p className="text-xs text-amber-700 font-medium flex items-center gap-1">
-                                                    <Icons.AlertTriangle className="w-3 h-3" /> Formulir dari unit lain HARUS melalui Pending Form untuk verifikasi sebelum difinalkan.
-                                                </p>
-                                            </div>
                                         </div>
                                     );
                                 })}
-                            </div>
-                        )}
-                        
-                        {data.length > 0 && (
-                            <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                                <p className="text-blue-700 text-sm font-medium">
-                                    <span className="font-bold">📋 Workflow Inbox Baru:</span> 
-                                    <ul className="list-disc list-inside mt-2 space-y-1">
-                                        <li><strong>Terima:</strong> Formulir akan masuk ke menu <strong>Pending Form</strong> untuk verifikasi ulang (Skenario A)</li>
-                                        <li><strong>Tolak:</strong> Formulir akan dikembalikan ke pengirim dengan status "Ditolak" (Skenario B)</li>
-                                        <li><strong>Teruskan:</strong> Formulir akan dikirim ke unit lain tanpa diproses (Skenario C)</li>
-                                        <li><strong>⚠ Penting:</strong> Formulir dari unit lain <strong>TIDAK BISA</strong> langsung difinalkan dari Inbox</li>
-                                        <li><strong>Verifikasi:</strong> Semua formulir dari unit lain harus melalui Pending Form untuk penyelidikan epidemiologi</li>
-                                    </ul>
-                                </p>
                             </div>
                         )}
                     </div>
@@ -3136,34 +3177,15 @@
                                 <p className="text-slate-500 mb-4 text-body">
                                     <strong>{reviewItem.namaKasus || 'Formulir'}</strong>
                                 </p>
-                                <div className="mb-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                                    <p className="text-sm text-amber-700 font-medium">
-                                        <strong>⚠ PERHATIAN:</strong> Formulir akan masuk ke <strong>Pending Form</strong> untuk verifikasi ulang sebelum dapat difinalkan.
-                                    </p>
-                                </div>
                                 <p className="text-slate-500 mb-6 text-sm">
-                                    Setelah diterima, Anda dapat:
-                                    <ul className="text-left mt-2 space-y-1 text-xs">
-                                        <li className="flex items-start">
-                                            <Icons.Edit className="w-3 h-3 text-blue-500 mt-1 mr-1 flex-shrink-0" />
-                                            <span>Edit data untuk penyelidikan epidemiologi</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <Icons.Check className="w-3 h-3 text-green-500 mt-1 mr-1 flex-shrink-0" />
-                                            <span>Finalkan setelah verifikasi selesai</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <Icons.Share className="w-3 h-3 text-indigo-500 mt-1 mr-1 flex-shrink-0" />
-                                            <span>Bagikan ke unit lain jika diperlukan</span>
-                                        </li>
-                                    </ul>
+                                    Formulir akan masuk ke <strong>Pending Form</strong> untuk verifikasi.
                                 </p>
                                 <div className="flex gap-3">
                                     <button onClick={() => setShowReviewModal(false)} className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition">
                                         Batal
                                     </button>
                                     <button onClick={() => onAccept(reviewItem)} className="flex-1 p-3.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-bold hover:shadow-lg transition">
-                                        Ya, Terima ke Pending
+                                        Ya, Terima
                                     </button>
                                 </div>
                             </div>
@@ -3178,7 +3200,6 @@
             );
         };
 
-        // PERBAIKAN POINT 2: RejectedListView dengan responsivitas mobile
         const RejectedListView = ({ title, data, type, onBack, onView, onEdit, onShare, onDelete, Icons, showDeleteModal, setShowDeleteModal, handleDelete, showShareModal, setShowShareModal, confirmShare, notification, loading, ALL_SERVICES, currentUser, count }) => {
             const getStatusBadge = (status, isFromOtherUnit = false) => {
                 const statusColors = {
@@ -3261,7 +3282,6 @@
                                                 </span>
                                             </p>
                                             
-                                            {/* PERBAIKAN POINT 2: Tombol responsif untuk mobile */}
                                             <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-4 mobile-button-group">
                                                 <button 
                                                     onClick={() => onView(item)} 
@@ -3301,30 +3321,11 @@
                                                     <Icons.Trash className="w-4.5 h-4.5"/>
                                                 </button>
                                             </div>
-                                            
-                                            <div className="mt-4 pt-4 border-t border-slate-100">
-                                                <p className="text-xs text-red-700 font-medium">
-                                                    <span className="font-bold">⚠ Formulir ditolak:</span> Periksa data, lakukan perbaikan jika diperlukan, lalu bagikan ulang ke unit lain.
-                                                </p>
-                                            </div>
                                         </div>
                                     );
                                 })}
                             </div>
                         )}
-                        
-                        <div className="mt-8 p-4 bg-gradient-to-r from-red-50 to-rose-50 rounded-xl border border-red-100">
-                            <p className="text-red-700 text-sm font-medium">
-                                <span className="font-bold">❌ Tentang Form Ditolak:</span> 
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Formulir yang ditolak oleh unit lain</li>
-                                    <li>Dapat diedit dan diperbaiki sebelum dikirim ulang</li>
-                                    <li>Dapat dibagikan ulang ke unit lain setelah perbaikan</li>
-                                    <li>Dapat dihapus jika tidak diperlukan lagi</li>
-                                    <li>Formulir tetap dapat dilihat detailnya untuk referensi</li>
-                                </ul>
-                            </p>
-                        </div>
                     </div>
                     
                     {showDeleteModal && <DeleteConfirmationModal onConfirm={handleDelete} onCancel={() => setShowDeleteModal(false)} />}
@@ -3465,8 +3466,8 @@
             </div>
         );
 
-        // BAGIAN 6: ADMIN DASHBOARD
-        const AdminDashboard = ({ currentUser, onLogout, mockDB, mockUserDB, showNotification, exportToCSV, loadDataForView, ALL_SERVICES, onViewForm, showAdminDeleteUserModal, setShowAdminDeleteUserModal, adminUserToDelete, setAdminUserToDelete, rejectedList }) => {
+        // PERBAIKAN POINT 1 & 3: AdminDashboard yang diperbaiki
+        const AdminDashboard = ({ currentUser, onLogout, mockDB, mockUserDB, showNotification, exportToCSV, loadDataForView, ALL_SERVICES, onViewForm, onUnfinalizeForm, onEditEpidForm, showAdminDeleteUserModal, setShowAdminDeleteUserModal, adminUserToDelete, setAdminUserToDelete, rejectedList }) => {
             const [activeTab, setActiveTab] = useState('forms');
             const [allForms, setAllForms] = useState([]);
             const [allUsers, setAllUsers] = useState([]);
@@ -3481,6 +3482,10 @@
             const [editingUser, setEditingUser] = useState(null);
             const [searchTerm, setSearchTerm] = useState('');
             const [userSearchTerm, setUserSearchTerm] = useState('');
+            
+            // PERBAIKAN POINT 1: State untuk pagination
+            const [currentPage, setCurrentPage] = useState(1);
+            const [itemsPerPage] = useState(10);
 
             const getStatusBadge = (status) => {
                 const statusColors = {
@@ -3532,12 +3537,28 @@
                 loadAllData();
             }, [activeTab]);
 
+            // PERBAIKAN POINT 1: Filter data dengan pencarian
             const filteredForms = searchTerm ? allForms.filter(form => 
                 form.namaKasus?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 form.nomorEPID?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 form.currentOwner?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                form.statusData?.toLowerCase().includes(searchTerm.toLowerCase())
+                form.statusData?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                form.createdUnit?.toLowerCase().includes(searchTerm.toLowerCase())
             ) : allForms;
+
+            // PERBAIKAN POINT 1: Pagination
+            const indexOfLastItem = currentPage * itemsPerPage;
+            const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+            const currentForms = filteredForms.slice(indexOfFirstItem, indexOfLastItem);
+            const totalPages = Math.ceil(filteredForms.length / itemsPerPage);
+
+            const nextPage = () => {
+                if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+            };
+
+            const prevPage = () => {
+                if (currentPage > 1) setCurrentPage(currentPage - 1);
+            };
 
             const filteredUsers = userSearchTerm ? allUsers.filter(user => 
                 user.name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
@@ -3609,7 +3630,7 @@
             
             const handleExportAll = () => { 
                 if(allForms.length > 0) {
-                    exportToCSV(allForms, 'SEMUA_DATA_SURVEILANS.csv', true); 
+                    exportToCSV(allForms, 'SEMUA_DATA_SURVEILANS.csv', false); // PERBAIKAN POINT 2: Gunakan format yang benar
                 } else {
                     showNotification('Tidak ada data untuk didownload', 'error'); 
                 }
@@ -3680,7 +3701,10 @@
                                                     placeholder="Cari formulir..."
                                                     className="w-full md:w-auto pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                                     value={searchTerm}
-                                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                                    onChange={(e) => {
+                                                        setSearchTerm(e.target.value);
+                                                        setCurrentPage(1); // Reset ke halaman 1 saat mencari
+                                                    }}
                                                 />
                                                 <Icons.Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                                             </div>
@@ -3693,7 +3717,7 @@
                                         </div>
                                     </div>
                                     
-                                    {/* PERBAIKAN POINT 2: Tabel responsif untuk mobile */}
+                                    {/* PERBAIKAN POINT 1: Tabel dengan pagination, tanpa kolom "Asal Unit" */}
                                     <div className="overflow-x-auto border border-slate-200 rounded-lg mobile-scroll">
                                         <table className="w-full text-sm text-left">
                                             <thead className="bg-slate-50 text-slate-600 uppercase text-xs font-bold">
@@ -3703,13 +3727,13 @@
                                                     <th className="px-4 py-3">Nama Kasus</th>
                                                     <th className="px-4 py-3">Usia</th>
                                                     <th className="px-4 py-3">Current Owner</th>
-                                                    <th className="px-4 py-3">Asal Unit</th>
                                                     <th className="px-4 py-3">Tgl Update</th>
+                                                    {/* PERBAIKAN POINT 1: Kolom "Asal Unit" dihapus */}
                                                     <th className="px-4 py-3">Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
-                                                {filteredForms.map(form => (
+                                                {currentForms.map(form => (
                                                     <tr key={form.id} className="hover:bg-slate-50">
                                                         <td className="px-4 py-3 font-mono">
                                                             {form.nomorEPID || 'DRAFT'}
@@ -3727,14 +3751,10 @@
                                                                 {form.currentOwner || determineCurrentOwner(form)}
                                                             </span>
                                                         </td>
-                                                        <td className="px-4 py-3">
-                                                            <span className="text-slate-700 text-xs font-medium">
-                                                                {form.createdUnit}
-                                                            </span>
-                                                        </td>
                                                         <td className="px-4 py-3 text-slate-500">
                                                             {new Date(form.updatedAt).toLocaleDateString()}
                                                         </td>
+                                                        {/* PERBAIKAN POINT 3: Kolom aksi dengan 4 tombol */}
                                                         <td className="px-4 py-3">
                                                             <div className="flex gap-1">
                                                                 <button 
@@ -3743,6 +3763,22 @@
                                                                     title="Lihat Detail"
                                                                 >
                                                                     <Icons.Eye className="w-4 h-4"/>
+                                                                </button>
+                                                                {form.statusData === 'Final' && (
+                                                                    <button 
+                                                                        onClick={() => onUnfinalizeForm(form)}
+                                                                        className="text-amber-500 bg-amber-50 hover:bg-amber-100 p-2 rounded-lg text-xs font-bold transition"
+                                                                        title="Batalkan Finalisasi"
+                                                                    >
+                                                                        <Icons.AlertTriangle className="w-4 h-4"/>
+                                                                    </button>
+                                                                )}
+                                                                <button 
+                                                                    onClick={() => onEditEpidForm(form)}
+                                                                    className="text-green-500 bg-green-50 hover:bg-green-100 p-2 rounded-lg text-xs font-bold transition"
+                                                                    title="Edit Nomor EPID"
+                                                                >
+                                                                    <Icons.Edit className="w-4 h-4"/>
                                                                 </button>
                                                                 <button 
                                                                     onClick={() => setDeleteFormId(form.id)}
@@ -3757,12 +3793,40 @@
                                                 ))}
                                             </tbody>
                                         </table>
-                                        {filteredForms.length === 0 && (
+                                        {currentForms.length === 0 && (
                                             <div className="text-center p-8 text-slate-400 italic">
                                                 {searchTerm ? 'Tidak ada formulir yang sesuai dengan pencarian' : 'Belum ada data formulir.'}
                                             </div>
                                         )}
                                     </div>
+                                    
+                                    {/* PERBAIKAN POINT 1: Pagination controls */}
+                                    {filteredForms.length > itemsPerPage && (
+                                        <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                                            <p className="text-sm text-slate-600">
+                                                Menampilkan {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredForms.length)} dari {filteredForms.length} formulir
+                                            </p>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={prevPage}
+                                                    disabled={currentPage === 1}
+                                                    className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200"
+                                                >
+                                                    Sebelumnya
+                                                </button>
+                                                <span className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium">
+                                                    Halaman {currentPage} dari {totalPages}
+                                                </span>
+                                                <button
+                                                    onClick={nextPage}
+                                                    disabled={currentPage === totalPages}
+                                                    className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200"
+                                                >
+                                                    Selanjutnya
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                     
                                     <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
                                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
@@ -4166,11 +4230,6 @@
                                                 ? 'Formulir dari unit lain → Inbox → Pending Form → Form Final'
                                                 : 'Formulir buatan sendiri → Draft/Pending → Form Final (Fast Track)'}
                                         </p>
-                                        {isFromOtherUnit && (
-                                            <p className="text-xs text-blue-600 mt-1">
-                                                ⚠ Harus melalui verifikasi di Pending Form
-                                            </p>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -4342,35 +4401,6 @@
                                                 </div>
                                             </div>
                                         ))}
-                                    </div>
-                                </div>
-                            )}
-                            
-                            {item.statusData === 'Pending' && isFromOtherUnit && (
-                                <div className="mt-8">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                                        <Icons.AlertTriangle className="w-5 h-5 text-amber-500" />
-                                        Informasi Workflow
-                                    </h3>
-                                    <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                                        <div className="flex items-start gap-3">
-                                            <Icons.Hourglass className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                                            <div>
-                                                <p className="text-sm font-bold text-amber-800 mb-1">📝 Formulir dalam Pending Form</p>
-                                                <p className="text-xs text-amber-700">
-                                                    Formulir ini berasal dari unit lain dan sedang dalam proses verifikasi/penyelidikan epidemiologi.
-                                                </p>
-                                                <div className="mt-2 text-xs text-amber-800 font-medium">
-                                                    <span className="font-bold">Alur yang harus diikuti:</span>
-                                                    <ol className="list-decimal list-inside mt-1 space-y-1">
-                                                        <li>Lakukan penyelidikan epidemiologi terhadap data</li>
-                                                        <li>Edit formulir jika diperlukan perbaikan data</li>
-                                                        <li>Klik "Finalisasi" jika data sudah valid</li>
-                                                        <li>Formulir akan pindah ke Form Final setelah difinalkan</li>
-                                                    </ol>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             )}
