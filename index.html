@@ -43,7 +43,7 @@
             padding: 0 15px;
         }
 
-        /* HEADER - DIUBAH MENJADI LEBIH MENARIK */
+        /* HEADER */
         .header {
             background: var(--bg-gradient);
             border-radius: var(--radius);
@@ -85,7 +85,7 @@
             opacity: 0.95;
         }
 
-        /* SEARCH BAR */
+        /* SEARCH BAR - TANPA SIMBOL */
         .search-container {
             max-width: 600px;
             margin: 0 auto;
@@ -94,18 +94,17 @@
         }
 
         .search-box {
-            display: flex;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 50px;
-            padding: 12px 20px;
+            padding: 12px 25px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .search-box input {
-            flex: 1;
+            width: 100%;
             border: none;
             background: transparent;
-            padding: 10px;
+            padding: 10px 5px;
             font-size: 1rem;
             color: var(--text-dark);
             outline: none;
@@ -113,25 +112,6 @@
 
         .search-box input::placeholder {
             color: #999;
-        }
-
-        .search-box button {
-            background: var(--primary-blue);
-            border: none;
-            color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .search-box button:hover {
-            background: var(--secondary-blue);
-            transform: scale(1.05);
         }
 
         /* GRID LAYOUT */
@@ -155,6 +135,16 @@
             color: inherit;
             border: 1px solid rgba(0, 0, 0, 0.05);
             box-shadow: var(--shadow);
+        }
+
+        /* EFEK BOUNCE SAAT DIKLIK */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.02); }
+        }
+
+        .health-card.clicked {
+            animation: bounce 0.4s ease;
         }
 
         .health-card:hover {
@@ -212,6 +202,103 @@
         .pertusis { background: linear-gradient(135deg, #FF2D55, #FF5A7D); }
         .dbd { background: linear-gradient(135deg, #007AFF, #3395FF); }
 
+        /* MODAL KONFIRMASI */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--card-white);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: scale(0.95);
+            animation: modalAppear 0.3s ease forwards;
+        }
+
+        @keyframes modalAppear {
+            to { transform: scale(1); }
+        }
+
+        .modal-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 30px;
+            color: white;
+        }
+
+        .modal h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+        }
+
+        .modal p {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 28px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            max-width: 160px;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background: #F2F2F7;
+            color: var(--primary-blue);
+        }
+
+        .modal-btn.confirm {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         /* FOOTER */
         .footer {
             text-align: center;
@@ -222,7 +309,7 @@
             margin-top: 20px;
         }
 
-        /* ANIMATIONS */
+        /* ANIMATIONS UNTUK KARTU */
         .health-card {
             opacity: 0;
             transform: translateY(10px);
@@ -246,7 +333,7 @@
                 font-size: 1rem;
             }
             
-            /* UBAH KE 2 KARTU PER BARIS */
+            /* 2 KARTU PER BARIS */
             .menu-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
@@ -278,6 +365,18 @@
             .card-arrow {
                 margin-left: 0;
             }
+
+            .modal {
+                padding: 25px 20px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                max-width: 100%;
+            }
         }
 
         @media (max-width: 480px) {
@@ -294,7 +393,7 @@
                 font-size: 1.7rem;
             }
             
-            /* DI BAWAH 480px KEMBALI KE 1 KOLOM */
+            /* KEMBALI KE 1 KOLOM PADA UKURAN SANGAT KECIL */
             .menu-grid {
                 grid-template-columns: 1fr;
             }
@@ -317,20 +416,17 @@
             <h1><i class="fas fa-heartbeat"></i> Sistem Informasi Kesehatan</h1>
             <p>Akses informasi lengkap tentang penyakit menular, gejala, pencegahan, dan penanganannya</p>
             
-            <!-- TOMBOL PENCARIAN -->
+            <!-- KOLOM PENCARIAN TANPA SIMBOL -->
             <div class="search-container">
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Cari nama penyakit...">
-                    <button id="searchButton">
-                        <i class="fas fa-search"></i>
-                    </button>
                 </div>
             </div>
         </header>
 
         <main class="menu-grid" id="menuGrid">
             <!-- Campak/Rubella -->
-            <a href="campak.html" class="health-card" data-disease="Campak/Rubella" data-color="campak" data-search="campak rubella measles">
+            <div class="health-card" data-disease="Campak/Rubella" data-color="campak" data-search="campak rubella measles" data-url="campak.html">
                 <div class="card-icon campak">
                     <i class="fas fa-virus"></i>
                 </div>
@@ -341,10 +437,10 @@
                 <div class="card-arrow">
                     <i class="fas fa-chevron-right"></i>
                 </div>
-            </a>
+            </div>
 
             <!-- Difteri -->
-            <a href="difteri.html" class="health-card" data-disease="Difteri" data-color="difteri" data-search="difteri diphtheria">
+            <div class="health-card" data-disease="Difteri" data-color="difteri" data-search="difteri diphtheria" data-url="difteri.html">
                 <div class="card-icon difteri">
                     <i class="fas fa-lungs-virus"></i>
                 </div>
@@ -355,10 +451,10 @@
                 <div class="card-arrow">
                     <i class="fas fa-chevron-right"></i>
                 </div>
-            </a>
+            </div>
 
             <!-- AFP -->
-            <a href="afp.html" class="health-card" data-disease="AFP" data-color="afp" data-search="afp acute flaccid paralysis polio kelumpuhan">
+            <div class="health-card" data-disease="AFP" data-color="afp" data-search="afp acute flaccid paralysis polio kelumpuhan" data-url="afp.html">
                 <div class="card-icon afp">
                     <i class="fas fa-procedures"></i>
                 </div>
@@ -369,10 +465,10 @@
                 <div class="card-arrow">
                     <i class="fas fa-chevron-right"></i>
                 </div>
-            </a>
+            </div>
 
             <!-- Tetanus Neonatorum -->
-            <a href="tetanus.html" class="health-card" data-disease="Tetanus Neonatorum" data-color="tetanus" data-search="tetanus neonatorum kejang bayi">
+            <div class="health-card" data-disease="Tetanus Neonatorum" data-color="tetanus" data-search="tetanus neonatorum kejang bayi" data-url="tetanus.html">
                 <div class="card-icon tetanus">
                     <i class="fas fa-baby"></i>
                 </div>
@@ -383,10 +479,10 @@
                 <div class="card-arrow">
                     <i class="fas fa-chevron-right"></i>
                 </div>
-            </a>
+            </div>
 
             <!-- Pertusis -->
-            <a href="pertusis.html" class="health-card" data-disease="Pertusis" data-color="pertusis" data-search="pertusis batuk rejan whooping cough">
+            <div class="health-card" data-disease="Pertusis" data-color="pertusis" data-search="pertusis batuk rejan whooping cough" data-url="pertusis.html">
                 <div class="card-icon pertusis">
                     <i class="fas fa-head-side-cough"></i>
                 </div>
@@ -397,10 +493,10 @@
                 <div class="card-arrow">
                     <i class="fas fa-chevron-right"></i>
                 </div>
-            </a>
+            </div>
 
             <!-- DBD -->
-            <a href="dbd.html" class="health-card" data-disease="DBD" data-color="dbd" data-search="dbd demam berdarah dengue nyamuk">
+            <div class="health-card" data-disease="DBD" data-color="dbd" data-search="dbd demam berdarah dengue nyamuk" data-url="dbd.html">
                 <div class="card-icon dbd">
                     <i class="fas fa-mosquito"></i>
                 </div>
@@ -411,8 +507,21 @@
                 <div class="card-arrow">
                     <i class="fas fa-chevron-right"></i>
                 </div>
-            </a>
+            </div>
         </main>
+
+        <!-- MODAL KONFIRMASI -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal" id="modal">
+                <div class="modal-icon" id="modalIcon"></div>
+                <h2 id="modalTitle">Buka Halaman</h2>
+                <p id="modalMessage">Apakah Anda yakin ingin membuka halaman ini?</p>
+                <div class="modal-actions">
+                    <button class="modal-btn cancel" id="cancelBtn">Batal</button>
+                    <button class="modal-btn confirm" id="confirmBtn">Buka</button>
+                </div>
+            </div>
+        </div>
 
         <footer class="footer">
             <p>Sistem Informasi Kesehatan © 2023</p>
@@ -424,11 +533,89 @@
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.health-card');
             const searchInput = document.getElementById('searchInput');
-            const searchButton = document.getElementById('searchButton');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modal = document.getElementById('modal');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            let selectedCard = null;
+            let targetUrl = '';
             
             // Stagger animation for cards
             cards.forEach((card, index) => {
                 card.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Fungsi untuk menampilkan modal
+            function showModal(card) {
+                const disease = card.getAttribute('data-disease');
+                const color = card.getAttribute('data-color');
+                targetUrl = card.getAttribute('data-url');
+                
+                // Update modal content
+                modalIcon.className = `modal-icon ${color}`;
+                modalIcon.innerHTML = card.querySelector('.card-icon').innerHTML;
+                modalTitle.textContent = `Buka: ${disease}`;
+                modalMessage.textContent = `Anda akan membuka halaman informasi tentang ${disease}.`;
+                
+                // Show modal
+                modalOverlay.classList.add('active');
+            }
+            
+            // Event listener untuk klik kartu
+            cards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Tambahkan efek bounce
+                    this.classList.add('clicked');
+                    
+                    // Hapus efek bounce setelah animasi selesai
+                    setTimeout(() => {
+                        this.classList.remove('clicked');
+                    }, 400);
+                    
+                    // Simpan kartu yang dipilih
+                    selectedCard = this;
+                    
+                    // Tampilkan modal konfirmasi
+                    showModal(this);
+                });
+            });
+            
+            // Modal button handlers
+            cancelBtn.addEventListener('click', () => {
+                modalOverlay.classList.remove('active');
+                selectedCard = null;
+                targetUrl = '';
+            });
+            
+            confirmBtn.addEventListener('click', () => {
+                if (targetUrl) {
+                    window.location.href = targetUrl;
+                }
+                modalOverlay.classList.remove('active');
+            });
+            
+            // Close modal on overlay click
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    modalOverlay.classList.remove('active');
+                    selectedCard = null;
+                    targetUrl = '';
+                }
+            });
+            
+            // Add keyboard support
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    modalOverlay.classList.remove('active');
+                    selectedCard = null;
+                    targetUrl = '';
+                }
             });
             
             // Fungsi pencarian
@@ -471,10 +658,7 @@
                 }, 10);
             }
             
-            // Event listener untuk tombol pencarian
-            searchButton.addEventListener('click', filterCards);
-            
-            // Event listener untuk input (real-time search)
+            // Event listener untuk pencarian real-time
             searchInput.addEventListener('input', filterCards);
             
             // Event listener untuk tombol Enter di input
@@ -483,9 +667,6 @@
                     filterCards();
                 }
             });
-            
-            // KARTU LANGSUNG DIKLIK TANPA KONFIRMASI
-            // Tidak perlu event handler khusus karena sudah menggunakan tag <a> dengan href
             
             // Tambahkan pesan jika tidak ada hasil pencarian
             const originalFilter = filterCards;
