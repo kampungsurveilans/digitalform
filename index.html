@@ -218,20 +218,41 @@
 
         /* Specific Hover Borders dihapus sesuai permintaan */
 
-        /* MODAL STYLES (Dipercantik) */
+        /* MODAL STYLES (Dipercantik & Dianimasi) */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6); /* Lebih gelap */
-            backdrop-filter: blur(8px);
-            display: none;
+            
+            /* Start state: transparan & tanpa blur */
+            background: rgba(15, 23, 42, 0); 
+            backdrop-filter: blur(0px);
+            
+            /* Selalu layout flex, tapi disembunyikan pakai visibility */
+            display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             padding: 20px;
+
+            /* Hidden Properties */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Agar tidak bisa diklik saat hidden */
+
+            /* Smooth Transition untuk background */
+            transition: all 0.4s ease;
         }
 
-        .modal-overlay.active { display: flex; }
+        .modal-overlay.active { 
+            /* Active Properties */
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            
+            /* End state: gelap & blur */
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(8px);
+        }
 
         .modal {
             background: white;
@@ -240,13 +261,18 @@
             max-width: 380px;
             width: 100%;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transform: scale(0.9);
+            
+            /* Start state: sedikit turun dan kecil (efek pop-up) */
+            transform: translateY(20px) scale(0.95);
             opacity: 0;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+            /* Transisi menggunakan cubic-bezier untuk efek pegas (bouncy) yang halus */
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .modal-overlay.active .modal {
-            transform: scale(1);
+            /* End state: posisi normal */
+            transform: translateY(0) scale(1);
             opacity: 1;
         }
 
