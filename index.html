@@ -9,21 +9,19 @@
         /* RESET & VARIABLES */
         :root {
             /* Warna Palet Baru yang Lebih Hidup */
-            /* UPDATED: Gradasi Violet ke Royal Blue yang lebih "Eye-Catching" */
             --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             
             --accent-color: #007AFF;
-            --bg-body: #EEF2F6; /* Sedikit lebih gelap dari putih pucat agar kartu kontras */
+            --bg-body: #EEF2F6;
             
             --card-white: #FFFFFF;
             --text-dark: #1e293b;
             --text-light: #64748b;
             
-            /* Shadow yang lebih modern (Soft but Deep) */
             --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
             --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             
-            --radius: 20px; /* Radius sedikit lebih bulat */
+            --radius: 20px;
         }
         
         * {
@@ -35,13 +33,129 @@
 
         body {
             background-color: var(--bg-body);
-            /* Pola halus di background agar tidak flat/pucat */
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
             background-size: 24px 24px;
             color: var(--text-dark);
             min-height: 100vh;
             padding-bottom: 40px;
+            /* Mencegah scroll saat splash screen tampil */
+            overflow: hidden; 
         }
+
+        body.loaded {
+            overflow: auto;
+        }
+
+        /* --- SPLASH SCREEN STYLES (OPENING) --- */
+        .splash-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--primary-gradient);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+        }
+
+        .splash-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .splash-content {
+            text-align: center;
+            color: white;
+        }
+
+        /* Icon Container mirip gaya kartu tapi lebih besar */
+        .splash-icon-box {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: zoomIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .splash-icon {
+            font-size: 45px;
+            color: white;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        .splash-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease forwards 0.3s;
+        }
+
+        .splash-subtitle {
+            font-size: 0.9rem;
+            opacity: 0;
+            font-weight: 300;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease forwards 0.5s;
+        }
+
+        /* Loading Dots */
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 30px;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards 0.8s;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: bounceDot 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes zoomIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.15); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.15); }
+            70% { transform: scale(1); }
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 0.7; }
+        }
+
+        @keyframes bounceDot {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* --- END SPLASH SCREEN --- */
+
 
         /* CONTAINER */
         .container {
@@ -53,9 +167,9 @@
         /* HEADER MODERN */
         .header-wrapper {
             background: var(--primary-gradient);
-            border-radius: 0 0 30px 30px; /* Lengkungan di bawah saja */
-            padding: 40px 20px 80px 20px; /* Padding bawah besar untuk tempat search bar */
-            margin-bottom: -35px; /* Negative margin agar search bar menumpuk */
+            border-radius: 0 0 30px 30px; 
+            padding: 40px 20px 80px 20px; 
+            margin-bottom: -35px; 
             text-align: center;
             color: white;
             position: relative;
@@ -63,10 +177,8 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
 
-        /* Elemen dekoratif background header */
         .header-bg-circle {
             position: absolute;
-            /* UPDATED: Opacity dinaikkan sedikit (0.05 -> 0.1) agar motif lebih terlihat */
             background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
         }
@@ -91,10 +203,10 @@
             font-weight: 300;
         }
 
-        /* SEARCH BAR - FLOATING STYLE */
+        /* SEARCH BAR */
         .search-container {
             max-width: 500px;
-            margin: 0 auto 40px auto; /* Margin bawah memberi jarak ke kartu */
+            margin: 0 auto 40px auto; 
             position: relative;
             z-index: 10;
         }
@@ -104,7 +216,7 @@
             backdrop-filter: blur(10px);
             border-radius: 50px;
             padding: 10px 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); /* Bayangan kuat agar melayang */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
             display: flex;
             align-items: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -132,16 +244,16 @@
             outline: none;
         }
 
-        /* GRID LAYOUT (TIDAK DIUBAH - SESUAI REQUEST) */
+        /* GRID LAYOUT */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
-            padding: 0 5px; /* Sedikit padding agar bayangan tidak terpotong */
+            padding: 0 5px;
         }
 
-        /* CARD STYLES (DIPERINDAH) */
+        /* CARD STYLES */
         .health-card {
             background: var(--card-white);
             border-radius: var(--radius);
@@ -159,24 +271,22 @@
             aspect-ratio: 1/1;
             position: relative;
             overflow: hidden;
-            border: 2px solid transparent; /* Persiapan untuk hover border */
+            border: 2px solid transparent; 
             
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
-        /* Hover Effect yang lebih "Clean" */
         .health-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-hover);
-            /* Border color dihapus agar tidak ada garis saat hover */
             border-color: transparent; 
         }
 
         .card-icon {
-            width: 55px; /* Sedikit diperbesar dari 50 ke 55 agar lebih tegas */
+            width: 55px; 
             height: 55px;
-            border-radius: 16px; /* Lebih rounded */
+            border-radius: 16px; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -208,7 +318,7 @@
             overflow: hidden;
         }
 
-        /* COLOR UTILITIES - Dibuat lebih vibrant */
+        /* COLOR UTILITIES */
         .campak { background: linear-gradient(135deg, #FF416C, #FF4B2B); box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3); }
         .difteri { background: linear-gradient(135deg, #F7971E, #FFD200); box-shadow: 0 4px 15px rgba(247, 151, 30, 0.3); }
         .afp { background: linear-gradient(135deg, #11998e, #38ef7d); box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3); }
@@ -216,40 +326,30 @@
         .pertusis { background: linear-gradient(135deg, #ec008c, #fc6767); box-shadow: 0 4px 15px rgba(236, 0, 140, 0.3); }
         .dbd { background: linear-gradient(135deg, #2193b0, #6dd5ed); box-shadow: 0 4px 15px rgba(33, 147, 176, 0.3); }
 
-        /* Specific Hover Borders dihapus sesuai permintaan */
-
-        /* MODAL STYLES (Dipercantik & Dianimasi) */
+        /* MODAL STYLES */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             
-            /* Start state: transparan & tanpa blur */
             background: rgba(15, 23, 42, 0); 
             backdrop-filter: blur(0px);
             
-            /* Selalu layout flex, tapi disembunyikan pakai visibility */
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             padding: 20px;
 
-            /* Hidden Properties */
             opacity: 0;
             visibility: hidden;
-            pointer-events: none; /* Agar tidak bisa diklik saat hidden */
-
-            /* Smooth Transition untuk background */
+            pointer-events: none;
             transition: all 0.4s ease;
         }
 
         .modal-overlay.active { 
-            /* Active Properties */
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
-            
-            /* End state: gelap & blur */
             background: rgba(15, 23, 42, 0.6); 
             backdrop-filter: blur(8px);
         }
@@ -261,17 +361,12 @@
             max-width: 380px;
             width: 100%;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            
-            /* Start state: sedikit turun dan kecil (efek pop-up) */
             transform: translateY(20px) scale(0.95);
             opacity: 0;
-            
-            /* Transisi menggunakan cubic-bezier untuk efek pegas (bouncy) yang halus */
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .modal-overlay.active .modal {
-            /* End state: posisi normal */
             transform: translateY(0) scale(1);
             opacity: 1;
         }
@@ -302,24 +397,15 @@
             flex: 1;
             font-size: 0.95rem;
             transition: 0.2s;
-            
-            /* FIX 1: Mencegah seleksi teks saat diklik */
             user-select: none;
             -webkit-user-select: none;
-            -moz-user-select: none;
-            
-            /* FIX 2: Menghilangkan highlight biru di mobile */
             -webkit-tap-highlight-color: transparent;
             outline: none;
         }
 
-        .modal-btn:focus {
-            outline: none;
-        }
-
+        .modal-btn:focus { outline: none; }
         .modal-btn.cancel { background: #f1f5f9; color: #64748b; }
-        .modal-btn.confirm { background: #0f172a; color: white; } /* Tombol konfirmasi hitam elegan */
-        
+        .modal-btn.confirm { background: #0f172a; color: white; }
         .modal-btn:active { transform: scale(0.96); }
 
         /* FOOTER */
@@ -339,9 +425,9 @@
         }
 
         @media (max-width: 600px) {
-            body { padding: 0 0 20px 0; } /* Remove side padding on body */
+            body { padding: 0 0 20px 0; }
             .header-wrapper { border-radius: 0 0 20px 20px; margin-bottom: -30px; }
-            .container { padding: 0 15px; } /* Add padding to container instead */
+            .container { padding: 0 15px; }
             .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .health-card { padding: 15px 10px; }
             .card-icon { width: 45px; height: 45px; font-size: 20px; border-radius: 12px; }
@@ -365,6 +451,23 @@
     </style>
 </head>
 <body>
+
+    <!-- SPLASH SCREEN / OPENING -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <div class="splash-icon-box">
+                <i class="fas fa-heartbeat splash-icon"></i>
+            </div>
+            <div class="splash-title">SURVEILANS</div>
+            <div class="splash-subtitle">UPT PUSKESMAS KAMPUNG DALAM</div>
+            
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Header Full Width Background -->
     <div class="header-wrapper">
@@ -464,6 +567,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- SPLASH SCREEN LOGIC ---
+            const splashScreen = document.getElementById('splashScreen');
+            
+            // Simulasikan loading aplikasi selama 3 detik
+            setTimeout(() => {
+                splashScreen.classList.add('hide');
+                document.body.classList.add('loaded'); // Aktifkan scroll kembali
+            }, 3000);
+
+            // --- MAIN APP LOGIC ---
             const cards = document.querySelectorAll('.health-card');
             const searchInput = document.getElementById('searchInput');
             const menuGrid = document.getElementById('menuGrid');
@@ -471,14 +584,16 @@
             
             let targetUrl = '';
 
-            // Animasi Masuk
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 100 * index);
-            });
+            // Animasi Masuk Kartu (Dijalankan setelah splash screen hilang agar smooth)
+            setTimeout(() => {
+                cards.forEach((card, index) => {
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100 * index);
+                });
+            }, 2800); // Mulai animasi sedikit sebelum splash screen benar-benar hilang
 
             // Logic Pencarian
             function filterCards() {
@@ -537,12 +652,9 @@
 
             document.getElementById('cancelBtn').addEventListener('click', () => modalOverlay.classList.remove('active'));
             
-            // FIX: Animasi penutupan modal sebelum navigasi
+            // Logic Tombol Buka
             document.getElementById('confirmBtn').addEventListener('click', () => {
-                // 1. Tutup modal secara visual dulu
                 modalOverlay.classList.remove('active');
-                
-                // 2. Jika ada URL, tunggu sebentar (0.15 detik) agar animasi penutupan terlihat, baru pindah
                 if (targetUrl) {
                     setTimeout(() => {
                         window.location.href = targetUrl;
