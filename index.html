@@ -302,6 +302,19 @@
             flex: 1;
             font-size: 0.95rem;
             transition: 0.2s;
+            
+            /* FIX 1: Mencegah seleksi teks saat diklik */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            
+            /* FIX 2: Menghilangkan highlight biru di mobile */
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        .modal-btn:focus {
+            outline: none;
         }
 
         .modal-btn.cancel { background: #f1f5f9; color: #64748b; }
@@ -523,9 +536,18 @@
             });
 
             document.getElementById('cancelBtn').addEventListener('click', () => modalOverlay.classList.remove('active'));
+            
+            // FIX: Animasi penutupan modal sebelum navigasi
             document.getElementById('confirmBtn').addEventListener('click', () => {
-                if (targetUrl) window.location.href = targetUrl;
+                // 1. Tutup modal secara visual dulu
                 modalOverlay.classList.remove('active');
+                
+                // 2. Jika ada URL, tunggu sebentar (0.15 detik) agar animasi penutupan terlihat, baru pindah
+                if (targetUrl) {
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 150);
+                }
             });
 
             modalOverlay.addEventListener('click', (e) => {
