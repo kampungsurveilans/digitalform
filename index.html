@@ -114,27 +114,34 @@
             color: #999;
         }
 
-        /* GRID LAYOUT */
+        /* GRID LAYOUT - DIMODIFIKASI UNTUK KARTU 1:1 */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
             margin-bottom: 40px;
         }
 
-        /* CARD STYLES */
+        /* CARD STYLES - DIMODIFIKASI MENJADI PERSEGI (1:1) */
         .health-card {
             background: var(--card-white);
             border-radius: var(--radius);
-            padding: 22px;
             display: flex;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.25s ease;
             text-decoration: none;
             color: inherit;
             border: 1px solid rgba(0, 0, 0, 0.05);
             box-shadow: var(--shadow);
+            padding: 30px 25px;
+            text-align: center;
+            min-height: 300px; /* Menjamin tinggi minimum */
+            aspect-ratio: 1/1; /* Membuat kartu persegi sempurna */
+            position: relative;
+            overflow: hidden;
         }
 
         /* EFEK BOUNCE SAAT DIKLIK */
@@ -148,50 +155,65 @@
         }
 
         .health-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px);
             box-shadow: var(--shadow-hover);
         }
 
+        /* EFEK HALUS SAAT HOVER */
+        .health-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-purple));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .health-card:hover::before {
+            transform: scaleX(1);
+        }
+
         .card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 14px;
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 20px;
-            flex-shrink: 0;
-            font-size: 26px;
+            margin-bottom: 25px;
+            font-size: 34px;
             color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .health-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .card-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
         }
 
         .card-content h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 6px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 12px;
             color: var(--text-dark);
         }
 
         .card-content p {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-light);
-            line-height: 1.4;
-        }
-
-        .card-arrow {
-            color: #C7C7CC;
-            font-size: 18px;
-            margin-left: 10px;
-            transition: transform 0.2s;
-        }
-
-        .health-card:hover .card-arrow {
-            transform: translateX(4px);
-            color: var(--primary-blue);
+            line-height: 1.5;
+            max-width: 100%;
+            margin: 0 auto;
         }
 
         /* COLOR VARIATIONS */
@@ -324,6 +346,12 @@
         }
 
         /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .menu-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -336,34 +364,27 @@
             /* 2 KARTU PER BARIS */
             .menu-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
+                gap: 20px;
             }
             
             .health-card {
-                padding: 16px;
-                flex-direction: column;
-                text-align: center;
+                padding: 25px 20px;
+                min-height: 280px;
             }
             
             .card-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 22px;
-                margin-right: 0;
-                margin-bottom: 12px;
+                width: 70px;
+                height: 70px;
+                font-size: 30px;
+                margin-bottom: 20px;
             }
             
             .card-content h3 {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
             }
             
             .card-content p {
-                font-size: 0.8rem;
-                margin-bottom: 10px;
-            }
-            
-            .card-arrow {
-                margin-left: 0;
+                font-size: 0.85rem;
             }
 
             .modal {
@@ -376,6 +397,27 @@
             
             .modal-btn {
                 max-width: 100%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            /* KEMBALI KE 1 KOLOM PADA UKURAN KECIL */
+            .menu-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .health-card {
+                min-height: 300px;
+                padding: 30px 25px;
+            }
+            
+            .card-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 34px;
             }
         }
 
@@ -393,19 +435,14 @@
                 font-size: 1.7rem;
             }
             
-            /* KEMBALI KE 1 KOLOM PADA UKURAN SANGAT KECIL */
-            .menu-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .health-card {
-                flex-direction: row;
-                text-align: left;
+                padding: 25px 20px;
             }
             
             .card-icon {
-                margin-right: 16px;
-                margin-bottom: 0;
+                width: 70px;
+                height: 70px;
+                font-size: 30px;
             }
         }
     </style>
@@ -413,8 +450,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1><i class="fas fa-heartbeat">
-            </i> Sistem Informasi Kesehatan </h1>
+            <h1><i class="fas fa-heartbeat"></i> Sistem Informasi Kesehatan</h1>
             <p>Sistem Pencatatan dan Pelaporan Penyakit Menular</p>
             
             <!-- KOLOM PENCARIAN TANPA SIMBOL -->
@@ -435,9 +471,6 @@
                     <h3>Campak/Rubella</h3>
                     <p>Infeksi virus yang sangat menular ditandai dengan ruam merah di seluruh tubuh.</p>
                 </div>
-                <div class="card-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
             </div>
 
             <!-- Difteri -->
@@ -448,9 +481,6 @@
                 <div class="card-content">
                     <h3>Difteri</h3>
                     <p>Infeksi bakteri serius yang memengaruhi selaput lendir tenggorokan dan hidung.</p>
-                </div>
-                <div class="card-arrow">
-                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
 
@@ -463,9 +493,6 @@
                     <h3>AFP (Acute Flaccid Paralysis)</h3>
                     <p>Kelumpuhan mendadak yang menjadi indikator surveilans polio.</p>
                 </div>
-                <div class="card-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
             </div>
 
             <!-- Tetanus Neonatorum -->
@@ -476,9 +503,6 @@
                 <div class="card-content">
                     <h3>Tetanus Neonatorum</h3>
                     <p>Infeksi pada bayi baru lahir yang menyebabkan kejang dan kekakuan otot.</p>
-                </div>
-                <div class="card-arrow">
-                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
 
@@ -491,9 +515,6 @@
                     <h3>Pertusis (Batuk Rejan)</h3>
                     <p>Infeksi saluran pernapasan bakteri yang ditandai dengan batuk hebat.</p>
                 </div>
-                <div class="card-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
             </div>
 
             <!-- DBD -->
@@ -504,9 +525,6 @@
                 <div class="card-content">
                     <h3>DBD (Demam Berdarah Dengue)</h3>
                     <p>Penyakit infeksi virus yang ditularkan melalui nyamuk Aedes aegypti.</p>
-                </div>
-                <div class="card-arrow">
-                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
         </main>
