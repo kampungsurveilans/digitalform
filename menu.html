@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Sistem Kesehatan - Gaya iOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #1d1d1f;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #007AFF 0%, #5856D6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #86868b;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .menu-container {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+        }
+
+        .menu-button {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 28px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.04),
+                0 1px 6px rgba(0, 0, 0, 0.04),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-6px);
+            box-shadow: 
+                0 12px 30px rgba(0, 0, 0, 0.1),
+                0 4px 12px rgba(0, 0, 0, 0.06),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+        }
+
+        .menu-button:active {
+            transform: translateY(-2px);
+            transition-duration: 0.1s;
+        }
+
+        .button-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 24px;
+            flex-shrink: 0;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-content {
+            flex: 1;
+        }
+
+        .button-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+            letter-spacing: -0.2px;
+        }
+
+        .button-content p {
+            font-size: 0.95rem;
+            color: #86868b;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .button-arrow {
+            color: #c7c7cc;
+            font-size: 20px;
+            transition: transform 0.3s, color 0.3s;
+        }
+
+        .menu-button:hover .button-arrow {
+            transform: translateX(5px);
+            color: #007AFF;
+        }
+
+        /* Warna khusus untuk setiap tombol */
+        .campak { background-color: #FF3B30; }
+        .difteri { background-color: #FF9500; }
+        .afp { background-color: #34C759; }
+        .tetanus { background-color: #5856D6; }
+        .pertusis { background-color: #FF2D55; }
+        .dbd { background-color: #007AFF; }
+
+        /* Efek sorotan saat hover */
+        .menu-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .menu-button:hover::after {
+            opacity: 1;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 800px;
+            color: #86868b;
+            font-size: 0.95rem;
+        }
+
+        .footer p {
+            margin-bottom: 8px;
+        }
+
+        /* Animasi saat halaman dimuat */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-button {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .menu-button:nth-child(1) { animation-delay: 0.1s; }
+        .menu-button:nth-child(2) { animation-delay: 0.2s; }
+        .menu-button:nth-child(3) { animation-delay: 0.3s; }
+        .menu-button:nth-child(4) { animation-delay: 0.4s; }
+        .menu-button:nth-child(5) { animation-delay: 0.5s; }
+        .menu-button:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Status aktif */
+        .menu-button.active {
+            box-shadow: 
+                0 0 0 4px rgba(0, 122, 255, 0.2),
+                0 4px 20px rgba(0, 0, 0, 0.08),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+        }
+
+        /* Indikator tombol yang dipilih */
+        .selection-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            padding: 15px 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: none;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .selection-indicator.show {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        .selection-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+            color: white;
+        }
+
+        .selection-text {
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistem Informasi Kesehatan</h1>
+            <p>Pilih penyakit untuk melihat informasi detail, statistik, dan rekomendasi penanganan. Desain ini dioptimalkan untuk perangkat desktop dan mobile dengan gaya iOS Apple.</p>
+        </div>
+
+        <div class="menu-container">
+            <!-- Campak/Rubella -->
+            <div class="menu-button campak-btn" data-disease="Campak/Rubella">
+                <div class="button-icon campak">
+                    <i class="fas fa-virus"></i>
+                </div>
+                <div class="button-content">
+                    <h2>Campak/Rubella</h2>
+                    <p>Infeksi virus yang sangat menular ditandai dengan ruam merah di seluruh tubuh. Dapat dicegah dengan imunisasi MR.</p>
+                </div>
+                <div class="button-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <!-- Difteri -->
+            <div class="menu-button difteri-btn" data-disease="Difteri">
+                <div class="button-icon difteri">
+                    <i class="fas fa-lungs-virus"></i>
+                </div>
+                <div class="button-content">
+                    <h2>Difteri</h2>
+                    <p>Infeksi bakteri serius yang memengaruhi selaput lendir tenggorokan dan hidung. Membutuhkan penanganan segera.</p>
+                </div>
+                <div class="button-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <!-- AFP -->
+            <div class="menu-button afp-btn" data-disease="AFP">
+                <div class="button-icon afp">
+                    <i class="fas fa-procedures"></i>
+                </div>
+                <div class="button-content">
+                    <h2>AFP (Acute Flaccid Paralysis)</h2>
+                    <p>Kelumpuhan mendadak yang menjadi indikator surveilans polio. Memerlukan investigasi epidemiologi cepat.</p>
+                </div>
+                <div class="button-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <!-- Tetanus Neonatorum -->
+            <div class="menu-button tetanus-btn" data-disease="Tetanus Neonatorum">
+                <div class="button-icon tetanus">
+                    <i class="fas fa-baby"></i>
+                </div>
+                <div class="button-content">
+                    <h2>Tetanus Neonatorum</h2>
+                    <p>Infeksi bakteri pada bayi baru lahir yang menyebabkan kejang dan kekakuan otot. Dapat dicegah dengan imunisasi TT ibu hamil.</p>
+                </div>
+                <div class="button-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <!-- Pertusis -->
+            <div class="menu-button pertusis-btn" data-disease="Pertusis">
+                <div class="button-icon pertusis">
+                    <i class="fas fa-head-side-cough"></i>
+                </div>
+                <div class="button-content">
+                    <h2>Pertusis (Batuk Rejan)</h2>
+                    <p>Infeksi saluran pernapasan bakteri yang ditandai dengan batuk hebat dan panjang. Berbahaya bagi bayi di bawah 1 tahun.</p>
+                </div>
+                <div class="button-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <!-- DBD -->
+            <div class="menu-button dbd-btn" data-disease="DBD">
+                <div class="button-icon dbd">
+                    <i class="fas fa-mosquito"></i>
+                </div>
+                <div class="button-content">
+                    <h2>DBD (Demam Berdarah Dengue)</h2>
+                    <p>Penyakit infeksi virus yang ditularkan melalui nyamuk Aedes aegypti. Dapat menyebabkan syok dan kematian jika tidak ditangani.</p>
+                </div>
+                <div class="button-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Indikator pilihan -->
+        <div class="selection-indicator" id="selectionIndicator">
+            <div class="selection-icon" id="selectionIcon"></div>
+            <div class="selection-text" id="selectionText">Memilih: Campak/Rubella</div>
+        </div>
+
+        <div class="footer">
+            <p>Sistem Informasi Kesehatan - © 2023</p>
+            <p>Desain dengan gaya iOS Apple. Responsif untuk desktop dan mobile.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuButtons = document.querySelectorAll('.menu-button');
+            const selectionIndicator = document.getElementById('selectionIndicator');
+            const selectionIcon = document.getElementById('selectionIcon');
+            const selectionText = document.getElementById('selectionText');
+            
+            // Fungsi untuk menangani klik tombol
+            function handleButtonClick(event) {
+                // Hapus kelas active dari semua tombol
+                menuButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                
+                // Tambahkan kelas active ke tombol yang diklik
+                const clickedButton = event.currentTarget;
+                clickedButton.classList.add('active');
+                
+                // Dapatkan data penyakit
+                const disease = clickedButton.getAttribute('data-disease');
+                const buttonIcon = clickedButton.querySelector('.button-icon');
+                const iconClass = buttonIcon.classList[1]; // kelas warna
+                
+                // Update indikator pilihan
+                selectionIcon.className = 'selection-icon ' + iconClass;
+                selectionIcon.innerHTML = clickedButton.querySelector('.button-icon i').outerHTML;
+                selectionText.textContent = 'Memilih: ' + disease;
+                
+                // Tampilkan indikator pilihan
+                selectionIndicator.classList.add('show');
+                
+                // Simulasi aksi: buka halaman terkait penyakit
+                console.log('Membuka halaman untuk: ' + disease);
+                
+                // Dalam implementasi nyata, ini akan mengarahkan ke halaman baru
+                // window.location.href = `/${disease.toLowerCase().replace('/', '-')}.html`;
+                
+                // Untuk demo, kita hanya akan menampilkan alert
+                setTimeout(() => {
+                    alert(`Akan membuka halaman: ${disease}\n\nDalam implementasi nyata, ini akan mengarahkan ke halaman detail untuk penyakit tersebut.`);
+                }, 300);
+                
+                // Sembunyikan indikator setelah beberapa detik
+                setTimeout(() => {
+                    selectionIndicator.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Tambahkan event listener ke setiap tombol
+            menuButtons.forEach(button => {
+                button.addEventListener('click', handleButtonClick);
+            });
+            
+            // Tambahkan efek hover untuk perangkat dengan mouse
+            menuButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-6px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            // Untuk perangkat sentuh, tambahkan kelas active saat tombol ditekan
+            menuButtons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.classList.add('active');
+                }, {passive: true});
+                
+                button.addEventListener('touchend', function() {
+                    // Biarkan kelas active tetap sampai tombol lain ditekan
+                }, {passive: true});
+            });
+            
+            // Animasi tombol saat halaman dimuat
+            setTimeout(() => {
+                menuButtons.forEach((button, index) => {
+                    setTimeout(() => {
+                        button.style.opacity = '1';
+                    }, 100 * (index + 1));
+                });
+            }, 300);
+        });
+    </script>
+</body>
+</html>
