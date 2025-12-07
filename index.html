@@ -8,120 +8,137 @@
     <style>
         /* RESET & VARIABLES */
         :root {
-            --primary-blue: #007AFF;
-            --secondary-blue: #5856D6;
-            --accent-purple: #AF52DE;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --bg-light: #F5F7FA;
+            /* Warna Palet Baru yang Lebih Hidup */
+            --primary-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); /* Deep Ocean */
+            --accent-color: #007AFF;
+            --bg-body: #EEF2F6; /* Sedikit lebih gelap dari putih pucat agar kartu kontras */
+            
             --card-white: #FFFFFF;
-            --text-dark: #1D1D1F;
-            --text-light: #86868B;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
-            --radius: 16px;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            
+            /* Shadow yang lebih modern (Soft but Deep) */
+            --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius: 20px; /* Radius sedikit lebih bulat */
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background: var(--bg-light);
+            background-color: var(--bg-body);
+            /* Pola halus di background agar tidak flat/pucat */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
             color: var(--text-dark);
             min-height: 100vh;
-            padding: 20px;
-            line-height: 1.4;
+            padding-bottom: 40px;
         }
 
         /* CONTAINER */
         .container {
-            max-width: 1000px; /* Diperkecil sedikit agar lebih fokus */
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 0 10px;
+            padding: 0 20px;
         }
 
-        /* HEADER */
-        .header {
-            background: var(--bg-gradient);
-            border-radius: var(--radius);
-            padding: 25px 20px;
-            margin-bottom: 30px;
-            color: white;
+        /* HEADER MODERN */
+        .header-wrapper {
+            background: var(--primary-gradient);
+            border-radius: 0 0 30px 30px; /* Lengkungan di bawah saja */
+            padding: 40px 20px 80px 20px; /* Padding bawah besar untuk tempat search bar */
+            margin-bottom: -35px; /* Negative margin agar search bar menumpuk */
             text-align: center;
+            color: white;
             position: relative;
             overflow: hidden;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
 
-        .header::before {
-            content: '';
+        /* Elemen dekoratif background header */
+        .header-bg-circle {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
-            opacity: 0.3;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        .circle-1 { width: 200px; height: 200px; top: -50px; left: -50px; }
+        .circle-2 { width: 150px; height: 150px; bottom: 10px; right: -20px; }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
         }
 
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 800;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
         }
 
         .header p {
-            font-size: 0.95rem;
-            max-width: 600px;
-            margin: 0 auto 20px;
-            position: relative;
-            z-index: 1;
-            opacity: 0.95;
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
         }
 
-        /* SEARCH BAR */
+        /* SEARCH BAR - FLOATING STYLE */
         .search-container {
             max-width: 500px;
-            margin: 0 auto;
+            margin: 0 auto 40px auto; /* Margin bawah memberi jarak ke kartu */
             position: relative;
-            z-index: 1;
+            z-index: 10;
         }
 
         .search-box {
             background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 50px;
-            padding: 8px 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            padding: 10px 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); /* Bayangan kuat agar melayang */
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.5);
         }
         
         .search-box:focus-within {
-            transform: scale(1.02);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .search-box i {
+            color: #94a3b8;
+            margin-right: 10px;
         }
 
         .search-box input {
             width: 100%;
             border: none;
             background: transparent;
-            padding: 8px 5px;
-            font-size: 0.95rem;
+            padding: 8px 0;
+            font-size: 1rem;
             color: var(--text-dark);
             outline: none;
         }
 
-        /* GRID LAYOUT - DIPERBAIKI: Menggunakan ukuran minmax lebih kecil */
+        /* GRID LAYOUT (TIDAK DIUBAH - SESUAI REQUEST) */
         .menu-grid {
             display: grid;
-            /* Perubahan utama: 300px diubah jadi 200px agar kartu lebih kecil */
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
+            padding: 0 5px; /* Sedikit padding agar bayangan tidak terpotong */
         }
 
-        /* CARD STYLES */
+        /* CARD STYLES (DIPERINDAH) */
         .health-card {
             background: var(--card-white);
             border-radius: var(--radius);
@@ -130,250 +147,210 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            
-            /* UBAH TRANSISI: Menggunakan efek pegas/bounce halus */
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
-            
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             text-decoration: none;
             color: inherit;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: var(--shadow);
-            
-            /* PENGATURAN MOBILE TOUCH - Menghilangkan block highlight */
-            -webkit-tap-highlight-color: transparent; /* Hilangkan kotak biru/abu saat tap */
-            user-select: none; /* Mencegah seleksi teks saat tap cepat */
-            outline: none;
-
-            /* Perubahan: Padding lebih kecil & hapus min-height fixed yang terlalu besar */
+            box-shadow: var(--shadow-card);
             padding: 20px 15px; 
             text-align: center;
-            aspect-ratio: 1/1; /* Tetap kotak */
+            aspect-ratio: 1/1;
             position: relative;
             overflow: hidden;
+            border: 2px solid transparent; /* Persiapan untuk hover border */
+            
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
-        /* EFEK HOVER & ANIMASI */
+        /* Hover Effect yang lebih "Clean" */
         .health-card:hover {
-            transform: translateY(-8px); /* Naik sedikit lebih tinggi */
+            transform: translateY(-5px);
             box-shadow: var(--shadow-hover);
+            /* Border akan berubah warna via Javascript atau CSS specific variable nanti */
+            border-color: rgba(0,0,0,0.05); 
         }
-
-        .health-card.clicked {
-            animation: bounce 0.4s ease;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-4px) scale(0.98); }
-        }
-
-        /* GARIS BERWARNA DIHAPUS DARI SINI */
 
         .card-icon {
-            /* Perubahan: Icon diperkecil dari 80px ke 50px agar lebih proporsional */
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
+            width: 55px; /* Sedikit diperbesar dari 50 ke 55 agar lebih tegas */
+            height: 55px;
+            border-radius: 16px; /* Lebih rounded */
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
-            font-size: 22px; /* Font icon diperkecil */
+            margin-bottom: 15px;
+            font-size: 24px;
             color: white;
             transition: transform 0.3s ease;
-            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .health-card:hover .card-icon {
             transform: scale(1.1) rotate(5deg);
         }
 
-        .card-content {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
         .card-content h3 {
-            font-size: 1rem; /* Font judul diperkecil dari 1.1rem */
+            font-size: 1.05rem;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             color: var(--text-dark);
-            line-height: 1.2;
         }
 
         .card-content p {
-            font-size: 0.75rem; /* Font deskripsi diperkecil dari 0.8rem */
+            font-size: 0.8rem;
             color: var(--text-light);
-            line-height: 1.35;
+            line-height: 1.4;
             display: -webkit-box;
-            -webkit-line-clamp: 3; /* Membatasi teks max 3 baris agar rapi */
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
-        /* WARNA IKON */
-        .campak { background: linear-gradient(135deg, #FF3B30, #FF6258); }
-        .difteri { background: linear-gradient(135deg, #FF9500, #FFB340); }
-        .afp { background: linear-gradient(135deg, #34C759, #5CDD75); }
-        .tetanus { background: linear-gradient(135deg, #5856D6, #7876FF); }
-        .pertusis { background: linear-gradient(135deg, #FF2D55, #FF5A7D); }
-        .dbd { background: linear-gradient(135deg, #007AFF, #3395FF); }
+        /* COLOR UTILITIES - Dibuat lebih vibrant */
+        .campak { background: linear-gradient(135deg, #FF416C, #FF4B2B); box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3); }
+        .difteri { background: linear-gradient(135deg, #F7971E, #FFD200); box-shadow: 0 4px 15px rgba(247, 151, 30, 0.3); }
+        .afp { background: linear-gradient(135deg, #11998e, #38ef7d); box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3); }
+        .tetanus { background: linear-gradient(135deg, #8E2DE2, #4A00E0); box-shadow: 0 4px 15px rgba(74, 0, 224, 0.3); }
+        .pertusis { background: linear-gradient(135deg, #ec008c, #fc6767); box-shadow: 0 4px 15px rgba(236, 0, 140, 0.3); }
+        .dbd { background: linear-gradient(135deg, #2193b0, #6dd5ed); box-shadow: 0 4px 15px rgba(33, 147, 176, 0.3); }
 
-        /* MODAL STYLES */
+        /* Specific Hover Borders (Agar tidak pucat) */
+        .health-card[data-color="campak"]:hover { border-color: #FF4B2B; }
+        .health-card[data-color="difteri"]:hover { border-color: #FFD200; }
+        .health-card[data-color="afp"]:hover { border-color: #38ef7d; }
+        .health-card[data-color="tetanus"]:hover { border-color: #8E2DE2; }
+        .health-card[data-color="pertusis"]:hover { border-color: #ec008c; }
+        .health-card[data-color="dbd"]:hover { border-color: #2193b0; }
+
+        /* MODAL STYLES (Dipercantik) */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.6); /* Lebih gelap */
+            backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             padding: 20px;
-            animation: fadeIn 0.2s ease;
         }
 
         .modal-overlay.active { display: flex; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         .modal {
-            background: var(--card-white);
-            border-radius: var(--radius);
-            padding: 25px;
-            max-width: 400px; /* Modal lebih ramping */
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 380px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            transform: scale(0.95);
-            animation: modalAppear 0.3s ease forwards;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes modalAppear { to { transform: scale(1); } }
+        .modal-overlay.active .modal {
+            transform: scale(1);
+            opacity: 1;
+        }
 
         .modal-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 14px;
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 24px;
+            margin: 0 auto 20px;
+            font-size: 28px;
             color: white;
         }
 
-        .modal h2 { text-align: center; margin-bottom: 8px; font-size: 1.4rem; }
-        .modal p { text-align: center; color: var(--text-light); margin-bottom: 20px; font-size: 0.9rem; }
+        .modal h2 { text-align: center; margin-bottom: 10px; color: var(--text-dark); }
+        .modal p { text-align: center; color: var(--text-light); margin-bottom: 25px; }
         
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-        }
+        .modal-actions { display: flex; gap: 12px; }
 
         .modal-btn {
-            padding: 10px 0;
-            border-radius: 10px;
+            padding: 12px 0;
+            border-radius: 12px;
             border: none;
             font-weight: 600;
             cursor: pointer;
             flex: 1;
-            transition: transform 0.2s;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            transition: 0.2s;
         }
 
-        .modal-btn.cancel { background: #F2F2F7; color: var(--primary-blue); }
-        .modal-btn.confirm { background: var(--primary-blue); color: white; }
-        .modal-btn:active { transform: scale(0.95); }
+        .modal-btn.cancel { background: #f1f5f9; color: #64748b; }
+        .modal-btn.confirm { background: #0f172a; color: white; } /* Tombol konfirmasi hitam elegan */
+        
+        .modal-btn:active { transform: scale(0.96); }
 
         /* FOOTER */
         .footer {
             text-align: center;
-            padding: 20px 0;
             color: var(--text-light);
-            font-size: 0.8rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            margin-top: 30px;
+            font-size: 0.85rem;
+            margin-top: 20px;
+            font-weight: 500;
         }
 
-        /* RESPONSIVE DESIGN - DISEDERHANAKAN */
-        
-        /* Tablet & Mobile Landscape */
+        /* RESPONSIVE */
         @media (max-width: 768px) {
-            .header h1 { font-size: 1.5rem; }
-            .header { padding: 20px 15px; }
-            
-            /* Memaksa grid menjadi 2 kolom lebih rapi */
-            .menu-grid {
-                grid-template-columns: repeat(3, 1fr); /* Tablet bisa 3 kolom */
-                gap: 15px;
-            }
+            .header-wrapper { padding: 30px 20px 70px 20px; border-radius: 0 0 25px 25px; }
+            .header h1 { font-size: 1.6rem; }
+            .menu-grid { grid-template-columns: repeat(3, 1fr); gap: 15px; }
         }
 
-        /* Mobile Portrait - TAMPILAN UTAMA HP */
         @media (max-width: 600px) {
-            body { padding: 15px; }
-            
-            .menu-grid {
-                /* Perubahan Penting: Memaksa 2 kolom di HP agar tidak terlalu besar */
-                grid-template-columns: repeat(2, 1fr); 
-                gap: 10px;
-            }
-
-            .health-card {
-                padding: 12px 8px; /* Padding sangat tipis untuk HP */
-                border-radius: 12px;
-                aspect-ratio: 1/1.1; /* Sedikit lebih tinggi dari lebar agar teks muat */
-            }
-
-            .card-icon {
-                width: 38px; /* Icon sangat compact */
-                height: 38px;
-                font-size: 16px;
-                border-radius: 10px;
-                margin-bottom: 8px;
-            }
-
-            .card-content h3 { 
-                font-size: 0.85rem; /* Judul kecil tapi terbaca */
-                margin-bottom: 4px; 
-            }
-            
-            .card-content p { 
-                font-size: 0.65rem; /* Deskripsi kecil */
-                -webkit-line-clamp: 3; 
-                line-height: 1.25;
-            }
-        }
-
-        /* HP Sangat Kecil (iPhone SE lama / Galaxy Fold tertutup) */
-        @media (max-width: 350px) {
-            .menu-grid {
-                grid-template-columns: 1fr; /* 1 kolom hanya jika layar sangat sempit */
-            }
+            body { padding: 0 0 20px 0; } /* Remove side padding on body */
+            .header-wrapper { border-radius: 0 0 20px 20px; margin-bottom: -30px; }
+            .container { padding: 0 15px; } /* Add padding to container instead */
+            .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .health-card { padding: 15px 10px; }
+            .card-icon { width: 45px; height: 45px; font-size: 20px; border-radius: 12px; }
+            .card-content h3 { font-size: 0.9rem; }
+            .card-content p { font-size: 0.7rem; }
         }
         
+        @media (max-width: 350px) {
+            .menu-grid { grid-template-columns: 1fr; }
+        }
+
         .no-results {
             grid-column: 1 / -1;
             text-align: center;
-            padding: 20px;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
             color: var(--text-light);
+            box-shadow: var(--shadow-card);
         }
     </style>
 </head>
 <body>
+
+    <!-- Header Full Width Background -->
+    <div class="header-wrapper">
+        <div class="header-bg-circle circle-1"></div>
+        <div class="header-bg-circle circle-2"></div>
+        
+        <div class="container header-content">
+            <header class="header">
+                <h1>Sistem Informasi Kesehatan</h1>
+                <p>Portal Pelaporan & Surveilans Penyakit Menular</p>
+            </header>
+        </div>
+    </div>
+
     <div class="container">
-        <header class="header">
-            <h1><i class="fas fa-heartbeat"></i> Sistem Informasi Kesehatan</h1>
-            <p>Pencatatan & Pelaporan Penyakit Menular</p>
-            
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Cari nama penyakit...">
-                </div>
+        <!-- Search Container Melayang -->
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari nama penyakit (Cth: DBD, Campak)...">
             </div>
-        </header>
+        </div>
 
         <main class="menu-grid" id="menuGrid">
             <!-- Campak/Rubella -->
@@ -431,21 +408,22 @@
             </div>
         </main>
 
-        <div class="modal-overlay" id="modalOverlay">
-            <div class="modal" id="modal">
-                <div class="modal-icon" id="modalIcon"></div>
-                <h2 id="modalTitle">Konfirmasi</h2>
-                <p id="modalMessage">Pesan konfirmasi.</p>
-                <div class="modal-actions">
-                    <button class="modal-btn cancel" id="cancelBtn">Batal</button>
-                    <button class="modal-btn confirm" id="confirmBtn">Buka</button>
-                </div>
-            </div>
-        </div>
-
         <footer class="footer">
             <p>UPT Puskesmas Kampung Dalam © 2026</p>
         </footer>
+    </div>
+
+    <!-- Modal Layout -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-icon" id="modalIcon"></div>
+            <h2 id="modalTitle">Konfirmasi</h2>
+            <p id="modalMessage">Pesan konfirmasi.</p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelBtn">Batal</button>
+                <button class="modal-btn confirm" id="confirmBtn">Buka</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -455,27 +433,21 @@
             const menuGrid = document.getElementById('menuGrid');
             const modalOverlay = document.getElementById('modalOverlay');
             
-            // Variabel state
-            let selectedCard = null;
             let targetUrl = '';
 
-            // Animasi awal masuk
+            // Animasi Masuk
             cards.forEach((card, index) => {
                 card.style.opacity = '0';
-                card.style.animation = `cardAppear 0.5s ease forwards ${index * 0.05}s`;
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
             });
 
-            // Tambahkan CSS Keyframe untuk animasi JS inject
-            const styleSheet = document.createElement("style");
-            styleSheet.innerText = `@keyframes cardAppear { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }`;
-            document.head.appendChild(styleSheet);
-
-            // LOGIKA PENCARIAN
+            // Logic Pencarian
             function filterCards() {
                 const term = searchInput.value.toLowerCase().trim();
                 let hasResults = false;
-
-                // Hapus pesan "tidak ditemukan" yang lama jika ada
                 const existingMsg = document.querySelector('.no-results');
                 if(existingMsg) existingMsg.remove();
 
@@ -485,31 +457,23 @@
                     
                     if (searchData.includes(term) || title.includes(term)) {
                         card.style.display = 'flex';
-                        // Reset animasi kecil agar terasa responsif
-                        card.style.animation = 'none';
-                        card.offsetHeight; /* trigger reflow */
-                        card.style.animation = 'cardAppear 0.3s ease forwards';
                         hasResults = true;
                     } else {
                         card.style.display = 'none';
                     }
                 });
 
-                // Tampilkan pesan jika tidak ada hasil
                 if (!hasResults && term !== '') {
                     const noResults = document.createElement('div');
                     noResults.className = 'no-results';
-                    noResults.innerHTML = `
-                        <i class="fas fa-search" style="font-size: 32px; opacity: 0.3; margin-bottom: 10px;"></i>
-                        <p>Penyakit "${term}" tidak ditemukan</p>
-                    `;
+                    noResults.innerHTML = `<i class="fas fa-folder-open" style="font-size: 32px; opacity: 0.3; margin-bottom: 10px; color:var(--text-dark)"></i><p>Penyakit tidak ditemukan</p>`;
                     menuGrid.appendChild(noResults);
                 }
             }
 
             searchInput.addEventListener('input', filterCards);
 
-            // LOGIKA MODAL (Tidak berubah dari sebelumnya, hanya dirapikan)
+            // Logic Modal
             function showModal(card) {
                 const disease = card.getAttribute('data-disease');
                 const color = card.getAttribute('data-color');
@@ -518,10 +482,12 @@
                 const iconHTML = card.querySelector('.card-icon').innerHTML;
                 const modalIcon = document.getElementById('modalIcon');
                 
-                modalIcon.className = `modal-icon ${color}`;
+                // Reset class dan tambahkan class warna baru
+                modalIcon.className = 'modal-icon ' + color;
                 modalIcon.innerHTML = iconHTML;
+                
                 document.getElementById('modalTitle').textContent = disease;
-                document.getElementById('modalMessage').textContent = `Buka halaman pelaporan ${disease}?`;
+                document.getElementById('modalMessage').textContent = `Lanjutkan mengisi laporan untuk ${disease}?`;
                 
                 modalOverlay.classList.add('active');
             }
@@ -529,21 +495,16 @@
             cards.forEach(card => {
                 card.addEventListener('click', function(e) {
                     e.preventDefault();
-                    this.classList.add('clicked');
-                    setTimeout(() => this.classList.remove('clicked'), 400);
                     showModal(this);
                 });
             });
 
-            // Tombol Modal
             document.getElementById('cancelBtn').addEventListener('click', () => modalOverlay.classList.remove('active'));
-            
             document.getElementById('confirmBtn').addEventListener('click', () => {
                 if (targetUrl) window.location.href = targetUrl;
                 modalOverlay.classList.remove('active');
             });
 
-            // Tutup modal jika klik di luar
             modalOverlay.addEventListener('click', (e) => {
                 if (e.target === modalOverlay) modalOverlay.classList.remove('active');
             });
