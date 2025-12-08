@@ -151,18 +151,57 @@
             }
             
             .mobile-button-group {
-                flex-wrap: wrap;
-                gap: 0.5rem;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 0.5rem;
+                margin-left: -0.25rem;
+                margin-right: -0.25rem;
+                padding-left: 0.25rem;
+                padding-right: 0.25rem;
+            }
+            
+            .mobile-button-group::-webkit-scrollbar {
+                height: 4px;
+            }
+            
+            .mobile-button-group::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 10px;
+            }
+            
+            .mobile-button-group::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 10px;
             }
             
             .mobile-button-group button {
-                flex: 1;
+                flex: 0 0 auto;
                 min-width: 120px;
                 font-size: 0.75rem;
                 padding: 0.5rem 0.75rem;
+                white-space: nowrap;
             }
 
-            /* PERBAIKAN POINT 1: Perbaikan tambahan untuk mobile */
+            /* PERBAIKAN POINT 1: Tombol aksi horizontal di mobile */
+            .mobile-actions-container {
+                display: flex;
+                overflow-x: auto;
+                gap: 0.5rem;
+                padding: 0.5rem 0;
+                margin: 0 -0.5rem;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+
+            .mobile-action-button {
+                flex: 0 0 auto;
+                min-width: 110px;
+                padding: 0.75rem 0.5rem;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+
             .mobile-menu-item {
                 padding: 1rem;
                 margin-bottom: 0.75rem;
@@ -197,19 +236,46 @@
                 font-size: 0.65rem;
                 padding: 0.15rem 0.5rem;
             }
+
+            /* PERBAIKAN POINT 4: Tombol tambah kontak erat di bawah kartu */
+            .mobile-kontak-erat-container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .mobile-kontak-erat-button {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
         }
 
-        /* PERBAIKAN POINT 2: Style untuk count di judul */
-        .title-count {
-            font-size: 1.25rem;
-            font-weight: 800;
-            margin-left: 0.5rem;
+        /* PERBAIKAN POINT 2: Style untuk input EPID manual */
+        .epid-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .epid-input-hint {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .epid-input-valid {
+            border-color: #10b981 !important;
+            background-color: #f0fdf4 !important;
+        }
+
+        .epid-input-invalid {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
         }
 
         @media (max-width: 640px) {
-            .title-count {
-                font-size: 1rem;
-                font-weight: 700;
+            .epid-input-container {
+                flex-direction: column;
             }
         }
 
@@ -246,6 +312,14 @@
         .kontak-erat-card {
             border: 2px dashed #cbd5e1;
             background: #f8fafc;
+            margin-bottom: 1rem;
+        }
+
+        /* PERBAIKAN POINT 4: Kontainer tombol tambah kontak erat */
+        .kontak-erat-add-button-container {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
         }
     </style>
 </head>
@@ -455,11 +529,10 @@
             }
         };
 
-        // PERBAIKAN POINT 5: Fungsi export CSV dengan data terpisah per cell
+        // Fungsi export CSV
         const exportToCSV = (data, filename, isRaw = false) => {
             if (!data || data.length === 0) { alert("Tidak ada data."); return; }
             
-            // Headers sesuai urutan pertanyaan
             const headers = [
                 "Nomor EPID", "Status", "Nama Kasus", "Jenis Kelamin", "Tanggal Lahir", 
                 "Alamat", "Kabupaten", "Kecamatan", "Kelurahan", "RT", "RW", 
@@ -480,9 +553,7 @@
                 "Unit Pembuat", "Current Owner", "Tanggal Terakhir Update"
             ];
             
-            // Format data untuk CSV
             const csvRows = data.map(item => {
-                // Helper function untuk format data
                 const formatArray = (arr) => Array.isArray(arr) ? arr.join('; ') : (arr || '');
                 const formatDate = (date) => date ? new Date(date).toLocaleDateString('id-ID') : '';
                 
@@ -555,13 +626,11 @@
                 ];
             });
             
-            // Buat CSV content
             const csvContent = [
                 headers.join(','),
                 ...csvRows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
             ].join('\n');
             
-            // Download file
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
@@ -591,8 +660,8 @@
             spesimenDarah: '', jenisSampleDarah: [], tanggalAmbilDarah: '', tanggalKirimDarah: '',
             spesimenLain: '', jenisSampelLain: [], jenisSampelLainSebutkan: '', tanggalAmbilLain: '', 
             tanggalKirimLain: '', keadaanSaatIni: '', pelaksanaInvestigasi: '', namaSekolah: '', 
-            titikLokasi: '', epidManual: false,
-            // TAMBAHAN: Data kontak erat
+            titikLokasi: '',
+            // PERBAIKAN POINT 4: Data kontak erat
             kontakErat: []
         };
 
@@ -613,32 +682,11 @@
             }
         };
 
-        let lastEPIDNumber = 0;
-        const generateAutoEPID = async () => {
-            if (!dbStore) return `C-140125001`;
-            try {
-                const snapshot = await dbStore.collection('forms').get();
-                const epids = snapshot.docs
-                    .map(doc => doc.data().nomorEPID)
-                    .filter(epid => epid && epid.startsWith('C-140125'));
-                let maxNumber = 0;
-                epids.forEach(epid => {
-                    const numStr = epid.replace('C-140125', '');
-                    const num = parseInt(numStr);
-                    if (!isNaN(num) && num > maxNumber) {
-                        maxNumber = num;
-                    }
-                });
-                const nextNumber = maxNumber + 1;
-                return `C-140125${nextNumber.toString().padStart(3, '0')}`;
-            } catch (e) {
-                console.error("Error generating EPID:", e);
-                return `C-140125${Date.now().toString().slice(-6)}`;
-            }
-        };
-
+        // PERBAIKAN POINT 2: Fungsi validasi EPID manual
         const validateManualEPID = (epid) => {
             if (!epid) return { valid: false, message: 'Nomor EPID tidak boleh kosong' };
+            
+            // Format: C-140125XXX (minimal 3 digit)
             const epidPattern = /^C-140125\d{3,}$/;
             if (!epidPattern.test(epid)) {
                 return { 
@@ -646,18 +694,16 @@
                     message: 'Format EPID salah. Harus: C-140125XXX (contoh: C-140125001)' 
                 };
             }
+            
             return { valid: true, message: '' };
         };
 
-        // PERBAIKAN UTAMA: Fungsi untuk menentukan current owner dengan logika yang benar
         const determineCurrentOwner = (formData) => {
             if (formData.currentOwner && formData.currentOwner !== '') {
                 return formData.currentOwner;
             }
             
-            // Untuk chain referral, kita perlu mencari pengirim terakhir
             if (formData.transferHistory && formData.transferHistory.length > 0) {
-                // Cari riwayat transfer terakhir yang BERHASIL (diterima)
                 const successfulTransfers = formData.transferHistory.filter(
                     record => record.action === 'diterima' || record.action === 'dikirim'
                 );
@@ -665,24 +711,20 @@
                 if (successfulTransfers.length > 0) {
                     const lastTransfer = successfulTransfers[successfulTransfers.length - 1];
                     
-                    // Jika ada newOwner di record terakhir, gunakan itu
                     if (lastTransfer.newOwner) {
                         return lastTransfer.newOwner;
                     }
                     
-                    // Jika action 'dikirim', owner masih pengirim
                     if (lastTransfer.action === 'dikirim') {
                         return lastTransfer.from;
                     }
                     
-                    // Jika action 'diterima', owner adalah penerima
                     if (lastTransfer.action === 'diterima') {
                         return lastTransfer.to;
                     }
                 }
             }
             
-            // Fallback untuk data lama
             if (formData.statusData === 'Final' || formData.statusData === 'Baru' || formData.statusData === 'Draft') {
                 return formData.createdUnit;
             }
@@ -696,9 +738,7 @@
             }
             
             if (formData.statusData === 'Ditolak') {
-                // Saat ditolak, kembalikan ke pengirim terakhir dari transferHistory
                 if (formData.transferHistory && formData.transferHistory.length > 0) {
-                    // Cari pengirim terakhir yang mengirim form ini
                     const sendRecords = formData.transferHistory.filter(r => r.action === 'dikirim');
                     if (sendRecords.length > 0) {
                         return sendRecords[sendRecords.length - 1].from;
@@ -760,7 +800,6 @@
         // BAGIAN 3: KOMPONEN UI DASAR
         const Card = ({ children, className = "" }) => (<div className={`bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-6 mobile-padding ${className}`}>{children}</div>);
 
-        // PERBAIKAN POINT 4: Komponen Input dengan required
         const Input = ({ label, as = 'input', className, uppercase = false, required = false, ...props }) => (
             <div className={`w-full ${className} mb-4`}>
                 <label className={`block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2 ml-1 text-micro ${required ? 'required-field' : ''}`}>
@@ -774,7 +813,6 @@
             </div>
         );
 
-        // PERBAIKAN POINT 4: Komponen Select dengan required
         const Select = ({ label, children, required = false, ...props }) => (
             <div className="w-full mb-4">
                 <label className={`block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2 ml-1 text-micro ${required ? 'required-field' : ''}`}>
@@ -789,7 +827,6 @@
             </div>
         );
 
-        // PERBAIKAN POINT 4: Komponen RadioGroup dengan required
         const RadioGroup = ({ name, label, options, value, onChange, required = false }) => (
             <div className="w-full mb-6">
                 {label && (
@@ -822,7 +859,6 @@
             </label>
         );
 
-        // PERBAIKAN POINT 4: ImunisasiSection dengan required
         const ImunisasiSection = ({ label, name, sourceName, data, onChange, required = false }) => (
             <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 mb-4 mobile-padding">
                 <Label required={required}>{label}</Label>
@@ -853,22 +889,55 @@
             </div>
         );
 
-        // PERBAIKAN POINT 4: Step1 tanpa fitur membuat nomor EPID manual
+        // PERBAIKAN POINT 2: Step1 dengan input EPID manual
         const Step1 = ({ data, onChange, onSumberChange, Icons }) => {
+            const [epidValidation, setEpidValidation] = useState({ valid: true, message: '' });
+            
+            const handleEpidChange = (e) => {
+                const value = e.target.value.toUpperCase();
+                onChange(e);
+                
+                // Validasi real-time
+                if (value) {
+                    const validation = validateManualEPID(value);
+                    setEpidValidation(validation);
+                } else {
+                    setEpidValidation({ valid: false, message: 'Nomor EPID tidak boleh kosong' });
+                }
+            };
+            
             return (
                 <div className="animate-fadeIn">
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100 mb-8 mobile-padding">
                         <div className="flex items-center justify-between mb-4">
                             <div>
                                 <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2 text-micro">Nomor EPID</p>
-                                <p className="text-2xl font-mono font-bold text-blue-700 tracking-tight">
-                                    {data.nomorEPID || 'Akan dibuat otomatis saat formulir difinalkan'}
-                                </p>
+                                <div className="epid-input-container">
+                                    <input
+                                        type="text"
+                                        name="nomorEPID"
+                                        value={data.nomorEPID || ''}
+                                        onChange={handleEpidChange}
+                                        placeholder="C-140125001"
+                                        className={`w-full p-4 rounded-xl text-slate-800 font-medium font-mono focus:bg-white focus:ring-2 focus:ring-blue-500 focus:shadow-sm transition-all outline-none border text-body placeholder-slate-400 mobile-form-input uppercase-input ${data.nomorEPID ? (epidValidation.valid ? 'epid-input-valid border-green-300' : 'epid-input-invalid border-red-300') : 'border-slate-200'}`}
+                                    />
+                                    <div className="epid-input-hint">
+                                        {data.nomorEPID ? (
+                                            epidValidation.valid ? (
+                                                <span className="text-green-600">✓ Format EPID valid</span>
+                                            ) : (
+                                                <span className="text-red-600">{epidValidation.message}</span>
+                                            )
+                                        ) : (
+                                            <span>Masukkan nomor EPID manual (Format: C-140125XXX)</span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                             <Icons.FileText className="text-blue-300 w-10 h-10"/>
                         </div>
                         <p className="text-sm text-blue-600 font-medium">
-                            Nomor EPID akan dibuat otomatis saat formulir difinalisasi.
+                            Nomor EPID harus diisi secara manual sebelum formulir disimpan.
                         </p>
                     </div>
                     
@@ -923,7 +992,6 @@
             );
         };
 
-        // PERBAIKAN POINT 4: Step2 dengan field required
         const Step2 = ({ data, onChange, onChangeKecamatan, Icons }) => (
             <div className="animate-fadeIn">
                 <Input label="Nama Lengkap Pasien" name="namaKasus" value={data.namaKasus} onChange={onChange} placeholder="Masukkan nama lengkap" uppercase={true} required={true} />
@@ -973,7 +1041,6 @@
             </div>
         );
 
-        // PERBAIKAN POINT 4: Step3 dengan field required
         const Step3 = ({ data, onChange, Icons }) => {
             const gejalaOptions = ['Batuk', 'Pilek', 'Mata Merah', 'Adenopathy', 'Arthralgia', 'Kehamilan', 'Lainnya'];
             
@@ -1034,7 +1101,6 @@
             );
         };
 
-        // PERBAIKAN POINT 4: Step4 dengan field required (kecuali tanggal imunisasi terakhir)
         const Step4 = ({ data, onChange, Icons }) => (
             <div className="animate-fadeIn">
                 <ImunisasiSection
@@ -1082,7 +1148,6 @@
                     required={true}
                 />
                 
-                {/* PERBAIKAN POINT 4: TANPA required (sesuai permintaan) */}
                 <Input
                     label="Tanggal imunisasi campak-rubela terakhir"
                     type="date"
@@ -1097,9 +1162,8 @@
             </div>
         );
 
-        // PERBAIKAN POINT: Step5 dengan penambahan bagian kontak erat
+        // PERBAIKAN POINT 4: Step5 dengan tombol tambah kontak erat di bawah kartu
         const Step5 = ({ data, onChange, Icons }) => {
-            // Fungsi untuk menambah kontak erat baru
             const handleAddKontakErat = () => {
                 const newKontak = {
                     id: Date.now().toString(),
@@ -1119,7 +1183,6 @@
                 });
             };
 
-            // Fungsi untuk menghapus kontak erat
             const handleRemoveKontakErat = (index) => {
                 const newKontakErat = [...data.kontakErat];
                 newKontakErat.splice(index, 1);
@@ -1132,7 +1195,6 @@
                 });
             };
 
-            // Fungsi untuk mengubah data kontak erat
             const handleKontakEratChange = (index, field, value) => {
                 const newKontakErat = [...data.kontakErat];
                 newKontakErat[index] = {
@@ -1149,7 +1211,7 @@
             };
 
             return (
-                <div className="animate-fadeIn">
+                <div className="animate-fadeIn mobile-kontak-erat-container">
                     <div className="mb-8">
                         <RadioGroup name="adaKontakSakitSama" label="Apakah ada kontak dengan kasus serupa?" options={['ya','tidak']} value={data.adaKontakSakitSama} onChange={onChange} required={true}/>
                         {data.adaKontakSakitSama === 'ya' && (
@@ -1174,20 +1236,11 @@
 
                     {/* BAGIAN KONTAK ERAT */}
                     <div className="mt-8 pt-6 border-t border-slate-200">
-                        <div className="flex justify-between items-center mb-4">
-                            <div>
-                                <Label>Penelusuran Kontak Erat</Label>
-                                <p className="text-sm text-slate-500 mt-1">
-                                    Tambahkan data kontak erat
-                                </p>
-                            </div>
-                            <button 
-                                type="button"
-                                onClick={handleAddKontakErat}
-                                className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-lg font-bold hover:shadow-lg transition flex items-center gap-2 mobile-menu-item"
-                            >
-                                <Icons.UserPlus className="w-4 h-4" /> Tambah Kontak Erat
-                            </button>
+                        <div className="mb-4">
+                            <Label>Penelusuran Kontak Erat</Label>
+                            <p className="text-sm text-slate-500 mt-1">
+                                Tambahkan data kontak erat
+                            </p>
                         </div>
 
                         {/* Form untuk setiap kontak erat */}
@@ -1264,6 +1317,17 @@
                             </div>
                         ))}
 
+                        {/* PERBAIKAN POINT 4: Tombol tambah kontak erat dipindah ke bawah kartu */}
+                        <div className="kontak-erat-add-button-container">
+                            <button 
+                                type="button"
+                                onClick={handleAddKontakErat}
+                                className="w-full md:w-auto bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition flex items-center justify-center gap-2 mobile-kontak-erat-button"
+                            >
+                                <Icons.UserPlus className="w-5 h-5" /> Tambah Kontak Erat
+                            </button>
+                        </div>
+
                         {/* Ringkasan kontak erat yang sudah diisi */}
                         {data.kontakErat.length > 0 && (
                             <div className="mt-6 pt-4 border-t border-slate-200">
@@ -1299,7 +1363,6 @@
             );
         };
 
-        // PERBAIKAN POINT 4: Step6 dengan field required (kecuali nama sekolah dan titik lokasi)
         const Step6 = ({ data, onChange, getGeo, loadingGeo, onSaveToPending, onSaveAndFinal, Icons }) => (
             <div className="animate-fadeIn">
                 <div className="mb-8">
@@ -1349,7 +1412,6 @@
 
                 <Input label="Pelaksana Investigasi" name="pelaksanaInvestigasi" value={data.pelaksanaInvestigasi} onChange={onChange} uppercase={true} required={true} />
                 
-                {/* PERBAIKAN POINT 4: TANPA required (sesuai permintaan) */}
                 <Input label="Nama Sekolah (Jika penderita berusia sekolah)" name="namaSekolah" value={data.namaSekolah} onChange={onChange} uppercase={true} />
 
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-6 rounded-xl mobile-padding">
@@ -1493,7 +1555,6 @@
             const [showUnfinalizeModal, setShowUnfinalizeModal] = useState(false);
             const [itemToUnfinalize, setItemToUnfinalize] = useState(null);
             
-            // PERBAIKAN POINT 3: State untuk modal edit nomor EPID
             const [showEditEpidModal, setShowEditEpidModal] = useState(false);
             const [itemToEditEpid, setItemToEditEpid] = useState(null);
             const [newEpidNumber, setNewEpidNumber] = useState('');
@@ -1507,7 +1568,10 @@
             
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
+            
+            // PERBAIKAN POINT 3: Ref untuk scroll ke atas
             const topRef = useRef(null);
+            const formContainerRef = useRef(null);
             const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
             const showLoading = (show = true, minDelay = 300) => {
@@ -1655,7 +1719,14 @@
             };
 
             useEffect(() => { 
-                if(view === 'form') window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                if(view === 'form') {
+                    // PERBAIKAN POINT 3: Scroll ke atas saat berpindah step
+                    if (formContainerRef.current) {
+                        formContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }
             }, [step, view]);
 
             const handleLogin = async (e) => {
@@ -1701,7 +1772,6 @@
                     createdUnit: currentUser?.unitName,
                     originalUnit: currentUser?.unitName,
                     currentOwner: currentUser?.unitName,
-                    epidManual: false,
                     transferHistory: []
                 }); 
                 setStep(1); 
@@ -1942,16 +2012,21 @@
             const confirmFinalize = async () => {
                 if (!itemToFinalize) return;
                 
+                // PERBAIKAN POINT 2: Validasi EPID sebelum finalisasi
+                if (!itemToFinalize.nomorEPID) {
+                    showNotification('Nomor EPID harus diisi sebelum finalisasi', 'error');
+                    return;
+                }
+                
+                const validation = validateManualEPID(itemToFinalize.nomorEPID);
+                if (!validation.valid) {
+                    showNotification(validation.message, 'error');
+                    return;
+                }
+                
                 showLoading(true); 
                 try {
                     let finalData = { ...itemToFinalize };
-                    
-                    if (!finalData.nomorEPID && !finalData.epidManual) {
-                        finalData.nomorEPID = await generateAutoEPID();
-                        finalData.epidManual = false;
-                    } else if (finalData.nomorEPID && finalData.epidManual) {
-                        finalData.epidManual = true;
-                    }
                     
                     finalData.updatedAt = Date.now();
                     finalData.statusData = 'Final';
@@ -2011,14 +2086,12 @@
                 }
             };
 
-            // PERBAIKAN POINT 3: Fungsi untuk handle edit nomor EPID
             const handleEditEpidForm = (item) => {
                 setItemToEditEpid(item);
                 setNewEpidNumber(item.nomorEPID || '');
                 setShowEditEpidModal(true);
             };
 
-            // PERBAIKAN POINT 3: Fungsi untuk confirm edit nomor EPID
             const confirmEditEpid = async () => {
                 if (!itemToEditEpid) return;
                 
@@ -2033,7 +2106,6 @@
                     const up = {
                         ...itemToEditEpid,
                         nomorEPID: newEpidNumber,
-                        epidManual: true,
                         updatedAt: Date.now()
                     };
                     
@@ -2175,9 +2247,9 @@
                 ); 
             };
             
-            // PERBAIKAN POINT 4: Validasi field required
             const validateRequiredFields = () => {
                 const requiredFields = [
+                    { field: 'nomorEPID', message: 'Nomor EPID wajib diisi!' },
                     { field: 'namaKasus', message: 'Nama Kasus wajib diisi!' },
                     { field: 'jenisKelamin', message: 'Jenis Kelamin wajib dipilih!' },
                     { field: 'tanggalLahir', message: 'Tanggal Lahir wajib diisi!' },
@@ -2211,6 +2283,15 @@
                 for (const { field, message } of requiredFields) {
                     if (!formData[field] || formData[field] === '') {
                         showNotification(message, 'error');
+                        return false;
+                    }
+                }
+
+                // PERBAIKAN POINT 2: Validasi format EPID
+                if (formData.nomorEPID) {
+                    const epidValidation = validateManualEPID(formData.nomorEPID);
+                    if (!epidValidation.valid) {
+                        showNotification(epidValidation.message, 'error');
                         return false;
                     }
                 }
@@ -2255,6 +2336,15 @@
             };
             
             const handleSaveDraft = async () => { 
+                // PERBAIKAN POINT 2: EPID tidak wajib untuk draft
+                if (formData.nomorEPID) {
+                    const validation = validateManualEPID(formData.nomorEPID);
+                    if (!validation.valid) {
+                        showNotification(validation.message, 'error');
+                        return;
+                    }
+                }
+                
                 showLoading(true); 
                 try { 
                     const d = { 
@@ -2318,13 +2408,6 @@
                 try { 
                     let finalData = { ...formData };
                     
-                    if (!finalData.nomorEPID && !finalData.epidManual) {
-                        finalData.nomorEPID = await generateAutoEPID();
-                        finalData.epidManual = false;
-                    } else if (finalData.nomorEPID && finalData.epidManual) {
-                        finalData.epidManual = true;
-                    }
-                    
                     finalData.updatedAt = Date.now();
                     finalData.statusData = 'Final';
                     finalData.sharedTo = '';
@@ -2351,26 +2434,29 @@
                 setTimeout(() => setNotification(null), 3000); 
             };
             
+            // PERBAIKAN POINT 3: Fungsi nextStep dengan scroll ke atas
             const nextStep = () => {
                 setStep(p => Math.min(p + 1, 6));
+                
+                // Scroll ke atas dengan timeout untuk memastikan render selesai
                 setTimeout(() => {
-                    if (topRef.current) {
-                        topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (formContainerRef.current) {
+                        formContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                     } else {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
-                }, 50);
+                }, 100);
             };
             
             const prevStep = () => {
                 setStep(p => Math.max(p - 1, 1));
                 setTimeout(() => {
-                    if (topRef.current) {
-                        topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (formContainerRef.current) {
+                        formContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                     } else {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
-                }, 50);
+                }, 100);
             };
 
             const STEP_LABELS = [
@@ -2638,7 +2724,8 @@
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-4 pb-32 scroll-smooth">
+                            {/* PERBAIKAN POINT 3: Container form dengan ref untuk scroll */}
+                            <div className="flex-1 overflow-y-auto p-4 pb-32 scroll-smooth" ref={formContainerRef}>
                                 <div className="max-w-3xl mx-auto animate-fadeIn">
                                     <Card className="min-h-[60vh]">
                                         <div className="flex justify-between items-start mb-8">
@@ -2724,7 +2811,6 @@
                     />
                 );
                 
-                // PERBAIKAN POINT 5: Form Final List View dengan pencarian dan pagination
                 if (view === 'form-final') return (
                     <FormFinalListView 
                         title="Form Final" 
@@ -2821,7 +2907,7 @@
                                 <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2 text-micro">Nomor EPID</p>
                                 <p className="text-2xl font-mono font-bold text-slate-800 tracking-tight">{formData.nomorEPID}</p>
                                 <p className="text-sm text-slate-500 mt-2">
-                                    {formData.epidManual ? '(EPID Manual)' : '(EPID Otomatis)'}
+                                    (EPID Manual)
                                 </p>
                             </div>
                             
@@ -2871,7 +2957,6 @@
                         />
                     )}
                     
-                    {/* PERBAIKAN POINT 3: Modal Edit Nomor EPID */}
                     {showEditEpidModal && (
                         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
                             <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl mobile-modal">
@@ -3013,7 +3098,7 @@
         };
 
         // BAGIAN 5: KOMPONEN LIST VIEW
-        // PERBAIKAN POINT 2: Update ListView untuk menggunakan title-count
+        // PERBAIKAN POINT 1: ListView dengan tombol aksi horizontal di mobile
         const ListView = ({ title, data, type, onBack, onAction, onDelete, Icons, notification, showDeleteModal, setShowDeleteModal, handleDelete, currentUser, count }) => (
             <div className="fixed inset-0 h-[100dvh] w-full bg-slate-50 flex flex-col">
                 <div className="flex-none p-6 pt-8 bg-white rounded-b-3xl shadow-sm border-b border-slate-100 z-10 mobile-padding">
@@ -3021,7 +3106,7 @@
                         <button onClick={onBack} className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:scale-90 transition hover:bg-slate-200">
                             <Icons.ChevronLeft className="w-5 h-5"/>
                         </button>
-                        <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-blue-600 title-count">({count})</span></h2>
+                        <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-blue-600">({count})</span></h2>
                         <div className="w-10"></div>
                     </div>
                 </div>
@@ -3052,12 +3137,13 @@
                                         {item.kelurahan || 'Lokasi tidak diketahui'}
                                     </p>
                                     
+                            
                                     <div className="flex gap-2 border-t border-slate-100 pt-4 mobile-button-group">
                                         <button onClick={() => onAction(item)} className="flex-1 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-bold shadow-sm hover:shadow-md transition mobile-menu-item">
                                             Edit Draft
                                         </button>
                                         {currentUser?.role === 'admin' && (
-                                            <button onClick={() => onDelete(item)} className="w-12 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100 mobile-menu-item">
+                                            <button onClick={() => onDelete(item)} className="mobile-action-button w-12 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100">
                                                 <Icons.Trash className="w-4.5 h-4.5"/>
                                             </button>
                                         )}
@@ -3073,7 +3159,7 @@
             </div>
         );
 
-        // PERBAIKAN POINT 2: Update PendingListView untuk menggunakan title-count
+        // PERBAIKAN POINT 1: PendingListView dengan tombol aksi horizontal di mobile
         const PendingListView = ({ title, data, type, onBack, onView, onEdit, onFinalize, onShare, onDelete, Icons, showDeleteModal, setShowDeleteModal, handleDelete, showShareModal, setShowShareModal, confirmShare, notification, loading, ALL_SERVICES, currentUser, count }) => {
             const getStatusBadge = (status, isFromOtherUnit = false) => {
                 const statusColors = {
@@ -3106,7 +3192,7 @@
                             <button onClick={onBack} className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:scale-90 transition hover:bg-slate-200">
                                 <Icons.ChevronLeft className="w-5 h-5"/>
                             </button>
-                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-amber-600 title-count">({count})</span></h2>
+                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-amber-600">({count})</span></h2>
                             <div className="w-10"></div>
                         </div>
                     </div>
@@ -3219,7 +3305,6 @@
             );
         };
 
-        // PERBAIKAN POINT 2 & 5: FormFinalListView dengan pencarian, pagination dan title-count
         const FormFinalListView = ({ title, data, type, onBack, onView, onExport, Icons, notification, currentUser, count }) => {
             const [searchTerm, setSearchTerm] = useState('');
             const [currentPage, setCurrentPage] = useState(1);
@@ -3260,7 +3345,7 @@
                             <button onClick={onBack} className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:scale-90 transition hover:bg-slate-200">
                                 <Icons.ChevronLeft className="w-5 h-5"/>
                             </button>
-                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-green-600 title-count">({count})</span></h2>
+                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-green-600">({count})</span></h2>
                             <button onClick={onExport} className="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100">
                                 <Icons.Download className="w-5 h-5"/>
                             </button>
@@ -3333,12 +3418,13 @@
                                                     </span>
                                                 </p>
                                                 
-                                                <div className="flex gap-2 border-t border-slate-100 pt-4 mobile-button-group">
+                                                {/* PERBAIKAN POINT 1: Container tombol aksi horizontal di mobile */}
+                                                <div className="mobile-actions-container">
                                                     <button 
                                                         onClick={() => onView(item)} 
                                                         className="w-full py-2.5 bg-slate-900 text-white rounded-lg text-sm font-bold shadow-sm hover:shadow-md transition flex items-center justify-center gap-2 mobile-menu-item"
                                                     >
-                                                        <Icons.Eye className="w-4 h-4"/> Lihat Detail (Read-Only)
+                                                        <Icons.Eye className="w-4 h-4"/> Lihat Detail
                                                     </button>
                                                 </div>
                                             </div>
@@ -3381,7 +3467,7 @@
             );
         };
 
-        // PERBAIKAN POINT 2: Update OutgoingListView untuk menggunakan title-count
+        // PERBAIKAN POINT 1: OutgoingListView dengan tombol aksi horizontal di mobile
         const OutgoingListView = ({ title, data, type, onBack, onView, Icons, notification, currentUser, count }) => {
             const getStatusBadge = (status) => {
                 const statusColors = {
@@ -3405,7 +3491,7 @@
                             <button onClick={onBack} className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:scale-90 transition hover:bg-slate-200">
                                 <Icons.ChevronLeft className="w-5 h-5"/>
                             </button>
-                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-indigo-600 title-count">({count})</span></h2>
+                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-indigo-600">({count})</span></h2>
                             <div className="w-10"></div>
                         </div>
                     </div>
@@ -3458,10 +3544,11 @@
                                                 )}
                                             </p>
                                             
-                                            <div className="flex gap-2 border-t border-slate-100 pt-4 mobile-button-group">
+                                            {/* PERBAIKAN POINT 1: Container tombol aksi horizontal di mobile */}
+                                            <div className="mobile-actions-container">
                                                 <button 
                                                     onClick={() => onView(item)} 
-                                                    className="flex-1 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-bold shadow-sm hover:shadow-md transition flex items-center justify-center gap-2 mobile-menu-item"
+                                                    className="w-full py-2.5 bg-slate-900 text-white rounded-lg text-sm font-bold shadow-sm hover:shadow-md transition flex items-center justify-center gap-2 mobile-menu-item"
                                                 >
                                                     <Icons.Eye className="w-4 h-4"/> Lihat Detail
                                                 </button>
@@ -3478,7 +3565,7 @@
             );
         };
 
-        // PERBAIKAN POINT 2: Update InboxListView untuk menggunakan title-count
+        // PERBAIKAN POINT 1: InboxListView dengan tombol aksi horizontal di mobile
         const InboxListView = ({ title, data, type, onBack, onView, onAccept, onReject, onTransfer, Icons, showReviewModal, reviewItem, setShowReviewModal, setReviewItem, showTransferModal, setShowTransferModal, confirmTransfer, notification, loading, ALL_SERVICES, currentUser, count, showRejectModal, setShowRejectModal, confirmRejectTransfer }) => {
             const getStatusBadge = (status) => {
                 const statusColors = {
@@ -3500,7 +3587,7 @@
                             <button onClick={onBack} className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:scale-90 transition hover:bg-slate-200">
                                 <Icons.ChevronLeft className="w-5 h-5"/>
                             </button>
-                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-rose-600 title-count">({count})</span></h2>
+                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-rose-600">({count})</span></h2>
                             <div className="w-10"></div>
                         </div>
                     </div>
@@ -3619,7 +3706,7 @@
             );
         };
 
-        // PERBAIKAN POINT 2: Update RejectedListView untuk menggunakan title-count
+        // PERBAIKAN POINT 1: RejectedListView dengan tombol aksi horizontal di mobile
         const RejectedListView = ({ title, data, type, onBack, onView, onEdit, onShare, onDelete, Icons, showDeleteModal, setShowDeleteModal, handleDelete, showShareModal, setShowShareModal, confirmShare, notification, loading, ALL_SERVICES, currentUser, count }) => {
             const getStatusBadge = (status, isFromOtherUnit = false) => {
                 const statusColors = {
@@ -3652,7 +3739,7 @@
                             <button onClick={onBack} className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:scale-90 transition hover:bg-slate-200">
                                 <Icons.ChevronLeft className="w-5 h-5"/>
                             </button>
-                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-red-600 title-count">({count})</span></h2>
+                            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{title} <span className="text-red-600">({count})</span></h2>
                             <div className="w-10"></div>
                         </div>
                     </div>
@@ -3736,7 +3823,7 @@
                                                 
                                                 <button 
                                                     onClick={() => onDelete(item)} 
-                                                    className="w-12 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100 mobile-menu-item"
+                                                    className="mobile-action-button w-12 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100"
                                                 >
                                                     <Icons.Trash className="w-4.5 h-4.5"/>
                                                 </button>
@@ -3756,7 +3843,6 @@
             );
         };
 
-        // PERBAIKAN POINT 1: SharePuskesmasModalWithSearch yang responsif
         const SharePuskesmasModalWithSearch = ({ servicesList, currentUnit, onConfirm, onCancel, title = "Kirim ke Unit Lain", description = "Pilih unit layanan yang akan menerima formulir ini." }) => {
             const [search, setSearch] = useState('');
             const [selected, setSelected] = useState('');
@@ -3887,7 +3973,7 @@
             </div>
         );
 
-        // PERBAIKAN POINT 1 & 3: AdminDashboard yang diperbaiki
+        // PERBAIKAN POINT 1: AdminDashboard dengan tombol aksi horizontal di mobile
         const AdminDashboard = ({ currentUser, onLogout, mockDB, mockUserDB, showNotification, exportToCSV, loadDataForView, ALL_SERVICES, onViewForm, onUnfinalizeForm, onEditEpidForm, showAdminDeleteUserModal, setShowAdminDeleteUserModal, adminUserToDelete, setAdminUserToDelete, rejectedList }) => {
             const [activeTab, setActiveTab] = useState('forms');
             const [allForms, setAllForms] = useState([]);
@@ -3904,7 +3990,6 @@
             const [searchTerm, setSearchTerm] = useState('');
             const [userSearchTerm, setUserSearchTerm] = useState('');
             
-            // PERBAIKAN POINT 1: State untuk pagination
             const [currentPage, setCurrentPage] = useState(1);
             const [itemsPerPage] = useState(10);
 
@@ -3958,7 +4043,6 @@
                 loadAllData();
             }, [activeTab]);
 
-            // PERBAIKAN POINT 1: Filter data dengan pencarian
             const filteredForms = searchTerm ? allForms.filter(form => 
                 form.namaKasus?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 form.nomorEPID?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -3967,7 +4051,6 @@
                 form.createdUnit?.toLowerCase().includes(searchTerm.toLowerCase())
             ) : allForms;
 
-            // PERBAIKAN POINT 1: Pagination
             const indexOfLastItem = currentPage * itemsPerPage;
             const indexOfFirstItem = indexOfLastItem - itemsPerPage;
             const currentForms = filteredForms.slice(indexOfFirstItem, indexOfLastItem);
@@ -4051,7 +4134,7 @@
             
             const handleExportAll = () => { 
                 if(allForms.length > 0) {
-                    exportToCSV(allForms, 'SEMUA_DATA_SURVEILANS.csv', false); // PERBAIKAN POINT 5: Gunakan format yang benar
+                    exportToCSV(allForms, 'SEMUA_DATA_SURVEILANS.csv', false);
                 } else {
                     showNotification('Tidak ada data untuk didownload', 'error'); 
                 }
@@ -4124,7 +4207,7 @@
                                                     value={searchTerm}
                                                     onChange={(e) => {
                                                         setSearchTerm(e.target.value);
-                                                        setCurrentPage(1); // Reset ke halaman 1 saat mencari
+                                                        setCurrentPage(1);
                                                     }}
                                                 />
                                                 <Icons.Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -4138,7 +4221,6 @@
                                         </div>
                                     </div>
                                     
-                                    {/* PERBAIKAN POINT 1: Tabel dengan pagination, tanpa kolom "Asal Unit" */}
                                     <div className="overflow-x-auto border border-slate-200 rounded-lg mobile-scroll">
                                         <table className="w-full text-sm text-left mobile-table">
                                             <thead className="bg-slate-50 text-slate-600 uppercase text-xs font-bold">
@@ -4149,7 +4231,6 @@
                                                     <th className="px-4 py-3">Usia</th>
                                                     <th className="px-4 py-3">Current Owner</th>
                                                     <th className="px-4 py-3">Tgl Update</th>
-                                                    {/* PERBAIKAN POINT 1: Kolom "Asal Unit" dihapus */}
                                                     <th className="px-4 py-3">Aksi</th>
                                                 </tr>
                                             </thead>
@@ -4175,12 +4256,12 @@
                                                         <td className="px-4 py-3 text-slate-500">
                                                             {new Date(form.updatedAt).toLocaleDateString()}
                                                         </td>
-                                                        {/* PERBAIKAN POINT 3: Kolom aksi dengan 4 tombol */}
                                                         <td className="px-4 py-3">
-                                                            <div className="flex gap-1 mobile-button-group">
+                                                            {/* PERBAIKAN POINT 1: Container tombol aksi horizontal di mobile */}
+                                                            <div className="mobile-actions-container">
                                                                 <button 
                                                                     onClick={() => handleViewFormInAdmin(form)}
-                                                                    className="text-blue-500 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg text-xs font-bold transition mobile-menu-item"
+                                                                    className="mobile-action-button text-blue-500 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg text-xs font-bold transition"
                                                                     title="Lihat Detail"
                                                                 >
                                                                     <Icons.Eye className="w-4 h-4"/>
@@ -4188,7 +4269,7 @@
                                                                 {form.statusData === 'Final' && (
                                                                     <button 
                                                                         onClick={() => onUnfinalizeForm(form)}
-                                                                        className="text-amber-500 bg-amber-50 hover:bg-amber-100 p-2 rounded-lg text-xs font-bold transition mobile-menu-item"
+                                                                        className="mobile-action-button text-amber-500 bg-amber-50 hover:bg-amber-100 p-2 rounded-lg text-xs font-bold transition"
                                                                         title="Batalkan Finalisasi"
                                                                     >
                                                                         <Icons.AlertTriangle className="w-4 h-4"/>
@@ -4196,14 +4277,14 @@
                                                                 )}
                                                                 <button 
                                                                     onClick={() => onEditEpidForm(form)}
-                                                                    className="text-green-500 bg-green-50 hover:bg-green-100 p-2 rounded-lg text-xs font-bold transition mobile-menu-item"
+                                                                    className="mobile-action-button text-green-500 bg-green-50 hover:bg-green-100 p-2 rounded-lg text-xs font-bold transition"
                                                                     title="Edit Nomor EPID"
                                                                 >
                                                                     <Icons.Edit className="w-4 h-4"/>
                                                                 </button>
                                                                 <button 
                                                                     onClick={() => setDeleteFormId(form.id)}
-                                                                    className="text-red-500 bg-red-50 hover:bg-red-100 p-2 rounded-lg text-xs font-bold transition mobile-menu-item"
+                                                                    className="mobile-action-button text-red-500 bg-red-50 hover:bg-red-100 p-2 rounded-lg text-xs font-bold transition"
                                                                     title="Hapus Formulir"
                                                                 >
                                                                     <Icons.Trash className="w-4 h-4"/>
@@ -4221,7 +4302,6 @@
                                         )}
                                     </div>
                                     
-                                    {/* PERBAIKAN POINT 1: Pagination controls */}
                                     {filteredForms.length > itemsPerPage && (
                                         <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-4 mobile-stack">
                                             <p className="text-sm text-slate-600">
@@ -4466,7 +4546,6 @@
             );
         };
 
-        // PERBAIKAN POINT 3: MODAL VIEW FORMULIR dengan posisi status yang diperbaiki
         const ViewModal = ({ item, onClose, Icons }) => {
             if (!item) {
                 console.log("ViewModal: No item provided");
@@ -4601,7 +4680,6 @@
                         </div>
                         
                         <div className="p-6 overflow-y-auto max-h-[65vh] mobile-padding">
-                            {/* PERBAIKAN POINT 3: Posisi status dipindahkan ke sini */}
                             <div className="mb-8">
                                 <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
                                     <Icons.Hourglass className="w-5 h-5 text-amber-500" />
