@@ -4300,18 +4300,12 @@
                                         </div>
                                     </div>
                                     <div className="flex flex-wrap gap-4 mt-3 text-sm text-slate-600">
-                                        <div className="flex items-center gap-1">
-                                            <Icons.User className="w-4 h-4" />
-                                            <span>Dibuat oleh: <strong>{item.createdBy || '-'}</strong></span>
-                                        </div>
+                                        
                                         <div className="flex items-center gap-1">
                                             <Icons.Shield className="w-4 h-4" />
-                                            <span>Current Owner: <strong>{currentOwner}</strong></span>
+                                            <span>Owner: <strong>{currentOwner}</strong></span>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                            <Icons.MapPin className="w-4 h-4" />
-                                            <span>Asal Unit: <strong>{item.createdUnit || '-'}</strong></span>
-                                        </div>
+                                        
                                         <div className="flex items-center gap-1">
                                             <Icons.Clock className="w-4 h-4" />
                                             <span>Update: <strong>{formatDateTime(item.updatedAt)}</strong></span>
