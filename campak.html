@@ -222,6 +222,31 @@
         .required-label {
             color: #ef4444;
         }
+
+        /* Style untuk kontak erat */
+        .kontak-erat-summary {
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+        }
+
+        .kontak-erat-summary-item {
+            display: inline-block;
+            margin-right: 1rem;
+            color: #64748b;
+        }
+
+        .kontak-erat-summary-item strong {
+            color: #475569;
+        }
+
+        .kontak-erat-card {
+            border: 2px dashed #cbd5e1;
+            background: #f8fafc;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
@@ -567,6 +592,8 @@
             spesimenLain: '', jenisSampelLain: [], jenisSampelLainSebutkan: '', tanggalAmbilLain: '', 
             tanggalKirimLain: '', keadaanSaatIni: '', pelaksanaInvestigasi: '', namaSekolah: '', 
             titikLokasi: '', epidManual: false,
+            // TAMBAHAN: Data kontak erat
+            kontakErat: []
         };
 
         const calculateAge = (tanggalLahir) => {
@@ -1070,32 +1097,207 @@
             </div>
         );
 
-        // PERBAIKAN POINT 4: Step5 dengan field required
-        const Step5 = ({ data, onChange, Icons }) => (
-            <div className="animate-fadeIn">
-                <div className="mb-8">
-                    <RadioGroup name="adaKontakSakitSama" label="Apakah ada kontak dengan kasus serupa?" options={['ya','tidak']} value={data.adaKontakSakitSama} onChange={onChange} required={true}/>
-                    {data.adaKontakSakitSama === 'ya' && (
-                        <div className="mt-4">
-                            <Input label="Jumlah Kontak Sakit" name="jumlahKontakSakit" value={data.jumlahKontakSakit} onChange={onChange} placeholder="Misal: 3" required={true} />
-                        </div>
-                    )}
-                </div>
+        // PERBAIKAN POINT: Step5 dengan penambahan bagian kontak erat
+        const Step5 = ({ data, onChange, Icons }) => {
+            // Fungsi untuk menambah kontak erat baru
+            const handleAddKontakErat = () => {
+                const newKontak = {
+                    id: Date.now().toString(),
+                    nama: '',
+                    umur: '',
+                    alamat: '',
+                    hubungan: '',
+                    imunisasiCampakRubella: '',
+                    kondisi: 'sehat'
+                };
                 
-                <div>
-                    <RadioGroup name="bepergian" label="Riwayat Bepergian" options={['ya','tidak']} value={data.bepergian} onChange={onChange} required={true}/>
-                    {data.bepergian==='ya' && (
-                        <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 mt-5 mobile-padding">
-                            <Input label="Lokasi Bepergian" name="lokasiBepergian" value={data.lokasiBepergian} onChange={onChange} placeholder="Kota, provinsi, atau negara tujuan" required={true}/>
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                                <Input label="Tanggal Pergi" type="date" name="tanggalPergi" value={data.tanggalPergi} onChange={onChange} required={true}/>
-                                <Input label="Tanggal Pulang" type="date" name="tanggalKembali" value={data.tanggalKembali} onChange={onChange} required={true}/>
+                onChange({
+                    target: {
+                        name: 'kontakErat',
+                        value: [...data.kontakErat, newKontak]
+                    }
+                });
+            };
+
+            // Fungsi untuk menghapus kontak erat
+            const handleRemoveKontakErat = (index) => {
+                const newKontakErat = [...data.kontakErat];
+                newKontakErat.splice(index, 1);
+                
+                onChange({
+                    target: {
+                        name: 'kontakErat',
+                        value: newKontakErat
+                    }
+                });
+            };
+
+            // Fungsi untuk mengubah data kontak erat
+            const handleKontakEratChange = (index, field, value) => {
+                const newKontakErat = [...data.kontakErat];
+                newKontakErat[index] = {
+                    ...newKontakErat[index],
+                    [field]: value
+                };
+                
+                onChange({
+                    target: {
+                        name: 'kontakErat',
+                        value: newKontakErat
+                    }
+                });
+            };
+
+            return (
+                <div className="animate-fadeIn">
+                    <div className="mb-8">
+                        <RadioGroup name="adaKontakSakitSama" label="Apakah ada kontak dengan kasus serupa?" options={['ya','tidak']} value={data.adaKontakSakitSama} onChange={onChange} required={true}/>
+                        {data.adaKontakSakitSama === 'ya' && (
+                            <div className="mt-4">
+                                <Input label="Jumlah Kontak Sakit" name="jumlahKontakSakit" value={data.jumlahKontakSakit} onChange={onChange} placeholder="Misal: 3" required={true} />
                             </div>
+                        )}
+                    </div>
+                    
+                    <div className="mb-8">
+                        <RadioGroup name="bepergian" label="Riwayat Bepergian" options={['ya','tidak']} value={data.bepergian} onChange={onChange} required={true}/>
+                        {data.bepergian==='ya' && (
+                            <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 mt-5 mobile-padding">
+                                <Input label="Lokasi Bepergian" name="lokasiBepergian" value={data.lokasiBepergian} onChange={onChange} placeholder="Kota, provinsi, atau negara tujuan" required={true}/>
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <Input label="Tanggal Pergi" type="date" name="tanggalPergi" value={data.tanggalPergi} onChange={onChange} required={true}/>
+                                    <Input label="Tanggal Pulang" type="date" name="tanggalKembali" value={data.tanggalKembali} onChange={onChange} required={true}/>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* BAGIAN KONTAK ERAT */}
+                    <div className="mt-8 pt-6 border-t border-slate-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <div>
+                                <Label>Penelusuran Kontak Erat</Label>
+                                <p className="text-sm text-slate-500 mt-1">
+                                    Tambahkan data kontak erat
+                                </p>
+                            </div>
+                            <button 
+                                type="button"
+                                onClick={handleAddKontakErat}
+                                className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-lg font-bold hover:shadow-lg transition flex items-center gap-2 mobile-menu-item"
+                            >
+                                <Icons.UserPlus className="w-4 h-4" /> Tambah Kontak Erat
+                            </button>
                         </div>
-                    )}
+
+                        {/* Form untuk setiap kontak erat */}
+                        {data.kontakErat.map((kontak, index) => (
+                            <div key={kontak.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-100 mb-4 kontak-erat-card mobile-padding">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h4 className="font-bold text-blue-700">Kontak Erat #{index + 1}</h4>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveKontakErat(index)}
+                                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition"
+                                    >
+                                        <Icons.Trash className="w-4 h-4" />
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Input
+                                        label="Nama"
+                                        name={`kontak_nama_${index}`}
+                                        value={kontak.nama}
+                                        onChange={(e) => handleKontakEratChange(index, 'nama', e.target.value)}
+                                        placeholder="Nama lengkap kontak erat"
+                                        uppercase={true}
+                                    />
+                                    
+                                    <Input
+                                        label="Umur (tahun)"
+                                        name={`kontak_umur_${index}`}
+                                        value={kontak.umur}
+                                        onChange={(e) => handleKontakEratChange(index, 'umur', e.target.value)}
+                                        placeholder="Contoh: 25"
+                                        type="number"
+                                    />
+                                    
+                                    <div className="md:col-span-2">
+                                        <Input
+                                            label="Alamat"
+                                            as="textarea"
+                                            name={`kontak_alamat_${index}`}
+                                            value={kontak.alamat}
+                                            onChange={(e) => handleKontakEratChange(index, 'alamat', e.target.value)}
+                                            placeholder="Alamat lengkap kontak erat"
+                                        />
+                                    </div>
+                                    
+                                    <Input
+                                        label="Hubungan dengan Kasus"
+                                        name={`kontak_hubungan_${index}`}
+                                        value={kontak.hubungan}
+                                        onChange={(e) => handleKontakEratChange(index, 'hubungan', e.target.value)}
+                                        placeholder="Contoh: Saudara, Teman Sekolah, dll"
+                                    />
+                                    
+                                    <Input
+                                        label="Berapa kali imunisasi Campak/Rubella"
+                                        name={`kontak_imunisasi_${index}`}
+                                        value={kontak.imunisasiCampakRubella}
+                                        onChange={(e) => handleKontakEratChange(index, 'imunisasiCampakRubella', e.target.value)}
+                                        placeholder="Contoh: 2"
+                                        type="number"
+                                    />
+                                    
+                                    <Select
+                                        label="Kondisi saat itu"
+                                        name={`kontak_kondisi_${index}`}
+                                        value={kontak.kondisi}
+                                        onChange={(e) => handleKontakEratChange(index, 'kondisi', e.target.value)}
+                                    >
+                                        <option value="sehat">Sehat</option>
+                                        <option value="sakit">Sakit</option>
+                                    </Select>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* Ringkasan kontak erat yang sudah diisi */}
+                        {data.kontakErat.length > 0 && (
+                            <div className="mt-6 pt-4 border-t border-slate-200">
+                                <Label>Ringkasan Kontak Erat yang Sudah Diisi</Label>
+                                <div className="mt-2 space-y-2">
+                                    {data.kontakErat.map((kontak, index) => (
+                                        <div key={kontak.id} className="kontak-erat-summary">
+                                            <div className="kontak-erat-summary-item">
+                                                <strong>#{index + 1}:</strong> {kontak.nama || '(Belum diisi)'}
+                                            </div>
+                                            <div className="kontak-erat-summary-item">
+                                                <strong>Umur:</strong> {kontak.umur || '-'} tahun
+                                            </div>
+                                            <div className="kontak-erat-summary-item">
+                                                <strong>Hubungan:</strong> {kontak.hubungan || '-'}
+                                            </div>
+                                            <div className="kontak-erat-summary-item">
+                                                <strong>Imunisasi:</strong> {kontak.imunisasiCampakRubella || '-'} kali
+                                            </div>
+                                            <div className="kontak-erat-summary-item">
+                                                <strong>Kondisi:</strong> {kontak.kondisi === 'sehat' ? 'Sehat' : 'Sakit'}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="text-xs text-slate-500 mt-2">
+                                    Total: {data.kontakErat.length} kontak erat telah ditambahkan
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        };
 
         // PERBAIKAN POINT 4: Step6 dengan field required (kecuali nama sekolah dan titik lokasi)
         const Step6 = ({ data, onChange, getGeo, loadingGeo, onSaveToPending, onSaveAndFinal, Icons }) => (
@@ -2449,7 +2651,7 @@
                                                 </p>
                                             </div>
                                             <button onClick={handleSaveDraft} className="text-blue-600 bg-blue-50 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition flex items-center gap-2 border border-blue-100 mobile-menu-item">
-                                                <Icons.Save className="w-4 h-4"/> Simpan Draft
+                                                <Icons.Save className="w-4 h-4"/> Draft
                                             </button>
                                         </div>
 
