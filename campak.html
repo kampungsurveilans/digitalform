@@ -3586,7 +3586,7 @@
                         <button onClick={onSave} className="w-full p-3.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-bold hover:shadow-lg transition">
                             Simpan sebagai Draft
                         </button>
-                        <button onClick={onDiscard} className="w-full p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition">
+                        <button onClick={onDiscard} className="w-full p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition">
                             Buang Perubahan
                         </button>
                         <button onClick={onCancel} className="w-full p-3.5 border border-slate-200 text-slate-500 rounded-lg font-bold hover:bg-slate-50 transition">
@@ -4283,11 +4283,9 @@
                             <div className="flex justify-between items-start">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2">
-                                        <div className="bg-white p-2 rounded-lg shadow-sm">
-                                            <Icons.FileText className="w-6 h-6 text-blue-600" />
-                                        </div>
+                                        
                                         <div>
-                                            <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data Formulir Surveilans</h2>
+                                            <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data</h2>
                                             <div className="flex items-center gap-3 mt-1">
                                                 <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded">
                                                     {item.nomorEPID || 'NO-EPID'}
@@ -4322,7 +4320,6 @@
                                 </div>
                                 <button 
                                     onClick={onClose}
-                                    className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition shadow-sm"
                                 >
                                     <Icons.XCircle className="w-5 h-5" />
                                 </button>
@@ -4332,7 +4329,7 @@
                         <div className="p-6 overflow-y-auto max-h-[65vh]">
                             <div className="mb-8">
                                 <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                                    <Icons.Hourglass className="w-5 h-5 text-amber-500" />
+                                    <Icons.FileText className="w-5 h-5 text-amber-500" />
                                     Informasi Workflow
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
