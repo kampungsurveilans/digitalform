@@ -2863,8 +2863,8 @@
                                     return (
                                         <div key={item.id} className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-100 hover:border-slate-200 transition-all group">
                                             <div className="flex justify-between items-start mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                                <div className="flex items-center gap-2 flex-nowrap">
+                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shrink-0">
                                                         {item.nomorEPID || 'NO-EPID'}
                                                     </div>
                                                     {getStatusBadge(item.statusData, isFromOtherUnit)}
@@ -3037,8 +3037,8 @@
                                         return (
                                             <div key={item.id} className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-100 hover:border-slate-200 transition-all group">
                                                 <div className="flex justify-between items-start mb-3">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                                    <div className="flex items-center gap-2 flex-nowrap">
+                                                        <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shrink-0">
                                                             {item.nomorEPID || 'NO-EPID'}
                                                         </div>
                                                         {getStatusBadge(item.statusData)}
@@ -3047,9 +3047,7 @@
                                                                 Rujukan
                                                             </span>
                                                         )}
-                                                    </div>
-                                                    <div className="text-xs text-slate-500 font-medium">
-                                                        {new Date(item.updatedAt).toLocaleDateString()}
+                                                    
                                                     </div>
                                                 </div>
                                                 
@@ -3158,15 +3156,13 @@
                                     return (
                                         <div key={item.id} className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-100 hover:border-slate-200 transition-all group">
                                             <div className="flex justify-between items-start mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                                <div className="flex items-center gap-2 flex-nowrap">
+                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shrink-0">
                                                         {item.nomorEPID || 'NO-EPID'}
                                                     </div>
                                                     {getStatusBadge(item.statusData)}
                                                 </div>
-                                                <div className="text-xs text-slate-500 font-medium">
-                                                    {new Date(item.updatedAt).toLocaleDateString()}
-                                                </div>
+                                               
                                             </div>
                                             
                                             <h3 className="font-bold text-lg text-slate-800 mb-1">{item.namaKasus || 'Tanpa Nama'}</h3>
@@ -3252,8 +3248,8 @@
                                     return (
                                         <div key={item.id} className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-100 hover:border-slate-200 transition-all group">
                                             <div className="flex justify-between items-start mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                                <div className="flex items-center gap-2 flex-nowrap">
+                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shrink-0">
                                                         {item.nomorEPID || 'NO-EPID'}
                                                     </div>
                                                     {getStatusBadge(item.statusData)}
@@ -3405,8 +3401,8 @@
                                     return (
                                         <div key={item.id} className="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-100 hover:border-slate-200 transition-all group">
                                             <div className="flex justify-between items-start mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                                <div className="flex items-center gap-2 flex-nowrap">
+                                                    <div className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shrink-0">
                                                         {item.nomorEPID || 'NO-EPID'}
                                                     </div>
                                                     {getStatusBadge(item.statusData, isFromOtherUnit)}
@@ -4288,11 +4284,14 @@ const ViewModal = ({ item, onClose, Icons }) => {
                     <div className="flex justify-between items-start">
                         <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
+                                <div className="bg-white p-2 rounded-lg shadow-sm">
+                                    <Icons.FileText className="w-6 h-6 text-blue-600" />        
+                                </div>        
                                 <div>
                                     <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data</h2>
-                                    <div className="flex items-center gap-3 mt-1">
-                                        <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded">
-                                            {item.nomorEPID || 'NO-EPID'}
+                                    <div className="flex items-center gap-3 mt-1 flex-nowrap">
+                                        <span className="font-mono font-bold text-white bg-black px-3 py-1 rounded shrink-0">
+                                            {item.nomorEPID ||'NO-EPID'}
                                         </span>
                                         {getStatusBadge(item.statusData)}
                                         {isFromOtherUnit && (
