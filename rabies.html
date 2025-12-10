@@ -404,8 +404,8 @@
                 // Format CSV sesuai urutan pertanyaan formulir GHPR
                 headers = [
                     "ID", "No. RM", "Nama Penderita", "Umur", "Jenis Kelamin", "Pekerjaan", 
-                    "Alamat", "Kecamatan", "Kelurahan", "RT", "RW", "Tanggal GHPR Dilaporkan",
-                    "Tanggal Digigit/Dicakar", "Tanggal Berobat", "Tempat Berobat", "Cuci Luka",
+                    "Alamat", "Kecamatan", "Kelurahan", "RT", "RW", "Tanggal Laporan",
+                    "Tanggal Kejadian", "Tanggal Berobat", "Tempat Berobat", "Cuci Luka",
                     "Tanggal Cuci Luka", "Alasan Tidak Cuci Luka", "Lokasi Gigitan", "Jenis Luka Gigitan",
                     "Deskripsi Luka", "Kondisi Penderita", "Tanggal Meninggal", "Diagnosa Meninggal",
                     "Gejala Sebelum Meninggal", "Jenis HPR", "Alasan HPR Menggigit", "Kronologi Singkat",
@@ -417,7 +417,7 @@
                 csvRows = data.map(item => [
                     `"${item.id||''}"`, `"${item.noRM||''}"`, `"${item.namaPenderita||''}"`, `"${item.umur||''}"`, `"${item.jenisKelamin||''}"`, `"${item.pekerjaan||''}"`, 
                     `"${(item.alamat||'').replace(/"/g, '""')}"`, `"${item.kecamatan||''}"`, `"${item.kelurahan||''}"`, `"${item.rt||''}"`, `"${item.rw||''}"`, 
-                    `"${item.tanggalGHPRDilaporkan||''}"`, `"${item.tanggalDigigit||''}"`, `"${item.tanggalBerobat||''}"`, `"${item.tempatBerobat||''}"`, 
+                    `"${item.tanggalLaporan||''}"`, `"${item.tanggalKejadian||''}"`, `"${item.tanggalBerobat||''}"`, `"${item.tempatBerobat||''}"`, 
                     `"${item.cuciLuka||''}"`, `"${item.tanggalCuciLuka||''}"`, `"${item.alasanTidakCuciLuka||''}"`, `"${Array.isArray(item.lokasiGigitan) ? item.lokasiGigitan.join(', ') : item.lokasiGigitan||''}"`, 
                     `"${item.jenisLukaGigitan||''}"`, `"${item.deskripsiLuka||''}"`, `"${item.kondisiPenderita||''}"`, `"${item.tanggalMeninggal||''}"`, 
                     `"${item.diagnosaMeninggal||''}"`, `"${item.gejalaSebelumMeninggal||''}"`, `"${item.jenisHPR||''}"`, `"${item.alasanHPRMenggigit||''}"`, 
@@ -458,8 +458,8 @@
             rt: '',
             
             // STEP 2: DATA KASUS GHPR
-            tanggalGHPRDilaporkan: '',
-            tanggalDigigit: '',
+            tanggalLaporan: '',
+            tanggalKejadian: '',
             tanggalBerobat: '',
             tempatBerobat: '',
             cuciLuka: '',
@@ -790,17 +790,17 @@
                     
                     <div className="grid grid-cols-3 gap-4">
                         <Input 
-                            label="Tanggal GHPR Dilaporkan" 
+                            label="Tanggal Laporan" 
                             type="date" 
-                            name="tanggalGHPRDilaporkan" 
-                            value={data.tanggalGHPRDilaporkan} 
+                            name="tanggalLaporan" 
+                            value={data.tanggalLaporan} 
                             onChange={onChange} 
                         />
                         <Input 
-                            label="Tanggal Digigit/Dicakar" 
+                            label="Tanggal Kejadian" 
                             type="date" 
-                            name="tanggalDigigit" 
-                            value={data.tanggalDigigit} 
+                            name="tanggalKejadian" 
+                            value={data.tanggalKejadian} 
                             onChange={onChange} 
                         />
                         <Input 
@@ -2107,8 +2107,8 @@
                     return; 
                 } 
                 
-                if (!formData.tanggalGHPRDilaporkan) {
-                    showNotification('Tanggal GHPR Dilaporkan wajib!', 'error');
+                if (!formData.tanggalLaporan) {
+                    showNotification('Tanggal Laporan wajib!', 'error');
                     return;
                 }
                 
@@ -2145,8 +2145,8 @@
                     return; 
                 } 
                 
-                if (!formData.tanggalGHPRDilaporkan) {
-                    showNotification('Tanggal GHPR Dilaporkan wajib!', 'error');
+                if (!formData.tanggalLaporan) {
+                    showNotification('Tanggal Laporan wajib!', 'error');
                     return;
                 }
                 
@@ -3742,13 +3742,10 @@
                                             <Icons.FileText className="w-6 h-6 text-blue-600" />        
                                         </div>        
                                         <div>
-                                            <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data GHPR</h2>
+                                            <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data</h2>
                                             <div className="flex items-center gap-3 mt-1 flex-nowrap">
                                                 <span className="font-mono font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white bg-black px-3 py-1 rounded shrink-0">
                                                     {item.noRM ||'NO-RM'}
-                                                </span>
-                                                <span className="font-mono font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded shrink-0">
-                                                    {item.namaPenderita || 'Tanpa Nama'}
                                                 </span>
                                                 {getStatusBadge(item.statusData)}
                                                 {isFromOtherUnit && (
@@ -3784,7 +3781,7 @@
                             <div className="mb-8">
                                 <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
                                     <Icons.User className="w-5 h-5 text-blue-500" />
-                                    STEP 1: Data Pasien GHPR
+                                    Data Pasien GHPR
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="bg-slate-50 p-4 rounded-lg">
@@ -3825,16 +3822,16 @@
                             <div className="mb-8">
                                 <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
                                     <Icons.Activity className="w-5 h-5 text-red-500" />
-                                    STEP 2: Data Kasus GHPR
+                                    Data Kasus GHPR
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="bg-red-50 p-4 rounded-lg">
-                                        <p className="text-sm text-red-600 mb-1">Tanggal GHPR Dilaporkan</p>
-                                        <p className="font-medium text-red-800">{formatDate(item.tanggalGHPRDilaporkan)}</p>
+                                        <p className="text-sm text-red-600 mb-1">Tanggal Laporan</p>
+                                        <p className="font-medium text-red-800">{formatDate(item.tanggalLaporan)}</p>
                                     </div>
                                     <div className="bg-red-50 p-4 rounded-lg">
-                                        <p className="text-sm text-red-600 mb-1">Tanggal Digigit/Dicakar</p>
-                                        <p className="font-medium text-red-800">{formatDate(item.tanggalDigigit)}</p>
+                                        <p className="text-sm text-red-600 mb-1">Tanggal Kejadian</p>
+                                        <p className="font-medium text-red-800">{formatDate(item.tanggalKejadian)}</p>
                                     </div>
                                     <div className="bg-red-50 p-4 rounded-lg">
                                         <p className="text-sm text-red-600 mb-1">Tanggal Berobat</p>
@@ -3903,7 +3900,7 @@
                             <div className="mb-8">
                                 <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
                                     <Icons.Shield className="w-5 h-5 text-orange-500" />
-                                    STEP 3: Data HPR
+                                    Data HPR
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="bg-orange-50 p-4 rounded-lg">
@@ -3941,7 +3938,7 @@
                                 <div className="mb-8">
                                     <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
                                         <Icons.Syringe className="w-5 h-5 text-green-500" />
-                                        STEP 4: Data Pemberian VAR
+                                        Data Pemberian VAR
                                     </h3>
                                     <div className="bg-green-50 p-4 rounded-lg mb-4">
                                         <p className="text-sm text-green-600 mb-1">Diberikan VAR?</p>
@@ -3996,7 +3993,7 @@
                                 <div className="mb-8">
                                     <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
                                         <Icons.Users className="w-5 h-5 text-purple-500" />
-                                        STEP 5: Petugas Pengumpul Data
+                                        Petugas Pengumpul Data
                                     </h3>
                                     <div className="space-y-4">
                                         {item.petugasPengumpulData.map((petugas, index) => (
