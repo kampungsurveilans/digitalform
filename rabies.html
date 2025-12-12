@@ -1466,6 +1466,8 @@
             const [showUnfinalizeModal, setShowUnfinalizeModal] = useState(false);
             const [itemToUnfinalize, setItemToUnfinalize] = useState(null);
             
+            const [showLogoutModal, setShowLogoutModal] = useState(false);
+            
             const [draftsList, setDraftsList] = useState([]);
             const [pendingList, setPendingList] = useState([]);
             const [formFinalList, setFormFinalList] = useState([]);
@@ -1652,11 +1654,16 @@
             };
             
             const handleLogout = () => { 
-                sessionManager.clear(); 
-                setUsername(''); 
-                setPassword(''); 
-                setCurrentUser(null); 
-                setView('login'); 
+    setShowLogoutModal(true); // Tampilkan modal konfirmasi
+   };
+
+            const confirmLogout = () => {
+              sessionManager.clear(); 
+              setUsername(''); 
+              setPassword(''); 
+              setCurrentUser(null); 
+              setView('login'); 
+              setShowLogoutModal(false);
             };
 
             const handleStartNew = async () => { 
@@ -2700,6 +2707,33 @@
                             Icons={Icons} 
                         />
                     )}
+                    
+                    {showLogoutModal && (
+    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Icons.LogOut className="w-8 h-8" />
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-red-600">Konfirmasi Logout</h3>
+            <p className="text-slate-500 mb-6 text-body">Apakah Anda yakin ingin keluar dari akun ini?</p>
+            <div className="flex gap-3">
+                <button 
+                    onClick={() => setShowLogoutModal(false)} 
+                    className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
+                >
+                    Batal
+                </button>
+                <button 
+                    onClick={confirmLogout} 
+                    className="flex-1 p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                >
+                    Ya, Logout
+                </button>
+            </div>
+        </div>
+    </div>
+)}
+                    
                     
                     {showFinalizeModal && (
                         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
