@@ -401,7 +401,7 @@
                 headers = Object.keys(data[0]);
                 csvRows = data.map(item => headers.map(header => `"${String(item[header]||'').replace(/"/g, '""')}"`).join(","));
             } else {
-                // Format CSV sesuai urutan pertanyaan formulir GHPR
+                // Format CSV sesuai urutan pertanyaan formulir GHPR + tambahan kontak erat
                 headers = [
                     "ID", "No. RM", "Nama Penderita", "Umur", "Jenis Kelamin", "Pekerjaan", 
                     "Alamat", "Kecamatan", "Kelurahan", "RT", "RW", "Tanggal Laporan",
@@ -411,22 +411,68 @@
                     "Gejala Sebelum Meninggal", "Jenis HPR", "Alasan HPR Menggigit", "Kronologi Singkat",
                     "Kondisi HPR", "Tanggal HPR Mati", "Tanggal HPR Dibunuh", "Diberikan VAR",
                     "Jumlah Riwayat VAR", "Riwayat VAR", "Jumlah Petugas", "Data Petugas",
+                    "Kontak Erat - Nama", "Kontak Erat - NIP", "Kontak Erat - Jabatan", 
+                    "Kontak Erat - Tanggal Kunjungan", "Kontak Erat - Unit Kerja",
                     "Status Data", "Dibuat Oleh", "Unit Pembuat", "Current Owner", "Tanggal Update"
                 ];
                 
-                csvRows = data.map(item => [
-                    `"${item.id||''}"`, `"${item.noRM||''}"`, `"${item.namaPenderita||''}"`, `"${item.umur||''}"`, `"${item.jenisKelamin||''}"`, `"${item.pekerjaan||''}"`, 
-                    `"${(item.alamat||'').replace(/"/g, '""')}"`, `"${item.kecamatan||''}"`, `"${item.kelurahan||''}"`, `"${item.rt||''}"`, `"${item.rw||''}"`, 
-                    `"${item.tanggalLaporan||''}"`, `"${item.tanggalKejadian||''}"`, `"${item.tanggalBerobat||''}"`, `"${item.tempatBerobat||''}"`, 
-                    `"${item.cuciLuka||''}"`, `"${item.tanggalCuciLuka||''}"`, `"${item.alasanTidakCuciLuka||''}"`, `"${Array.isArray(item.lokasiGigitan) ? item.lokasiGigitan.join(', ') : item.lokasiGigitan||''}"`, 
-                    `"${item.jenisLukaGigitan||''}"`, `"${item.deskripsiLuka||''}"`, `"${item.kondisiPenderita||''}"`, `"${item.tanggalMeninggal||''}"`, 
-                    `"${item.diagnosaMeninggal||''}"`, `"${item.gejalaSebelumMeninggal||''}"`, `"${item.jenisHPR||''}"`, `"${item.alasanHPRMenggigit||''}"`, 
-                    `"${item.kronologiSingkat||''}"`, `"${item.kondisiHPR||''}"`, `"${item.tanggalHPRMati||''}"`, `"${item.tanggalHPRDibunuh||''}"`, 
-                    `"${item.diberikanVAR||''}"`, `"${item.riwayatVAR ? item.riwayatVAR.length : 0}"`, `"${JSON.stringify(item.riwayatVAR||[])}"`, 
-                    `"${item.petugasPengumpulData ? item.petugasPengumpulData.length : 0}"`, `"${JSON.stringify(item.petugasPengumpulData||[])}"`, 
-                    `"${item.statusData||''}"`, `"${item.createdBy||''}"`, `"${item.createdUnit||''}"`, `"${item.currentOwner || item.createdUnit}"`, 
-                    `"${new Date(item.updatedAt).toLocaleDateString()}"`
-                ].join(","));
+                csvRows = data.map(item => {
+                    // Ambil data petugas sebagai kontak erat
+                    const kontakErat = item.petugasPengumpulData || [];
+                    const kontakEratText = kontakErat.map(p => 
+                        `${p.nama || ''} (${p.nip || ''}) - ${p.jabatan || ''}`
+                    ).join('; ');
+                    
+                    return [
+                        `"${item.id||''}"`, 
+                        `"${item.noRM||''}"`, 
+                        `"${item.namaPenderita||''}"`, 
+                        `"${item.umur||''}"`, 
+                        `"${item.jenisKelamin||''}"`, 
+                        `"${item.pekerjaan||''}"`, 
+                        `"${(item.alamat||'').replace(/"/g, '""')}"`, 
+                        `"${item.kecamatan||''}"`, 
+                        `"${item.kelurahan||''}"`, 
+                        `"${item.rt||''}"`, 
+                        `"${item.rw||''}"`, 
+                        `"${item.tanggalLaporan||''}"`, 
+                        `"${item.tanggalKejadian||''}"`, 
+                        `"${item.tanggalBerobat||''}"`, 
+                        `"${item.tempatBerobat||''}"`, 
+                        `"${item.cuciLuka||''}"`, 
+                        `"${item.tanggalCuciLuka||''}"`, 
+                        `"${item.alasanTidakCuciLuka||''}"`, 
+                        `"${Array.isArray(item.lokasiGigitan) ? item.lokasiGigitan.join(', ') : item.lokasiGigitan||''}"`, 
+                        `"${item.jenisLukaGigitan||''}"`, 
+                        `"${item.deskripsiLuka||''}"`, 
+                        `"${item.kondisiPenderita||''}"`, 
+                        `"${item.tanggalMeninggal||''}"`, 
+                        `"${item.diagnosaMeninggal||''}"`, 
+                        `"${item.gejalaSebelumMeninggal||''}"`, 
+                        `"${item.jenisHPR||''}"`, 
+                        `"${item.alasanHPRMenggigit||''}"`, 
+                        `"${item.kronologiSingkat||''}"`, 
+                        `"${item.kondisiHPR||''}"`, 
+                        `"${item.tanggalHPRMati||''}"`, 
+                        `"${item.tanggalHPRDibunuh||''}"`, 
+                        `"${item.diberikanVAR||''}"`, 
+                        `"${item.riwayatVAR ? item.riwayatVAR.length : 0}"`, 
+                        `"${JSON.stringify(item.riwayatVAR||[])}"`, 
+                        `"${item.petugasPengumpulData ? item.petugasPengumpulData.length : 0}"`, 
+                        `"${JSON.stringify(item.petugasPengumpulData||[])}"`,
+                        // Data kontak erat (petugas) dipisah per kolom
+                        `"${kontakErat.map(p => p.nama).join(', ') || ''}"`,
+                        `"${kontakErat.map(p => p.nip).join(', ') || ''}"`,
+                        `"${kontakErat.map(p => p.jabatan).join(', ') || ''}"`,
+                        `"${kontakErat.map(p => p.tanggalKunjungan).join(', ') || ''}"`,
+                        `"${kontakErat.map(p => p.unitKerja).join(', ') || ''}"`,
+                        `"${item.statusData||''}"`, 
+                        `"${item.createdBy||''}"`, 
+                        `"${item.createdUnit||''}"`, 
+                        `"${item.currentOwner || item.createdUnit}"`, 
+                        `"${new Date(item.updatedAt).toLocaleDateString()}"`
+                    ].join(",");
+                });
             }
             const blob = new Blob([[headers.join(","), ...csvRows].join("\n")], { type: "text/csv;charset=utf-8;" });
             const link = document.createElement("a");
@@ -485,7 +531,7 @@
             diberikanVAR: '',
             riwayatVAR: [], // Array of VAR records
             
-            // STEP 5: PETUGAS PENGUMPUL DATA
+            // STEP 5: PETUGAS PENGUMPUL DATA (KONTAK ERAT)
             petugasPengumpulData: [] // Array of petugas records
         };
 
@@ -1290,7 +1336,7 @@
                 <div className="animate-fadeIn">
                     <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <Icons.Users className="w-5 h-5 text-purple-500" />
-                        Petugas Pengumpul Data
+                        Petugas Pengumpul Data (Kontak Erat)
                     </h3>
                     
                     <div className="flex justify-between items-center mb-6">
@@ -1441,6 +1487,7 @@
             const [formData, setFormData] = useState(INITIAL_DATA);
             const [notification, setNotification] = useState(null);
             const [hasNewReceived, setHasNewReceived] = useState(false);
+            const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
             // Modals & States
             const [showExitModal, setShowExitModal] = useState(false);
@@ -1479,6 +1526,70 @@
             const [password, setPassword] = useState('');
             const topRef = useRef(null);
             const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+
+            // PERBAIKAN 1: Event listener untuk beforeunload
+            useEffect(() => {
+                const handleBeforeUnload = (e) => {
+                    if (hasUnsavedChanges && view === 'form') {
+                        e.preventDefault();
+                        e.returnValue = 'Ada perubahan yang belum disimpan. Yakin ingin meninggalkan halaman?';
+                        return e.returnValue;
+                    }
+                };
+
+                window.addEventListener('beforeunload', handleBeforeUnload);
+                
+                return () => {
+                    window.removeEventListener('beforeunload', handleBeforeUnload);
+                };
+            }, [hasUnsavedChanges, view]);
+
+            // PERBAIKAN 2: History management untuk navigasi step
+            useEffect(() => {
+                if (view === 'form') {
+                    // Simpan state awal ke history
+                    window.history.pushState({ view: 'form', step: step }, '');
+                    
+                    const handlePopState = (event) => {
+                        if (view === 'form') {
+                            if (event.state && event.state.view === 'form') {
+                                // Kembali ke step sebelumnya
+                                if (event.state.step && event.state.step !== step) {
+                                    if (hasUnsavedChanges) {
+                                        if (window.confirm('Ada perubahan yang belum disimpan. Yakin ingin kembali?')) {
+                                            setStep(event.state.step);
+                                            setHasUnsavedChanges(false);
+                                        } else {
+                                            // Batalkan navigasi
+                                            window.history.pushState({ view: 'form', step: step }, '');
+                                        }
+                                    } else {
+                                        setStep(event.state.step);
+                                    }
+                                }
+                            } else {
+                                // Kembali ke menu utama
+                                if (hasUnsavedChanges) {
+                                    if (window.confirm('Ada perubahan yang belum disimpan. Yakin ingin keluar dari form?')) {
+                                        setView('start');
+                                        setHasUnsavedChanges(false);
+                                    } else {
+                                        window.history.pushState({ view: 'form', step: step }, '');
+                                    }
+                                } else {
+                                    setView('start');
+                                }
+                            }
+                        }
+                    };
+
+                    window.addEventListener('popstate', handlePopState);
+                    
+                    return () => {
+                        window.removeEventListener('popstate', handlePopState);
+                    };
+                }
+            }, [view, step, hasUnsavedChanges]);
 
             const showLoading = (show = true, minDelay = 300) => {
                 if (show) {
@@ -1654,8 +1765,8 @@
             };
             
             const handleLogout = () => { 
-    setShowLogoutModal(true); // Tampilkan modal konfirmasi
-   };
+                setShowLogoutModal(true);
+            };
 
             const confirmLogout = () => {
               sessionManager.clear(); 
@@ -1678,6 +1789,7 @@
                     transferHistory: []
                 }); 
                 setStep(1); 
+                setHasUnsavedChanges(false);
                 setView('form'); 
             };
             
@@ -1704,6 +1816,7 @@
                 showNotification('Formulir dibuka untuk diedit', 'success');
                 setFormData(formDataToEdit);
                 setStep(1); 
+                setHasUnsavedChanges(false);
                 setView('form'); 
             };
             
@@ -1982,6 +2095,7 @@
             const handleResumeDraft = (d) => { 
                 setFormData(d); 
                 setStep(1); 
+                setHasUnsavedChanges(false);
                 setView('form'); 
             };
             
@@ -2007,14 +2121,23 @@
                 setShowReviewModal(true); 
             };
             
-            const handleBackToStart = () => setShowExitModal(true);
+            const handleBackToStart = () => {
+                if (hasUnsavedChanges) {
+                    setShowExitModal(true);
+                } else {
+                    setView('start');
+                }
+            };
             
             const handleConfirmExit = (act) => { 
                 setShowExitModal(false); 
                 if (act === 'save') { 
                     handleSaveDraft(); 
                     setTimeout(() => setView('start'), 1000); 
-                } else if (act === 'discard') setView('start'); 
+                } else if (act === 'discard') {
+                    setHasUnsavedChanges(false);
+                    setView('start'); 
+                }
             };
             
             const confirmDelete = (i) => { 
@@ -2064,11 +2187,15 @@
                 } else { 
                     setFormData(prev => ({ ...prev, [name]: processedValue })); 
                 } 
+                
+                // Tandai ada perubahan yang belum disimpan
+                setHasUnsavedChanges(true);
             };
             
             const handleKecamatanChange = (e) => { 
                 const v = e.target.value; 
                 setFormData(p => ({ ...p, kecamatan: v, kelurahan: '' })); 
+                setHasUnsavedChanges(true);
             };
             
             const getGeoLocation = () => { 
@@ -2100,6 +2227,7 @@
                     
                     await mockDB.save(d); 
                     setFormData(d); 
+                    setHasUnsavedChanges(false); // Reset status perubahan
                     showLoading(false); 
                     showNotification('Draft tersimpan', 'success'); 
                 } catch (e) { 
@@ -2133,6 +2261,7 @@
                     
                     await mockDB.save(d); 
                     setFormData(d); 
+                    setHasUnsavedChanges(false); // Reset status perubahan
                     showLoading(false); 
                     showNotification('Formulir disimpan ke Pending Form', 'success');
                     
@@ -2173,6 +2302,7 @@
                     
                     await mockDB.save(finalData); 
                     setFormData(finalData); 
+                    setHasUnsavedChanges(false); // Reset status perubahan
                     showLoading(false); 
                     
                     showNotification('Formulir berhasil difinalkan!', 'success');
@@ -2194,6 +2324,8 @@
             
             const nextStep = () => {
                 setStep(p => Math.min(p + 1, 5));
+                // Update history untuk step baru
+                window.history.pushState({ view: 'form', step: Math.min(step + 1, 5) }, '');
                 setTimeout(() => {
                     if (topRef.current) {
                         topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2205,13 +2337,8 @@
             
             const prevStep = () => {
                 setStep(p => Math.max(p - 1, 1));
-                setTimeout(() => {
-                    if (topRef.current) {
-                        topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    } else {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                }, 50);
+                // Kembali menggunakan history API
+                window.history.back();
             };
 
             const STEP_LABELS = [
@@ -2489,9 +2616,16 @@
                                                     Lengkapi data berikut dengan benar dan teliti.
                                                 </p>
                                             </div>
-                                            <button onClick={handleSaveDraft} className="text-blue-600 bg-blue-50 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition flex items-center gap-2 border border-blue-100">
-                                                <Icons.Save className="w-4 h-4"/> Draft
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                {hasUnsavedChanges && (
+                                                    <span className="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded">
+                                                        Belum Disimpan
+                                                    </span>
+                                                )}
+                                                <button onClick={handleSaveDraft} className="text-blue-600 bg-blue-50 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition flex items-center gap-2 border border-blue-100">
+                                                    <Icons.Save className="w-4 h-4"/> Draft
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {step === 1 && <Step1 data={formData} onChange={handleChange} onChangeKecamatan={handleKecamatanChange} Icons={Icons} />}
@@ -2709,30 +2843,30 @@
                     )}
                     
                     {showLogoutModal && (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Icons.LogOut className="w-8 h-8" />
-            </div>
-            <h3 className="font-bold text-xl mb-2 text-red-600">Konfirmasi Logout</h3>
-            <p className="text-slate-500 mb-6 text-body">Apakah Anda yakin ingin keluar dari akun ini?</p>
-            <div className="flex gap-3">
-                <button 
-                    onClick={() => setShowLogoutModal(false)} 
-                    className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
-                >
-                    Batal
-                </button>
-                <button 
-                    onClick={confirmLogout} 
-                    className="flex-1 p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
-                >
-                    Ya, Logout
-                </button>
-            </div>
-        </div>
-    </div>
-)}
+                        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
+                                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Icons.LogOut className="w-8 h-8" />
+                                </div>
+                                <h3 className="font-bold text-xl mb-2 text-red-600">Konfirmasi Logout</h3>
+                                <p className="text-slate-500 mb-6 text-body">Apakah Anda yakin ingin keluar dari akun ini?</p>
+                                <div className="flex gap-3">
+                                    <button 
+                                        onClick={() => setShowLogoutModal(false)} 
+                                        className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button 
+                                        onClick={confirmLogout} 
+                                        className="flex-1 p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                                    >
+                                        Ya, Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     
                     
                     {showFinalizeModal && (
@@ -2832,7 +2966,7 @@
             );
         };
 
-        // BAGIAN 5: KOMPONEN LIST VIEW (Sama seperti sebelumnya, tetapi dengan field GHPR)
+        // BAGIAN 5: KOMPONEN LIST VIEW
         const ListView = ({ title, data, type, onBack, onAction, onDelete, Icons, notification, showDeleteModal, setShowDeleteModal, handleDelete, currentUser, count }) => (
             <div className="fixed inset-0 h-[100dvh] w-full bg-slate-50 flex flex-col">
                 <div className="flex-none p-6 pt-8 bg-white rounded-b-3xl shadow-sm border-b border-slate-100 z-10">
@@ -3660,7 +3794,7 @@
                         <Icons.AlertTriangle className="w-8 h-8" />
                     </div>
                     <h3 className="font-bold text-xl mb-2 text-slate-800">Simpan Perubahan?</h3>
-                    <p className="text-slate-500 mb-6 text-body">Konfirmasi sebelum meninggalkan halaman</p>
+                    <p className="text-slate-500 mb-6 text-body">Ada perubahan yang belum disimpan. Apa yang ingin Anda lakukan?</p>
                     <div className="flex flex-col gap-3">
                         <button onClick={onSave} className="w-full p-3.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-bold hover:shadow-lg transition">
                             Simpan sebagai Draft
@@ -4027,7 +4161,7 @@
                                 <div className="mb-8">
                                     <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
                                         <Icons.Users className="w-5 h-5 text-purple-500" />
-                                        Petugas Pengumpul Data
+                                        Petugas Pengumpul Data (Kontak Erat)
                                     </h3>
                                     <div className="space-y-4">
                                         {item.petugasPengumpulData.map((petugas, index) => (
@@ -4113,7 +4247,7 @@
             );
         };
 
-        // BAGIAN 6: ADMIN DASHBOARD (Sama seperti sebelumnya)
+        // BAGIAN 6: ADMIN DASHBOARD
         const AdminDashboard = ({ currentUser, onLogout, mockDB, mockUserDB, showNotification, exportToCSV, loadDataForView, ALL_SERVICES, onViewForm, onUnfinalizeForm, showAdminDeleteUserModal, setShowAdminDeleteUserModal, adminUserToDelete, setAdminUserToDelete, rejectedList }) => {
             const [activeTab, setActiveTab] = useState('forms');
             const [allForms, setAllForms] = useState([]);
