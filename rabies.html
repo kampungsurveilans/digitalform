@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -789,7 +788,7 @@
                         Data Kasus GHPR
                     </h3>
                     
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-2">
                         <Input 
                             label="Tanggal Laporan" 
                             type="date" 
@@ -855,7 +854,7 @@
                     
                     <div className="mb-6">
                         <Label>Lokasi Gigitan</Label>
-                        <div className="grid grid-cols-3 gap-3 mt-3">
+                        <div className="grid grid-cols-2 gap-2 mt-3">
                             {DATA_LOKASI_GIGITAN.map(lokasi => (
                                 <Checkbox 
                                     key={lokasi}
@@ -956,7 +955,7 @@
                         <Label>Jenis HPR</Label>
                         <div className="grid grid-cols-3 gap-3 mt-3">
                             {['Anjing', 'Kucing', 'Monyet'].map(jenis => (
-                                <label key={jenis} className={`flex flex-col items-center justify-center p-4 rounded-xl cursor-pointer transition-all border ${data.jenisHPR === jenis ? 'bg-orange-50 border-orange-300 text-orange-700' : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'}`}>
+                                <label key={jenis} className={`flex flex-col items-center justify-center p-4 rounded-xl cursor-pointer transition-all border ${data.jenisHPR === jenis ? 'bg-purple-50 border-purple-300 text-purple-700' : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'}`}>
                                     <input 
                                         type="radio" 
                                         name="jenisHPR" 
@@ -965,7 +964,7 @@
                                         onChange={onChange} 
                                         className="hidden" 
                                     />
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${data.jenisHPR === jenis ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}`}>
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${data.jenisHPR === jenis ? 'bg-purple-100 text-purple-600' : 'bg-slate-100 text-slate-500'}`}>
                                         {getHPRIcon(jenis)}
                                     </div>
                                     <span className="font-medium text-sm">{jenis}</span>
@@ -1049,17 +1048,29 @@
                                 </div>
                             </label>
                             
-                            <label className={`flex items-center p-4 rounded-lg cursor-pointer border ${data.kondisiHPR === 'Hilang/Tdk dikenal' ? 'bg-yellow-50 border-yellow-200' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
+                            <label className={`flex items-center p-4 rounded-lg cursor-pointer border ${data.kondisiHPR === 'Hilang/Tdk dikenal' ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
                                 <input 
                                     type="radio" 
                                     name="kondisiHPR" 
                                     value="Hilang/Tdk dikenal" 
                                     checked={data.kondisiHPR === 'Hilang/Tdk dikenal'} 
                                     onChange={onChange} 
-                                    className="w-5 h-5 accent-yellow-600 mr-3" 
+                                    className="w-5 h-5 accent-rose-600 mr-3" 
                                 />
                                 <span className="font-medium text-slate-800">Hilang/Tidak dikenal</span>
                             </label>
+                            <label className={`flex items-center p-4 rounded-lg cursor-pointer border ${data.kondisiHPR === 'Sehat/Peliharaan' ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
+                                <input 
+                                    type="radio" 
+                                    name="kondisiHPR" 
+                                    value="Sehat/Peliharaan" 
+                                    checked={data.kondisiHPR === 'Sehat/Peliharaan'} 
+                                    onChange={onChange} 
+                                    className="w-5 h-5 accent-green-600 mr-3" 
+                                />
+                                <span className="font-medium text-slate-800">Sehat/Peliharaan</span>
+                            </label>
+                          
                         </div>
                     </div>
                 </div>
@@ -1121,7 +1132,7 @@
                     {data.diberikanVAR === 'YA' && (
                         <div>
                             <div className="flex justify-between items-center mb-6">
-                                <h4 className="font-bold text-slate-700">Riwayat Pemberian VAR</h4>
+                                <h4 className="font-bold text-slate-700">Riwayat VAR</h4>
                                 <button
                                     type="button"
                                     onClick={addVarRecord}
@@ -1157,12 +1168,12 @@
                                                     <input 
                                                         type="radio" 
                                                         name={`layanan-${record.id}`}
-                                                        value="pilihan"
-                                                        checked={record.layanan === 'pilihan'}
-                                                        onChange={() => updateVarRecord(index, 'layanan', 'pilihan')}
+                                                        value="dalam_kota"
+                                                        checked={record.layanan === 'dalam_kota'}
+                                                        onChange={() => updateVarRecord(index, 'layanan', 'dalam_kota')}
                                                         className="w-4 h-4 accent-green-600 mr-3"
                                                     />
-                                                    <span className="text-slate-700">Pilihan Layanan</span>
+                                                    <span className="text-slate-700">Faskes Kota Pontianak</span>
                                                 </label>
                                                 <label className="flex items-center p-3 bg-white rounded-lg border border-green-100 cursor-pointer">
                                                     <input 
@@ -1173,12 +1184,12 @@
                                                         onChange={() => updateVarRecord(index, 'layanan', 'luar_kota')}
                                                         className="w-4 h-4 accent-green-600 mr-3"
                                                     />
-                                                    <span className="text-slate-700">Layanan Luar Kota Pontianak</span>
+                                                    <span className="text-slate-700">Faskes Luar Kota Pontianak</span>
                                                 </label>
                                             </div>
                                         </div>
                                         
-                                        {record.layanan === 'pilihan' && (
+                                        {record.layanan === 'dalam_kota' && (
                                             <div className="mb-4">
                                                 <Select 
                                                     label="Pilih Layanan" 
@@ -1196,7 +1207,7 @@
                                         {record.layanan === 'luar_kota' && (
                                             <div className="mb-4">
                                                 <Input 
-                                                    label="Layanan Luar Kota Pontianak" 
+                                                    label="Faskes Luar Kota Pontianak" 
                                                     value={record.layananLuarKota}
                                                     onChange={(e) => updateVarRecord(index, 'layananLuarKota', e.target.value)}
                                                     placeholder="Tulis nama layanan luar kota"
@@ -1204,7 +1215,7 @@
                                             </div>
                                         )}
                                         
-                                        {(record.layanan === 'pilihan' || record.layanan === 'luar_kota') && (
+                                        {(record.layanan === 'dalam_kota' || record.layanan === 'luar_kota') && (
                                             <div className="grid grid-cols-2 gap-4">
                                                 <Input 
                                                     label="Tanggal VAR" 
@@ -1296,8 +1307,8 @@
                     
                     <div className="flex justify-between items-center mb-6">
                         <div>
-                            <p className="text-slate-600">Tambahkan data petugas yang melakukan pengumpulan data</p>
-                            <p className="text-sm text-slate-500">Bisa lebih dari satu petugas berdasarkan kunjungan</p>
+                            <p className="text-slate-600">Tambahkan data petugas</p>
+                            <p className="text-sm text-slate-500">Petugas penyelidikan</p>
                         </div>
                         <button
                             type="button"
@@ -1478,7 +1489,10 @@
             
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
-            const topRef = useRef(null);
+            
+            // FIX: Ganti dari topRef ke scrollContainerRef dan tambahkan formTopRef
+            const scrollContainerRef = useRef(null);
+            const formTopRef = useRef(null);
             const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
             const showLoading = (show = true, minDelay = 300) => {
@@ -1492,6 +1506,40 @@
                     }, minDelay);
                 }
             };
+
+            // FIX: Fungsi untuk scroll ke atas yang lebih efektif
+            const scrollToTop = () => {
+                setTimeout(() => {
+                    // Coba container scroll utama
+                    if (scrollContainerRef.current) {
+                        scrollContainerRef.current.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
+                    
+                    // Coba scroll ke elemen formTopRef
+                    if (formTopRef.current) {
+                        formTopRef.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                    
+                    // Backup: window scroll
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }, 50);
+            };
+
+            // FIX: Tambahkan useEffect untuk reset scroll ketika step berubah
+            useEffect(() => {
+                if (view === 'form') {
+                    scrollToTop();
+                }
+            }, [step, view]);
 
             const checkNewReceived = async () => {
                 if (!currentUser) return;
@@ -1624,11 +1672,7 @@
                     showLoading(false);
                 }
             };
-
-            useEffect(() => { 
-                if(view === 'form') window.scrollTo({ top: 0, behavior: 'smooth' }); 
-            }, [step, view]);
-
+            
             const handleLogin = async (e) => {
                 e.preventDefault(); 
                 showLoading(true);
@@ -1655,8 +1699,8 @@
             };
             
             const handleLogout = () => { 
-    setShowLogoutModal(true); // Tampilkan modal konfirmasi
-   };
+                setShowLogoutModal(true);
+            };
 
             const confirmLogout = () => {
               sessionManager.clear(); 
@@ -2129,7 +2173,7 @@
                         createdBy: currentUser?.username, 
                         createdUnit: currentUser?.unitName,
                         originalUnit: currentUser?.unitName,
-                        currentOwner: currentUser?.unitName
+                        currentOwner: currentUser.unitName
                     }; 
                     
                     await mockDB.save(d); 
@@ -2193,26 +2237,15 @@
                 setTimeout(() => setNotification(null), 3000); 
             };
             
+            // FIX: Perbaikan fungsi nextStep dan prevStep untuk menggunakan scrollToTop
             const nextStep = () => {
                 setStep(p => Math.min(p + 1, 5));
-                setTimeout(() => {
-                    if (topRef.current) {
-                        topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    } else {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                }, 50);
+                scrollToTop();
             };
             
             const prevStep = () => {
                 setStep(p => Math.max(p - 1, 1));
-                setTimeout(() => {
-                    if (topRef.current) {
-                        topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    } else {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                }, 50);
+                scrollToTop();
             };
 
             const STEP_LABELS = [
@@ -2431,11 +2464,15 @@
                     </div>
                 );
 
+                // FIX: Bagian form dengan implementasi scroll yang diperbaiki
                 if (view === 'form') {
                     const progressPercent = ((step - 1) / (STEP_LABELS.length - 1)) * 100;
                     
                     return (
-                        <div className="fixed inset-0 h-[100dvh] w-full flex flex-col bg-slate-50 overflow-hidden" ref={topRef}>
+                        <div className="fixed inset-0 h-[100dvh] w-full flex flex-col bg-slate-50 overflow-hidden">
+                            {/* FIX: Tambahkan anchor untuk scroll ke atas */}
+                            <div ref={formTopRef} className="absolute top-0 left-0 w-1 h-1 opacity-0"></div>
+                            
                             <div className="flex-none z-50 px-4 py-4 bg-white/90 backdrop-blur-sm border-b border-slate-100 shadow-sm">
                                 <div className="max-w-3xl mx-auto">
                                     <div className="flex items-center justify-between mb-4">
@@ -2478,7 +2515,12 @@
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-4 pb-32 scroll-smooth">
+                            {/* FIX: Container scroll dengan ref */}
+                            <div 
+                                ref={scrollContainerRef}
+                                className="flex-1 overflow-y-auto p-4 pb-32 scroll-smooth"
+                                id="form-scroll-container"
+                            >
                                 <div className="max-w-3xl mx-auto animate-fadeIn">
                                     <Card className="min-h-[60vh]">
                                         <div className="flex justify-between items-start mb-8">
@@ -2833,7 +2875,7 @@
             );
         };
 
-        // BAGIAN 5: KOMPONEN LIST VIEW (Sama seperti sebelumnya, tetapi dengan field GHPR)
+        // BAGIAN 5: KOMPONEN LIST VIEW
         const ListView = ({ title, data, type, onBack, onAction, onDelete, Icons, notification, showDeleteModal, setShowDeleteModal, handleDelete, currentUser, count }) => (
             <div className="fixed inset-0 h-[100dvh] w-full bg-slate-50 flex flex-col">
                 <div className="flex-none p-6 pt-8 bg-white rounded-b-3xl shadow-sm border-b border-slate-100 z-10">
@@ -3994,7 +4036,7 @@
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                         <div>
                                                             <p className="text-xs text-green-600 mb-1">Layanan</p>
-                                                            <p className="font-medium text-slate-700">{varRecord.layanan === 'pilihan' ? 'Pilihan Layanan' : 'Luar Kota Pontianak'}</p>
+                                                            <p className="font-medium text-slate-700">{varRecord.layanan === 'dalam_kota' ? 'Faskes Kota Pontianak' : 'Luar Kota Pontianak'}</p>
                                                         </div>
                                                         <div>
                                                             <p className="text-xs text-green-600 mb-1">Nama Layanan</p>
@@ -4114,7 +4156,7 @@
             );
         };
 
-        // BAGIAN 6: ADMIN DASHBOARD (Sama seperti sebelumnya)
+        // BAGIAN 6: ADMIN DASHBOARD
         const AdminDashboard = ({ currentUser, onLogout, mockDB, mockUserDB, showNotification, exportToCSV, loadDataForView, ALL_SERVICES, onViewForm, onUnfinalizeForm, showAdminDeleteUserModal, setShowAdminDeleteUserModal, adminUserToDelete, setAdminUserToDelete, rejectedList }) => {
             const [activeTab, setActiveTab] = useState('forms');
             const [allForms, setAllForms] = useState([]);
@@ -4673,4 +4715,4 @@
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
-</html>
+    </html>
