@@ -370,14 +370,15 @@
             }
         };
 
+        // PERBAIKAN POINT 6: Export CSV dengan kontak erat
         const exportToCSV = (data, filename, isRaw = false) => {
             if (!data || data.length === 0) { alert("Tidak ada data."); return; }
             let headers, csvRows;
+            
             if (isRaw) {
                 headers = Object.keys(data[0]);
                 csvRows = data.map(item => headers.map(header => `"${String(item[header]||'').replace(/"/g, '""')}"`).join(","));
             } else {
-                // PERBAIKAN POINT 2: Format CSV sesuai urutan pertanyaan formulir
                 headers = [
                     "Nomor EPID", "Status", "Nama Kasus", "Jenis Kelamin", "Tanggal Lahir", 
                     "Alamat", "Kabupaten", "Kecamatan", "Kelurahan", "RT", "RW", 
@@ -395,27 +396,46 @@
                     "Spesimen Lain", "Jenis Sampel Lain", "Jenis Sampel Lain Sebutkan",
                     "Tanggal Ambil Lain", "Tanggal Kirim Lain", "Keadaan Saat Ini",
                     "Pelaksana Investigasi", "Nama Sekolah", "Titik Lokasi", "Petugas Input",
-                    "Unit Pembuat", "Current Owner", "Tanggal Terakhir Update"
+                    "Unit Pembuat", "Current Owner", "Tanggal Terakhir Update",
+                    // PERBAIKAN POINT 6: Tambah kolom untuk kontak erat
+                    "Jumlah Kontak Erat", "Daftar Kontak Erat"
                 ];
                 
-                csvRows = data.map(item => [
-                    `"${item.nomorEPID||''}"`, `"${item.statusData||''}"`, `"${item.namaKasus||''}"`, `"${item.jenisKelamin||''}"`, `"${item.tanggalLahir||''}"`, 
-                    `"${(item.alamat||'').replace(/"/g, '""')}"`, `"${item.kabupaten||'Kota Pontianak'}"`, `"${item.kecamatan||''}"`, `"${item.kelurahan||''}"`, 
-                    `"${item.rt||''}"`, `"${item.rw||''}"`, `"${item.namaOrangtua||''}"`, `"${item.noKontakOrangtua||''}"`, `"${item.sumberLaporan||''}"`, 
-                    `"${item.namaUnitPelapor||''}"`, `"${item.tanggalTerimaLaporan||''}"`, `"${item.tanggalPelacakan||''}"`, `"${item.demam||''}"`, 
-                    `"${item.tanggalMulaiDemam||''}"`, `"${item.ruam||''}"`, `"${item.tanggalMulaiRuam||''}"`, `"${Array.isArray(item.gejalaLain) ? item.gejalaLain.join(', ') : item.gejalaLain||''}"`, 
-                    `"${item.gejalaLainSebutkan||''}"`, `"${Array.isArray(item.komplikasi) ? item.komplikasi.join(', ') : item.komplikasi||''}"`, `"${item.komplikasiLainnyaSebutkan||''}"`, 
-                    `"${item.dirawat||''}"`, `"${item.namaRumahSakit||''}"`, `"${item.nomorRekamMedik||''}"`, `"${item.tanggalMasukRawat||''}"`, `"${item.tanggalKeluarRawat||''}"`, 
-                    `"${item.imunisasiCampak1||''}"`, `"${item.sumberCampak1||''}"`, `"${item.imunisasiCampak2||''}"`, `"${item.sumberCampak2||''}"`, `"${item.imunisasiBIAS||''}"`, 
-                    `"${item.sumberBIAS||''}"`, `"${item.imunisasiMMR||''}"`, `"${item.sumberMMR||''}"`, `"${item.imunisasiTambahan||''}"`, `"${item.sumberTambahan||''}"`, 
-                    `"${item.tanggalImunisasiTerakhir||''}"`, `"${item.vitaminA||''}"`, `"${item.adaKontakSakitSama||''}"`, `"${item.jumlahKontakSakit||''}"`, `"${item.bepergian||''}"`, 
-                    `"${item.lokasiBepergian||''}"`, `"${item.tanggalPergi||''}"`, `"${item.tanggalKembali||''}"`, `"${item.spesimenDarah||''}"`, `"${Array.isArray(item.jenisSampleDarah) ? item.jenisSampleDarah.join(', ') : item.jenisSampleDarah||''}"`, 
-                    `"${item.tanggalAmbilDarah||''}"`, `"${item.tanggalKirimDarah||''}"`, `"${item.spesimenLain||''}"`, `"${Array.isArray(item.jenisSampelLain) ? item.jenisSampelLain.join(', ') : item.jenisSampelLain||''}"`, 
-                    `"${item.jenisSampelLainSebutkan||''}"`, `"${item.tanggalAmbilLain||''}"`, `"${item.tanggalKirimLain||''}"`, `"${item.keadaanSaatIni||''}"`, `"${item.pelaksanaInvestigasi||''}"`, 
-                    `"${item.namaSekolah||''}"`, `"${item.titikLokasi||''}"`, `"${item.createdBy||''}"`, `"${item.createdUnit||''}"`, `"${item.currentOwner || item.createdUnit}"`, 
-                    `"${new Date(item.updatedAt).toLocaleDateString()}"`
-                ].join(","));
+                csvRows = data.map(item => {
+                    // Format kontak erat menjadi string
+                    let kontakEratString = '';
+                    let jumlahKontakErat = 0;
+                    
+                    if (item.kontakErat && Array.isArray(item.kontakErat) && item.kontakErat.length > 0) {
+                        jumlahKontakErat = item.kontakErat.length;
+                        kontakEratString = item.kontakErat.map(kontak => 
+                            `${kontak.nama || 'Tanpa Nama'} (${kontak.umur || '-'}, ${kontak.hubungan || '-'})`
+                        ).join('; ');
+                    }
+                    
+                    return [
+                        `"${item.nomorEPID||''}"`, `"${item.statusData||''}"`, `"${item.namaKasus||''}"`, `"${item.jenisKelamin||''}"`, `"${item.tanggalLahir||''}"`, 
+                        `"${(item.alamat||'').replace(/"/g, '""')}"`, `"${item.kabupaten||'Kota Pontianak'}"`, `"${item.kecamatan||''}"`, `"${item.kelurahan||''}"`, 
+                        `"${item.rt||''}"`, `"${item.rw||''}"`, `"${item.namaOrangtua||''}"`, `"${item.noKontakOrangtua||''}"`, `"${item.sumberLaporan||''}"`, 
+                        `"${item.namaUnitPelapor||''}"`, `"${item.tanggalTerimaLaporan||''}"`, `"${item.tanggalPelacakan||''}"`, `"${item.demam||''}"`, 
+                        `"${item.tanggalMulaiDemam||''}"`, `"${item.ruam||''}"`, `"${item.tanggalMulaiRuam||''}"`, `"${Array.isArray(item.gejalaLain) ? item.gejalaLain.join(', ') : item.gejalaLain||''}"`, 
+                        `"${item.gejalaLainSebutkan||''}"`, `"${Array.isArray(item.komplikasi) ? item.komplikasi.join(', ') : item.komplikasi||''}"`, `"${item.komplikasiLainnyaSebutkan||''}"`, 
+                        `"${item.dirawat||''}"`, `"${item.namaRumahSakit||''}"`, `"${item.nomorRekamMedik||''}"`, `"${item.tanggalMasukRawat||''}"`, `"${item.tanggalKeluarRawat||''}"`, 
+                        `"${item.imunisasiCampak1||''}"`, `"${item.sumberCampak1||''}"`, `"${item.imunisasiCampak2||''}"`, `"${item.sumberCampak2||''}"`, `"${item.imunisasiBIAS||''}"`, 
+                        `"${item.sumberBIAS||''}"`, `"${item.imunisasiMMR||''}"`, `"${item.sumberMMR||''}"`, `"${item.imunisasiTambahan||''}"`, `"${item.sumberTambahan||''}"`, 
+                        `"${item.tanggalImunisasiTerakhir||''}"`, `"${item.vitaminA||''}"`, `"${item.adaKontakSakitSama||''}"`, `"${item.jumlahKontakSakit||''}"`, `"${item.bepergian||''}"`, 
+                        `"${item.lokasiBepergian||''}"`, `"${item.tanggalPergi||''}"`, `"${item.tanggalKembali||''}"`, `"${item.spesimenDarah||''}"`, `"${Array.isArray(item.jenisSampleDarah) ? item.jenisSampleDarah.join(', ') : item.jenisSampleDarah||''}"`, 
+                        `"${item.tanggalAmbilDarah||''}"`, `"${item.tanggalKirimDarah||''}"`, `"${item.spesimenLain||''}"`, `"${Array.isArray(item.jenisSampelLain) ? item.jenisSampelLain.join(', ') : item.jenisSampelLain||''}"`, 
+                        `"${item.jenisSampelLainSebutkan||''}"`, `"${item.tanggalAmbilLain||''}"`, `"${item.tanggalKirimLain||''}"`, `"${item.keadaanSaatIni||''}"`, `"${item.pelaksanaInvestigasi||''}"`, 
+                        `"${item.namaSekolah||''}"`, `"${item.titikLokasi||''}"`, `"${item.createdBy||''}"`, `"${item.createdUnit||''}"`, `"${item.currentOwner || item.createdUnit}"`, 
+                        `"${new Date(item.updatedAt).toLocaleDateString()}"`,
+                        // PERBAIKAN POINT 6: Tambah data kontak erat
+                        `"${jumlahKontakErat}"`,
+                        `"${kontakEratString.replace(/"/g, '""')}"`
+                    ].join(",");
+                });
             }
+            
             const blob = new Blob([[headers.join(","), ...csvRows].join("\n")], { type: "text/csv;charset=utf-8;" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
@@ -444,7 +464,7 @@
             spesimenLain: '', jenisSampelLain: [], jenisSampelLainSebutkan: '', tanggalAmbilLain: '', 
             tanggalKirimLain: '', keadaanSaatIni: '', pelaksanaInvestigasi: '', namaSekolah: '', 
             titikLokasi: '', epidManual: false,
-            // PERBAIKAN POINT 1: Tambah field untuk kontak erat
+            // PERBAIKAN POINT 6: Tambah field untuk kontak erat
             kontakErat: []
         };
 
@@ -468,20 +488,17 @@
         let lastEPIDNumber = 0;
 
         const validateManualEPID = (epid) => {
-            // PERBAIKAN POINT 3: Validasi bebas untuk input manual
             if (!epid) return { valid: false, message: 'Nomor EPID tidak boleh kosong' };
             return { valid: true, message: '' };
         };
 
-        // PERBAIKAN UTAMA: Fungsi untuk menentukan current owner dengan logika yang benar
+        // Fungsi untuk menentukan current owner dengan logika yang benar
         const determineCurrentOwner = (formData) => {
             if (formData.currentOwner && formData.currentOwner !== '') {
                 return formData.currentOwner;
             }
             
-            // Untuk chain referral, kita perlu mencari pengirim terakhir
             if (formData.transferHistory && formData.transferHistory.length > 0) {
-                // Cari riwayat transfer terakhir yang BERHASIL (diterima)
                 const successfulTransfers = formData.transferHistory.filter(
                     record => record.action === 'diterima' || record.action === 'dikirim'
                 );
@@ -489,24 +506,20 @@
                 if (successfulTransfers.length > 0) {
                     const lastTransfer = successfulTransfers[successfulTransfers.length - 1];
                     
-                    // Jika ada newOwner di record terakhir, gunakan itu
                     if (lastTransfer.newOwner) {
                         return lastTransfer.newOwner;
                     }
                     
-                    // Jika action 'dikirim', owner masih pengirim
                     if (lastTransfer.action === 'dikirim') {
                         return lastTransfer.from;
                     }
                     
-                    // Jika action 'diterima', owner adalah penerima
                     if (lastTransfer.action === 'diterima') {
                         return lastTransfer.to;
                     }
                 }
             }
             
-            // Fallback untuk data lama
             if (formData.statusData === 'Final' || formData.statusData === 'Baru' || formData.statusData === 'Draft') {
                 return formData.createdUnit;
             }
@@ -520,9 +533,7 @@
             }
             
             if (formData.statusData === 'Ditolak') {
-                // Saat ditolak, kembalikan ke pengirim terakhir dari transferHistory
                 if (formData.transferHistory && formData.transferHistory.length > 0) {
-                    // Cari pengirim terakhir yang mengirim form ini
                     const sendRecords = formData.transferHistory.filter(r => r.action === 'dikirim');
                     if (sendRecords.length > 0) {
                         return sendRecords[sendRecords.length - 1].from;
@@ -578,6 +589,34 @@
             clear: () => {
                 try { localStorage.removeItem('epid_session'); } catch (e) {}
                 document.cookie = "epid_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            }
+        };
+
+        // PERBAIKAN POINT 1: Fungsi untuk menangani beforeunload
+        const setupPageUnloadWarning = (shouldWarn = true) => {
+            if (shouldWarn) {
+                window.addEventListener('beforeunload', handleBeforeUnload);
+                window.history.pushState(null, '', window.location.href);
+                window.addEventListener('popstate', handlePopState);
+            } else {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+                window.removeEventListener('popstate', handlePopState);
+            }
+        };
+
+        const handleBeforeUnload = (e) => {
+            e.preventDefault();
+            e.returnValue = 'Perubahan yang belum disimpan akan hilang. Yakin ingin meninggalkan halaman?';
+            return e.returnValue;
+        };
+
+        const handlePopState = (e) => {
+            if (window.confirm('Perubahan yang belum disimpan akan hilang. Yakin ingin meninggalkan halaman?')) {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+                window.removeEventListener('popstate', handlePopState);
+                window.history.back();
+            } else {
+                window.history.pushState(null, '', window.location.href);
             }
         };
 
@@ -658,7 +697,7 @@
             </div>
         );
 
-        // PERBAIKAN POINT 3: Step1 dengan input manual untuk nomor EPID
+        // Step1 dengan input manual untuk nomor EPID
         const Step1 = ({ data, onChange, onSumberChange, Icons }) => {
             return (
                 <div className="animate-fadeIn">
@@ -895,7 +934,7 @@
             </div>
         );
 
-        // PERBAIKAN POINT 1: Step5 dengan fitur Pengumpulan Data Kontak Erat
+        // Step5 dengan fitur Pengumpulan Data Kontak Erat
         const Step5 = ({ data, onChange, Icons }) => {
             // Fungsi untuk menambah kontak erat
             const addKontakErat = () => {
@@ -950,7 +989,7 @@
                         )}
                     </div>
 
-                    {/* PERBAIKAN POINT 1: Bagian Pengumpulan Data Kontak Erat */}
+                    {/* Bagian Pengumpulan Data Kontak Erat */}
                     <div className="mt-10 pt-6 border-t border-slate-200">
                         <div className="flex items-center justify-between mb-6">
                             <div>
@@ -1266,7 +1305,10 @@
             const [formData, setFormData] = useState(INITIAL_DATA);
             const [notification, setNotification] = useState(null);
             const [hasNewReceived, setHasNewReceived] = useState(false);
-
+            
+            // PERBAIKAN POINT 2: State untuk menandai apakah sudah simpan draft
+            const [hasSavedDraft, setHasSavedDraft] = useState(false);
+            
             // Modals & States
             const [showExitModal, setShowExitModal] = useState(false);
             const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -1306,9 +1348,39 @@
             
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
-            // PERBAIKAN: Ganti topRef dengan formContainerRef
             const formContainerRef = useRef(null);
             const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+
+            // PERBAIKAN POINT 1 & 3: Setup event listener untuk unload
+            useEffect(() => {
+                if (view === 'form') {
+                    setupPageUnloadWarning(true);
+                } else {
+                    setupPageUnloadWarning(false);
+                }
+                
+                return () => {
+                    setupPageUnloadWarning(false);
+                };
+            }, [view]);
+
+            // PERBAIKAN POINT 3: Handle browser back/forward
+            useEffect(() => {
+                const handleBrowserBack = (e) => {
+                    if (view === 'form' && !hasSavedDraft) {
+                        e.preventDefault();
+                        setShowExitModal(true);
+                        window.history.pushState(null, '', window.location.href);
+                    }
+                };
+
+                window.history.pushState(null, '', window.location.href);
+                window.addEventListener('popstate', handleBrowserBack);
+
+                return () => {
+                    window.removeEventListener('popstate', handleBrowserBack);
+                };
+            }, [view, hasSavedDraft]);
 
             const showLoading = (show = true, minDelay = 300) => {
                 if (show) {
@@ -1361,7 +1433,6 @@
                 init(); 
             }, [view, currentUser]);
 
-            // PERBAIKAN: Reset scroll saat step berubah
             useEffect(() => {
                 if (view === 'form' && formContainerRef.current) {
                     setTimeout(() => {
@@ -1493,17 +1564,17 @@
             };
             
             const handleLogout = () => { 
-    setShowLogoutModal(true); // Tampilkan modal konfirmasi
-   };
+                setShowLogoutModal(true);
+            };
 
-  const confirmLogout = () => {
-    sessionManager.clear(); 
-    setUsername(''); 
-    setPassword(''); 
-    setCurrentUser(null); 
-    setView('login'); 
-    setShowLogoutModal(false);
-  };
+            const confirmLogout = () => {
+                sessionManager.clear(); 
+                setUsername(''); 
+                setPassword(''); 
+                setCurrentUser(null); 
+                setView('login'); 
+                setShowLogoutModal(false);
+            };
 
             const handleStartNew = async () => { 
                 const newId = Date.now().toString(); 
@@ -1520,6 +1591,33 @@
                 }); 
                 setStep(1); 
                 setView('form'); 
+                setHasSavedDraft(false); // Reset state saat buat form baru
+            };
+            
+            // PERBAIKAN POINT 2: Modifikasi handleBackToStart untuk mempertimbangkan hasSavedDraft
+            const handleBackToStart = () => {
+                if (hasSavedDraft) {
+                    // Jika sudah disimpan draft, langsung kembali tanpa modal
+                    setView('start');
+                    setHasSavedDraft(false); // Reset state
+                } else {
+                    // Jika belum disimpan draft, tampilkan modal konfirmasi
+                    setShowExitModal(true);
+                }
+            };
+
+            const handleConfirmExit = (act) => { 
+                setShowExitModal(false); 
+                if (act === 'save') { 
+                    handleSaveDraft(); 
+                    setTimeout(() => {
+                        setView('start');
+                        setHasSavedDraft(false); // Reset setelah save dan keluar
+                    }, 1000); 
+                } else if (act === 'discard') {
+                    setView('start');
+                    setHasSavedDraft(false); // Reset saat discard
+                }
             };
             
             const handleEditForm = (item) => {
@@ -1546,6 +1644,7 @@
                 setFormData(formDataToEdit);
                 setStep(1); 
                 setView('form'); 
+                setHasSavedDraft(false); // Reset saat edit form
             };
             
             const handleOpenDrafts = async () => { 
@@ -1762,7 +1861,6 @@
                 try {
                     let finalData = { ...itemToFinalize };
                     
-                    // PERBAIKAN POINT 3: Tidak ada lagi generate otomatis
                     if (finalData.nomorEPID) {
                         finalData.epidManual = true;
                     }
@@ -1867,6 +1965,7 @@
                 setFormData(d); 
                 setStep(1); 
                 setView('form'); 
+                setHasSavedDraft(false); // Reset saat resume draft
             };
             
             const handleExportMyData = () => { 
@@ -1889,16 +1988,6 @@
             const handleOpenReview = (i) => { 
                 setReviewItem(i); 
                 setShowReviewModal(true); 
-            };
-            
-            const handleBackToStart = () => setShowExitModal(true);
-            
-            const handleConfirmExit = (act) => { 
-                setShowExitModal(false); 
-                if (act === 'save') { 
-                    handleSaveDraft(); 
-                    setTimeout(() => setView('start'), 1000); 
-                } else if (act === 'discard') setView('start'); 
             };
             
             const confirmDelete = (i) => { 
@@ -1987,6 +2076,7 @@
                 ); 
             };
             
+            // PERBAIKAN POINT 2: Modifikasi handleSaveDraft untuk set hasSavedDraft
             const handleSaveDraft = async () => { 
                 showLoading(true); 
                 try { 
@@ -2002,6 +2092,7 @@
                     
                     await mockDB.save(d); 
                     setFormData(d); 
+                    setHasSavedDraft(true); // Tandai bahwa sudah disimpan draft
                     showLoading(false); 
                     showNotification('Draft tersimpan', 'success'); 
                 } catch (e) { 
@@ -2010,13 +2101,13 @@
                 } 
             };
             
+            // PERBAIKAN POINT 2: Modifikasi handleSaveToPending untuk set hasSavedDraft
             const handleSaveToPending = async () => { 
                 if (!formData.namaKasus) { 
                     showNotification('Nama Kasus wajib!', 'error'); 
                     return; 
                 } 
                 
-                // PERBAIKAN POINT 3: Validasi nomor EPID
                 if (!formData.nomorEPID) {
                     showNotification('Nomor EPID wajib diisi!', 'error');
                     return;
@@ -2036,11 +2127,13 @@
                     
                     await mockDB.save(d); 
                     setFormData(d); 
+                    setHasSavedDraft(true); // Tandai bahwa sudah disimpan
                     showLoading(false); 
                     showNotification('Formulir disimpan ke Pending Form', 'success');
                     
                     setTimeout(() => {
                         setView('pending'); 
+                        setHasSavedDraft(false); // Reset setelah pindah view
                     }, 1000);
                     
                 } catch (e) { 
@@ -2065,7 +2158,6 @@
                     return;
                 }
                 
-                // PERBAIKAN POINT 3: Validasi nomor EPID
                 if (!formData.nomorEPID) {
                     showNotification('Nomor EPID wajib diisi!', 'error');
                     return;
@@ -2075,7 +2167,6 @@
                 try { 
                     let finalData = { ...formData };
                     
-                    // PERBAIKAN POINT 3: Tidak ada lagi generate otomatis
                     if (finalData.nomorEPID) {
                         finalData.epidManual = true;
                     }
@@ -2087,12 +2178,14 @@
                     
                     await mockDB.save(finalData); 
                     setFormData(finalData); 
+                    setHasSavedDraft(true); // Tandai bahwa sudah disimpan
                     showLoading(false); 
                     
                     showNotification('Formulir berhasil difinalkan!', 'success');
                     
                     setTimeout(() => {
                         setView('success'); 
+                        setHasSavedDraft(false); // Reset setelah pindah view
                     }, 500);
                     
                 } catch (e) { 
@@ -2106,10 +2199,8 @@
                 setTimeout(() => setNotification(null), 3000); 
             };
             
-            // PERBAIKAN UTAMA: Fungsi nextStep dan prevStep yang sudah diperbaiki
             const nextStep = () => {
                 setStep(p => Math.min(p + 1, 6));
-                // PERBAIKAN: Scroll ke container form
                 setTimeout(() => {
                     if (formContainerRef.current) {
                         formContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2181,6 +2272,16 @@
                                         Masuk Sekarang
                                     </button>
                                 </form>
+                                
+                                {/* PERBAIKAN POINT 5: Tombol Beranda di Login */}
+                                <div className="mt-6">
+                                    <button 
+                                        onClick={() => window.location.href = 'index.html'}
+                                        className="w-full py-3.5 bg-gradient-to-r from-slate-700 to-slate-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:shadow-slate-800/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                                    >
+                                        <Icons.Home className="w-5 h-5" /> Kembali ke Beranda
+                                    </button>
+                                </div>
                                 
                                 <div className="mt-8 text-center">
                                     <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest text-micro">by UPT Puskesmas Kampung Dalam</p>
@@ -2426,7 +2527,7 @@
                 </div>
             </div>
 
-            {/* MODAL KONFIRMASI KELUAR - DITAMBAHKAN DI SINI */}
+            {/* MODAL KONFIRMASI KELUAR */}
             {showExitModal && (
                 <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
@@ -3687,7 +3788,37 @@
             </div>
         );
 
-        // PERBAIKAN POINT 1 & 3: AdminDashboard yang diperbaiki
+        // PERBAIKAN POINT 4: Modal konfirmasi hapus akun di admin
+        const DeleteUserConfirmationModal = ({ user, onConfirm, onCancel }) => {
+            if (!user) return null;
+            
+            return (
+                <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
+                        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Icons.AlertTriangle className="w-8 h-8" />
+                        </div>
+                        <h3 className="font-bold text-xl mb-2 text-red-600">Hapus User?</h3>
+                        <p className="text-slate-500 mb-4 text-body">
+                            User: <strong>{user.name}</strong><br/>
+                            Username: <strong>{user.username}</strong><br/>
+                            Unit: <strong>{user.unitName}</strong>
+                        </p>
+                        <p className="text-slate-500 mb-6 text-sm">User akan dihapus permanen dan tidak dapat dikembalikan.</p>
+                        <div className="flex gap-3">
+                            <button onClick={onCancel} className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition">
+                                Batal
+                            </button>
+                            <button onClick={onConfirm} className="flex-1 p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition">
+                                Ya, Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // AdminDashboard yang diperbaiki
         const AdminDashboard = ({ currentUser, onLogout, mockDB, mockUserDB, showNotification, exportToCSV, loadDataForView, ALL_SERVICES, onViewForm, onUnfinalizeForm, onEditEpidForm, showAdminDeleteUserModal, setShowAdminDeleteUserModal, adminUserToDelete, setAdminUserToDelete, rejectedList }) => {
             const [activeTab, setActiveTab] = useState('forms');
             const [allForms, setAllForms] = useState([]);
@@ -3839,11 +3970,12 @@
             };
             
             const handleDeleteUser = async (id) => { 
-                if(window.confirm('Yakin ingin menghapus user ini secara permanen?')) { 
-                    await mockUserDB.deleteUser(id); 
-                    showNotification('User dihapus', 'success'); 
-                    setAllUsers(await mockUserDB.getUsers()); 
-                } 
+                // PERBAIKAN POINT 4: Menggunakan modal konfirmasi hapus user
+                const userToDelete = allUsers.find(u => u.id === id);
+                if (userToDelete) {
+                    setAdminUserToDelete(userToDelete);
+                    setShowAdminDeleteUserModal(true);
+                }
             };
             
             const handleExportAll = () => { 
@@ -4348,7 +4480,6 @@ const ViewModal = ({ item, onClose, Icons }) => {
     
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            {/* PERBAIKAN: Ditambahkan 'overflow-hidden' agar sudut rounded-2xl tidak tertutup konten */}
             <div className="relative bg-white rounded-2xl w-full sm:w-[95%] md:w-[80%] lg:w-[70%] max-w-4xl shadow-2xl border border-slate-200 flex flex-col max-h-[80vh] overflow-hidden">
                 
                 {/* HEADER (Tetap dipertahankan, tidak ikut scroll) */}
@@ -4589,6 +4720,53 @@ const ViewModal = ({ item, onClose, Icons }) => {
                                         )}
                                     </div>
                                 )}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* PERBAIKAN POINT 6: Tampilkan data kontak erat di View Modal */}
+                    {item.kontakErat && item.kontakErat.length > 0 && (
+                        <div className="mb-8">
+                            <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                                <Icons.Users className="w-5 h-5 text-indigo-500" />
+                                Data Kontak Erat ({item.kontakErat.length} orang)
+                            </h3>
+                            <div className="space-y-4">
+                                {item.kontakErat.map((kontak, index) => (
+                                    <div key={index} className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                                                    <Icons.User className="w-4 h-4" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-slate-800">Kontak Erat #{index + 1}: {kontak.nama || 'Tanpa Nama'}</h4>
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2 text-sm">
+                                                        <div>
+                                                            <span className="text-slate-600">Umur: </span>
+                                                            <span className="font-medium">{kontak.umur || '-'}</span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-slate-600">Hubungan: </span>
+                                                            <span className="font-medium">{kontak.hubungan || '-'}</span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-slate-600">Imunisasi: </span>
+                                                            <span className="font-medium">{kontak.imunisasiCampakRubella || 'Belum pernah'}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-2">
+                                                        <span className="text-slate-600">Alamat: </span>
+                                                        <span className="font-medium">{kontak.alamat || '-'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${kontak.kondisi === 'sakit' ? 'bg-red-100 text-red-800 border border-red-200' : 'bg-green-100 text-green-800 border border-green-200'}`}>
+                                                {kontak.kondisi === 'sakit' ? 'Sakit' : 'Sehat'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}
