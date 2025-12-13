@@ -171,6 +171,52 @@
         // BAGIAN 1: KONFIGURASI DAN DATA
         const { useState, useEffect, useRef } = React;
 
+        // ==================== FITUR BARU: PAGE PROTECTION ====================
+        // Fungsi untuk mengatur proteksi halaman dari reload dan navigasi
+        const setupPageProtection = (isFormActive) => {
+            // Handler untuk beforeunload (reload/tutup tab)
+            const handleBeforeUnload = (e) => {
+                if (isFormActive) {
+                    const message = 'Anda memiliki perubahan yang belum disimpan. Apakah Anda yakin ingin meninggalkan halaman?';
+                    e.preventDefault();
+                    e.returnValue = message;
+                    return message;
+                }
+            };
+
+            // Handler untuk popstate (tombol back/forward browser)
+            const handlePopState = (e) => {
+                if (isFormActive) {
+                    // Tampilkan konfirmasi custom
+                    if (!window.confirm('Anda memiliki perubahan yang belum disimpan. Apakah Anda yakin ingin meninggalkan form?')) {
+                        // Jika user memilih batal, kembalikan ke state sebelumnya
+                        window.history.pushState(null, '', window.location.pathname);
+                        return false;
+                    }
+                }
+            };
+
+            // Setup event listeners
+            if (isFormActive) {
+                window.addEventListener('beforeunload', handleBeforeUnload);
+                window.addEventListener('popstate', handlePopState);
+                // Push state untuk mencegah tombol back langsung keluar
+                window.history.pushState(null, '', window.location.pathname);
+            } else {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+                window.removeEventListener('popstate', handlePopState);
+            }
+
+            return () => {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+                window.removeEventListener('popstate', handlePopState);
+            };
+        };
+
+        // Variabel untuk melacak cleanup function
+        let formProtectionCleanup = null;
+        // ==================== END FITUR BARU ====================
+
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyCNkEVslyMr-ReNO77drTO7n-AkWoYJPCY",
             authDomain: "pd3i-roli.firebaseapp.com",
@@ -1310,6 +1356,53 @@
             const formContainerRef = useRef(null);
             const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
+            // ==================== FITUR BARU: State untuk melacak perubahan form ====================
+            const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+            const [isFormActive, setIsFormActive] = useState(false);
+
+            // ==================== FITUR BARU: Effect untuk mengatur proteksi halaman ====================
+            useEffect(() => {
+                // Aktifkan proteksi hanya ketika di view 'form' dan ada perubahan yang belum disimpan
+                const shouldProtect = view === 'form' && hasUnsavedChanges;
+                setIsFormActive(shouldProtect);
+                
+                if (shouldProtect) {
+                    formProtectionCleanup = setupPageProtection(true);
+                    
+                    // Tambahkan state ke history untuk mencegah tombol back langsung keluar
+                    window.history.pushState(null, '', window.location.pathname);
+                    
+                    return () => {
+                        if (formProtectionCleanup) {
+                            formProtectionCleanup();
+                            formProtectionCleanup = null;
+                        }
+                    };
+                } else {
+                    // Nonaktifkan proteksi
+                    if (formProtectionCleanup) {
+                        formProtectionCleanup();
+                        formProtectionCleanup = null;
+                    }
+                }
+            }, [view, hasUnsavedChanges]);
+
+            // ==================== FITUR BARU: Effect untuk melacak perubahan form ====================
+            useEffect(() => {
+                // Cek apakah ada data yang sudah diisi
+                const checkUnsavedChanges = () => {
+                    const fieldsToCheck = ['namaKasus', 'nomorEPID', 'alamat', 'jenisKelamin', 'tanggalLahir'];
+                    const hasChanges = fieldsToCheck.some(field => 
+                        formData[field] && formData[field].toString().trim() !== ''
+                    );
+                    setHasUnsavedChanges(hasChanges);
+                };
+                
+                if (view === 'form') {
+                    checkUnsavedChanges();
+                }
+            }, [formData, view]);
+
             const showLoading = (show = true, minDelay = 300) => {
                 if (show) {
                     setLoading(true);
@@ -1493,17 +1586,17 @@
             };
             
             const handleLogout = () => { 
-    setShowLogoutModal(true); // Tampilkan modal konfirmasi
-   };
+                setShowLogoutModal(true); // Tampilkan modal konfirmasi
+            };
 
-  const confirmLogout = () => {
-    sessionManager.clear(); 
-    setUsername(''); 
-    setPassword(''); 
-    setCurrentUser(null); 
-    setView('login'); 
-    setShowLogoutModal(false);
-  };
+            const confirmLogout = () => {
+                sessionManager.clear(); 
+                setUsername(''); 
+                setPassword(''); 
+                setCurrentUser(null); 
+                setView('login'); 
+                setShowLogoutModal(false);
+            };
 
             const handleStartNew = async () => { 
                 const newId = Date.now().toString(); 
@@ -1511,10 +1604,10 @@
                     ...INITIAL_DATA, 
                     id: newId, 
                     nomorEPID: '', 
-                    createdBy: currentUser.username, 
-                    createdUnit: currentUser.unitName,
-                    originalUnit: currentUser.unitName,
-                    currentOwner: currentUser.unitName,
+                    createdBy: currentUser?.username, 
+                    createdUnit: currentUser?.unitName,
+                    originalUnit: currentUser?.unitName,
+                    currentOwner: currentUser?.unitName,
                     epidManual: false,
                     transferHistory: []
                 }); 
@@ -1891,14 +1984,29 @@
                 setShowReviewModal(true); 
             };
             
-            const handleBackToStart = () => setShowExitModal(true);
+            // ==================== FITUR BARU: Handle back dengan peringatan ====================
+            const handleBackToStart = () => {
+                if (hasUnsavedChanges) {
+                    if (window.confirm('Anda memiliki perubahan yang belum disimpan. Apakah Anda yakin ingin meninggalkan form?')) {
+                        setShowExitModal(true);
+                    }
+                } else {
+                    setShowExitModal(true);
+                }
+            };
             
             const handleConfirmExit = (act) => { 
                 setShowExitModal(false); 
                 if (act === 'save') { 
                     handleSaveDraft(); 
-                    setTimeout(() => setView('start'), 1000); 
-                } else if (act === 'discard') setView('start'); 
+                    setTimeout(() => {
+                        setHasUnsavedChanges(false);
+                        setView('start');
+                    }, 1000); 
+                } else if (act === 'discard') {
+                    setHasUnsavedChanges(false);
+                    setView('start'); 
+                }
             };
             
             const confirmDelete = (i) => { 
@@ -1929,7 +2037,7 @@
                 const { name, value, type, checked } = e.target; 
                 
                 let processedValue = value;
-                if (name === 'namaKasus' || name === 'namaOrangtua' || name === 'pelaksanaInvestigasi' || name === 'namaSekolah') {
+                if (name === 'namaKasus' || name === 'namaOrangtua' || name === 'pelaksanaInvestigarasi' || name === 'namaSekolah') {
                     processedValue = value.toUpperCase();
                 }
                 
@@ -1960,6 +2068,11 @@
                 } else { 
                     setFormData(prev => ({ ...prev, [name]: processedValue })); 
                 } 
+                
+                // ==================== FITUR BARU: Set unsaved changes ====================
+                if (view === 'form') {
+                    setHasUnsavedChanges(true);
+                }
             };
             
             const handleKecamatanChange = (e) => { 
@@ -2003,6 +2116,8 @@
                     await mockDB.save(d); 
                     setFormData(d); 
                     showLoading(false); 
+                    // ==================== FITUR BARU: Reset unsaved changes ====================
+                    setHasUnsavedChanges(false);
                     showNotification('Draft tersimpan', 'success'); 
                 } catch (e) { 
                     showLoading(false); 
@@ -2037,6 +2152,8 @@
                     await mockDB.save(d); 
                     setFormData(d); 
                     showLoading(false); 
+                    // ==================== FITUR BARU: Reset unsaved changes ====================
+                    setHasUnsavedChanges(false);
                     showNotification('Formulir disimpan ke Pending Form', 'success');
                     
                     setTimeout(() => {
@@ -2088,6 +2205,8 @@
                     await mockDB.save(finalData); 
                     setFormData(finalData); 
                     showLoading(false); 
+                    // ==================== FITUR BARU: Reset unsaved changes ====================
+                    setHasUnsavedChanges(false);
                     
                     showNotification('Formulir berhasil difinalkan!', 'success');
                     
@@ -2180,6 +2299,20 @@
                                     <button className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transition-all active:scale-[0.98] text-subtitle mt-6">
                                         Masuk Sekarang
                                     </button>
+                                    
+                                    {/* ==================== FITUR BARU: Tombol Beranda ==================== */}
+                                    <div className="pt-4 border-t border-white/10">
+                                        <a 
+                                            href="index.html"
+                                            className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold flex items-center justify-center gap-2 border border-white/20 transition-all active:scale-[0.98] text-subtitle"
+                                        >
+                                            <Icons.Home className="w-5 h-5" />
+                                            Kembali ke Beranda
+                                        </a>
+                                        <p className="text-center text-xs text-slate-400 mt-2">
+                                            Kembali ke halaman utama website
+                                        </p>
+                                    </div>
                                 </form>
                                 
                                 <div className="mt-8 text-center">
@@ -2345,56 +2478,56 @@
                 );
 
                 if (view === 'form') {
-    const progressPercent = ((step - 1) / (STEP_LABELS.length - 1)) * 100;
-    
-    return (
-        <div className="fixed inset-0 h-[100dvh] w-full flex flex-col bg-slate-50 overflow-hidden">
-            <div className="flex-none z-50 px-4 py-4 bg-white/90 backdrop-blur-sm border-b border-slate-100 shadow-sm">
-                <div className="max-w-3xl mx-auto">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                            <button onClick={step === 1 ? handleBackToStart : prevStep} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:shadow-md active:scale-90 transition">
-                                {step === 1 ? (
-                                    <Icons.Home className="w-5 h-5" />
-                                ) : (
-                                    <Icons.ChevronLeft className="w-5 h-5" />
-                                )}
-                            </button>
-                            {step > 1 && (
-                                <button onClick={handleBackToStart} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:shadow-md active:scale-90 transition" title="Kembali ke Menu Utama">
-                                    <Icons.Home className="w-5 h-5" />
-                                </button>
-                            )}
-                        </div>
-                        
-                        <div className="flex flex-col items-center">
-                            <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider mb-0.5 text-micro">
-                                Langkah {step} dari 6
-                            </span>
-                            <h2 className="text-lg font-bold text-slate-800 tracking-tight">
-                                {STEP_LABELS[step-1].label}
-                            </h2>
-                        </div>
-
-                        {step < 6 ? (
-                            <button onClick={nextStep} className="h-10 px-5 rounded-full bg-slate-900 text-white text-sm font-bold shadow-md hover:shadow-lg active:scale-90 transition flex items-center gap-2">
-                                Lanjut <Icons.ChevronLeft className="rotate-180 w-3.5 h-3.5"/>
-                            </button>
-                        ) : (
-                            <div className="w-20"></div>
-                        )}
-                    </div>
+                    const progressPercent = ((step - 1) / (STEP_LABELS.length - 1)) * 100;
                     
-                    <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500 ease-out" style={{ width: `${progressPercent}%` }}></div>
-                    </div>
-                </div>
-            </div>
+                    return (
+                        <div className="fixed inset-0 h-[100dvh] w-full flex flex-col bg-slate-50 overflow-hidden">
+                            <div className="flex-none z-50 px-4 py-4 bg-white/90 backdrop-blur-sm border-b border-slate-100 shadow-sm">
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <button onClick={step === 1 ? handleBackToStart : prevStep} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:shadow-md active:scale-90 transition">
+                                                {step === 1 ? (
+                                                    <Icons.Home className="w-5 h-5" />
+                                                ) : (
+                                                    <Icons.ChevronLeft className="w-5 h-5" />
+                                                )}
+                                            </button>
+                                            {step > 1 && (
+                                                <button onClick={handleBackToStart} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:shadow-md active:scale-90 transition" title="Kembali ke Menu Utama">
+                                                    <Icons.Home className="w-5 h-5" />
+                                                </button>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="flex flex-col items-center">
+                                            <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider mb-0.5 text-micro">
+                                                Langkah {step} dari 6
+                                            </span>
+                                            <h2 className="text-lg font-bold text-slate-800 tracking-tight">
+                                                {STEP_LABELS[step-1].label}
+                                            </h2>
+                                        </div>
 
-            <div ref={formContainerRef} className="flex-1 overflow-y-auto p-4 pb-32 scroll-smooth">
-                <div className="max-w-3xl mx-auto animate-fadeIn">
-                    <Card className="min-h-[60vh]">
-                        <div className="flex justify-between items-start mb-8">
+                                        {step < 6 ? (
+                                            <button onClick={nextStep} className="h-10 px-5 rounded-full bg-slate-900 text-white text-sm font-bold shadow-md hover:shadow-lg active:scale-90 transition flex items-center gap-2">
+                                                Lanjut <Icons.ChevronLeft className="rotate-180 w-3.5 h-3.5"/>
+                                            </button>
+                                        ) : (
+                                            <div className="w-20"></div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+                                        <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500 ease-out" style={{ width: `${progressPercent}%` }}></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div ref={formContainerRef} className="flex-1 overflow-y-auto p-4 pb-32 scroll-smooth">
+                                <div className="max-w-3xl mx-auto animate-fadeIn">
+                                    <Card className="min-h-[60vh]">
+                                        <div className="flex justify-between items-start mb-8">
                                             <div>
                                                 <h3 className="font-bold text-2xl text-slate-800 mb-2 tracking-tight">
                                                     {STEP_LABELS[step-1].label}
@@ -2422,50 +2555,50 @@
                                             onSaveAndFinal={handleSaveAndFinal}
                                             Icons={Icons} 
                                         />}
-                    </Card>
-                </div>
-            </div>
+                                    </Card>
+                                </div>
+                            </div>
 
-            {/* MODAL KONFIRMASI KELUAR - DITAMBAHKAN DI SINI */}
-            {showExitModal && (
-                <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
-                        <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Icons.AlertTriangle className="w-8 h-8" />
+                            {/* MODAL KONFIRMASI KELUAR - DITAMBAHKAN DI SINI */}
+                            {showExitModal && (
+                                <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+                                    <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
+                                        <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Icons.AlertTriangle className="w-8 h-8" />
+                                        </div>
+                                        <h3 className="font-bold text-xl mb-2 text-blue-600">Keluar dari Formulir?</h3>
+                                        <p className="text-slate-500 mb-6 text-body">
+                                            Apakah Anda ingin menyimpan draft sebelum keluar? Perubahan yang belum disimpan akan hilang.
+                                        </p>
+                                        <div className="flex flex-col gap-3">
+                                            <button 
+                                                onClick={() => handleConfirmExit('save')} 
+                                                className="w-full p-3.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                                            >
+                                                Simpan sebagai Draft
+                                            </button>
+                                            <button 
+                                                onClick={() => handleConfirmExit('discard')} 
+                                                className="w-full p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                                            >
+                                                Keluar Tanpa Menyimpan
+                                            </button>
+                                            <button 
+                                                onClick={() => setShowExitModal(false)} 
+                                                className="w-full p-3.5 border border-slate-200 text-slate-500 rounded-lg font-bold hover:bg-slate-50 transition"
+                                            >
+                                                Batal & Lanjutkan Editing
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {showLoadingOverlay && <LoadingOverlay />} 
+                            <Toast notification={notification} />
                         </div>
-                        <h3 className="font-bold text-xl mb-2 text-blue-600">Keluar dari Formulir?</h3>
-                        <p className="text-slate-500 mb-6 text-body">
-                            Apakah Anda ingin menyimpan draft sebelum keluar? Perubahan yang belum disimpan akan hilang.
-                        </p>
-                        <div className="flex flex-col gap-3">
-                            <button 
-                                onClick={() => handleConfirmExit('save')} 
-                                className="w-full p-3.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-bold hover:shadow-lg transition"
-                            >
-                                Simpan sebagai Draft
-                            </button>
-                            <button 
-                                onClick={() => handleConfirmExit('discard')} 
-                                className="w-full p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
-                            >
-                                Keluar Tanpa Menyimpan
-                            </button>
-                            <button 
-                                onClick={() => setShowExitModal(false)} 
-                                className="w-full p-3.5 border border-slate-200 text-slate-500 rounded-lg font-bold hover:bg-slate-50 transition"
-                            >
-                                Batal & Lanjutkan Editing
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            
-            {showLoadingOverlay && <LoadingOverlay />} 
-            <Toast notification={notification} />
-        </div>
-    );
-}
+                    );
+                }
                 
                 if (view === 'drafts') return (
                     <ListView 
@@ -2731,32 +2864,32 @@
                         </div>
                     )}
                     
-                   {showLogoutModal && (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Icons.LogOut className="w-8 h-8" />
-            </div>
-            <h3 className="font-bold text-xl mb-2 text-red-600">Konfirmasi Logout</h3>
-            <p className="text-slate-500 mb-6 text-body">Apakah Anda yakin ingin keluar dari akun ini?</p>
-            <div className="flex gap-3">
-                <button 
-                    onClick={() => setShowLogoutModal(false)} 
-                    className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
-                >
-                    Batal
-                </button>
-                <button 
-                    onClick={confirmLogout} 
-                    className="flex-1 p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
-                >
-                    Ya, Logout
-                </button>
-            </div>
-        </div>
-    </div>
-)}
-                   
+                    {showLogoutModal && (
+                        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
+                                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Icons.LogOut className="w-8 h-8" />
+                                </div>
+                                <h3 className="font-bold text-xl mb-2 text-red-600">Konfirmasi Logout</h3>
+                                <p className="text-slate-500 mb-6 text-body">Apakah Anda yakin ingin keluar dari akun ini?</p>
+                                <div className="flex gap-3">
+                                    <button 
+                                        onClick={() => setShowLogoutModal(false)} 
+                                        className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button 
+                                        onClick={confirmLogout} 
+                                        className="flex-1 p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                                    >
+                                        Ya, Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
                     {showUnfinalizeModal && (
                         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
                             <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center shadow-2xl">
@@ -4260,385 +4393,385 @@
         };
 
         // MODAL VIEW FORMULIR
-const ViewModal = ({ item, onClose, Icons }) => {
-    if (!item) {
-        console.log("ViewModal: No item provided");
-        return null;
-    }
-    
-    console.log("ViewModal rendering with item:", item);
-    
-    const formatDate = (dateString) => {
-        if (!dateString) return '-';
-        try {
-            if (typeof dateString === 'number') {
-                return new Date(dateString).toLocaleDateString('id-ID');
-            }
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString;
-            return date.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            });
-        } catch (e) {
-            console.log("Date formatting error:", e);
-            return dateString;
-        }
-    };
-    
-    const formatDateTime = (timestamp) => {
-        if (!timestamp) return '-';
-        try {
-            const date = new Date(timestamp);
-            if (isNaN(date.getTime())) return timestamp;
-            return date.toLocaleString('id-ID', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        } catch (e) {
-            return timestamp;
-        }
-    };
-    
-    const calculateAgeFromDOB = (dob) => {
-        if (!dob) return '';
-        try {
-            const birthDate = new Date(dob);
-            const today = new Date();
-            
-            let years = today.getFullYear() - birthDate.getFullYear();
-            let months = today.getMonth() - birthDate.getMonth();
-            
-            if (months < 0) {
-                years--;
-                months += 12;
+        const ViewModal = ({ item, onClose, Icons }) => {
+            if (!item) {
+                console.log("ViewModal: No item provided");
+                return null;
             }
             
-            return `${years} tahun, ${months} bulan`;
-        } catch (e) {
-            return dob;
-        }
-    };
-    
-    const getStatusBadge = (status) => {
-        const statusColors = {
-            'Draft': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-            'Pending': 'bg-amber-100 text-amber-800 border border-amber-200',
-            'Final': 'bg-green-100 text-green-800 border border-green-200',
-            'Proses': 'bg-blue-100 text-blue-800 border border-blue-200',
-            'Ditolak': 'bg-red-100 text-red-800 border border-red-200',
-            'Diterima': 'bg-emerald-100 text-emerald-800 border border-emerald-200',
-            'Transferred': 'bg-purple-100 text-purple-800 border border-purple-200',
-            'Baru': 'bg-gray-100 text-gray-800 border border-gray-200'
-        };
-        
-        return (
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
-                {status || 'Unknown'}
-            </span>
-        );
-    };
-    
-    const currentOwner = typeof determineCurrentOwner !== 'undefined' ? determineCurrentOwner(item) : (item.currentOwner || '-');
-    const isFromOtherUnit = item.createdUnit !== currentOwner;
-    
-    return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            {/* PERBAIKAN: Ditambahkan 'overflow-hidden' agar sudut rounded-2xl tidak tertutup konten */}
-            <div className="relative bg-white rounded-2xl w-full sm:w-[95%] md:w-[80%] lg:w-[70%] max-w-4xl shadow-2xl border border-slate-200 flex flex-col max-h-[80vh] overflow-hidden">
-                
-                {/* HEADER (Tetap dipertahankan, tidak ikut scroll) */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-slate-200 flex-none">
-                    <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="bg-white p-2 rounded-lg shadow-sm">
-                                    <Icons.FileText className="w-6 h-6 text-blue-600" />        
-                                </div>        
-                                <div>
-                                    <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data</h2>
-                                    <div className="flex items-center gap-3 mt-1 flex-nowrap">
-                                        <span className="font-mono font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white bg-black px-3 py-1 rounded shrink-0">
-                                            {item.nomorEPID ||'NO-EPID'}
-                                        </span>
-                                      
-                                        {isFromOtherUnit && (
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
-                                                Eksternal
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex flex-wrap gap-4 mt-3 text-sm text-slate-600">
-                                <div className="flex items-center gap-1">
-                                    <Icons.Shield className="w-4 h-4" />
-                                    <span>Owner: <strong>{currentOwner}</strong></span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Icons.Clock className="w-4 h-4" />
-                                    <span>Update: <strong>{formatDateTime(item.updatedAt)}</strong></span>
-                                </div>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={onClose}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-10"
-                        >
-                            <Icons.XCircle className="w-8 h-8" />
-                        </button>
-                    </div>
-                </div>
-                
-                {/* KONTEN ISI (Bisa discroll) */}
-                <div className="p-6 overflow-y-auto flex-1">
-                    <div className="mb-8">
-                        <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                            <Icons.FileText className="w-5 h-5 text-amber-500" />
-                            Informasi Workflow
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Status Card */}
-                            <div className={`p-4 rounded-lg border ${
-                                item.statusData === 'Pending' 
-                                    ? 'bg-amber-50 border-amber-100' 
-                                    : item.statusData === 'Final'
-                                    ? 'bg-green-50 border-green-100'
-                                    : item.statusData === 'Ditolak'
-                                    ? 'bg-red-50 border-red-100'
-                                    : 'bg-blue-50 border-blue-100'
-                            }`}>
-                                <p className="text-sm font-semibold mb-1">Status Saat Ini</p>
-                                <p className={`text-lg font-bold ${
-                                    item.statusData === 'Pending' 
-                                        ? 'text-amber-800' 
-                                        : item.statusData === 'Final'
-                                        ? 'text-green-800'
-                                        : item.statusData === 'Ditolak'
-                                        ? 'text-red-800'
-                                        : 'text-blue-800'
-                                }`}>
-                                    {item.statusData}
-                                </p>
-                                <p className="text-xs mt-1">
-                                    {item.statusData === 'Pending' 
-                                        ? 'Formulir dalam proses verifikasi di Pending Form'
-                                        : item.statusData === 'Final'
-                                        ? 'Formulir sudah final'
-                                        : item.statusData === 'Ditolak'
-                                        ? 'Formulir ditolak oleh unit lain'
-                                        : 'Formulir dalam proses lainnya'}
-                                </p>
-                            </div>
-
-                            {/* Tombol Lokasi (Pindah kesini) */}
-                            {item.titikLokasi ? (
-                                <button 
-                                    onClick={() => {
-                                        if (item.titikLokasi) {
-                                            const coords = item.titikLokasi.split(',').map(c => c.trim());
-                                            if (coords.length === 2) {
-                                                const url = `https://www.google.com/maps?q=${coords[0]},${coords[1]}`;
-                                                window.open(url, '_blank');
-                                            }
-                                        }
-                                    }}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg border border-blue-700 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group h-full min-h-[100px]"
-                                >
-                                    <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
-                                        <Icons.MapPin className="w-6 h-6 text-white" />
-                                    </div>
-                                    <span className="font-bold text-sm">Lihat Titik Lokasi</span>
-                                </button>
-                            ) : (
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center justify-center text-slate-400 min-h-[100px]">
-                                    <Icons.MapPin className="w-6 h-6 mb-1 text-slate-300" />
-                                    <p className="text-sm">Lokasi tidak tersedia</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+            console.log("ViewModal rendering with item:", item);
+            
+            const formatDate = (dateString) => {
+                if (!dateString) return '-';
+                try {
+                    if (typeof dateString === 'number') {
+                        return new Date(dateString).toLocaleDateString('id-ID');
+                    }
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) return dateString;
+                    return date.toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                } catch (e) {
+                    console.log("Date formatting error:", e);
+                    return dateString;
+                }
+            };
+            
+            const formatDateTime = (timestamp) => {
+                if (!timestamp) return '-';
+                try {
+                    const date = new Date(timestamp);
+                    if (isNaN(date.getTime())) return timestamp;
+                    return date.toLocaleString('id-ID', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } catch (e) {
+                    return timestamp;
+                }
+            };
+            
+            const calculateAgeFromDOB = (dob) => {
+                if (!dob) return '';
+                try {
+                    const birthDate = new Date(dob);
+                    const today = new Date();
                     
-                    <div className="mb-8">
-                        <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                            <Icons.User className="w-5 h-5 text-blue-500" />
-                            Informasi Umum
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-slate-50 p-4 rounded-lg">
-                                <p className="text-sm text-slate-500 mb-1">Nama Lengkap Kasus</p>
-                                <p className="font-bold text-slate-800 text-lg">{item.namaKasus || '-'}</p>
-                            </div>
-                            <div className="bg-slate-50 p-4 rounded-lg">
-                                <p className="text-sm text-slate-500 mb-1">Jenis Kelamin</p>
-                                <p className="font-medium text-slate-800">{item.jenisKelamin || '-'}</p>
-                            </div>
-                            <div className="bg-slate-50 p-4 rounded-lg">
-                                <p className="text-sm text-slate-500 mb-1">Tanggal Lahir / Usia</p>
-                                <p className="font-medium text-slate-800">
-                                    {formatDate(item.tanggalLahir)} 
-                                    {item.tanggalLahir && (
-                                        <span className="ml-2 text-blue-600">({calculateAgeFromDOB(item.tanggalLahir)})</span>
-                                    )}
-                                </p>
-                            </div>
-                            <div className="bg-slate-50 p-4 rounded-lg">
-                                <p className="text-sm text-slate-500 mb-1">Alamat Lengkap</p>
-                                <p className="font-medium text-slate-800">{item.alamat || '-'}</p>
-                            </div>
-                            <div className="bg-slate-50 p-4 rounded-lg">
-                                <p className="text-sm text-slate-500 mb-1">Kecamatan</p>
-                                <p className="font-medium text-slate-800">{item.kecamatan || '-'}</p>
-                            </div>
-                            <div className="bg-slate-50 p-4 rounded-lg">
-                                <p className="text-sm text-slate-500 mb-1">Kelurahan</p>
-                                <p className="font-medium text-slate-800">{item.kelurahan || '-'}</p>
-                            </div>
-                            <div className="bg-slate-50 p-4 rounded-lg">
-                                <p className="text-sm text-slate-500 mb-1">RT/RW</p>
-                                <p className="font-medium text-slate-800">{item.rt || '-'}/{item.rw || '-'}</p>
-                            </div>
-                            <div className="bg-slate-50 p-4 rounded-lg">
-                                <p className="text-sm text-slate-500 mb-1">Sumber Laporan</p>
-                                <p className="font-medium text-slate-800">{item.sumberLaporan || '-'}</p>
-                            </div>
-                        </div>
-                    </div>
+                    let years = today.getFullYear() - birthDate.getFullYear();
+                    let months = today.getMonth() - birthDate.getMonth();
                     
-                    {(item.demam || item.ruam || item.dirawat) && (
-                        <div className="mb-8">
-                            <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                                <Icons.Thermometer className="w-5 h-5 text-red-500" />
-                                Data Klinis
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {item.demam && (
-                                    <div className="bg-red-50 p-4 rounded-lg">
-                                        <p className="text-sm text-red-600 mb-1">Demam</p>
-                                        <p className="font-medium text-red-800">{item.demam === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                        {item.demam === 'ya' && item.tanggalMulaiDemam && (
-                                            <p className="text-xs text-red-500 mt-1">
-                                                Mulai: {formatDate(item.tanggalMulaiDemam)}
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
-                                
-                                {item.ruam && (
-                                    <div className="bg-orange-50 p-4 rounded-lg">
-                                        <p className="text-sm text-orange-600 mb-1">Ruam</p>
-                                        <p className="font-medium text-orange-800">{item.ruam === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                        {item.ruam === 'ya' && item.tanggalMulaiRuam && (
-                                            <p className="text-xs text-orange-500 mt-1">
-                                                Mulai: {formatDate(item.tanggalMulaiRuam)}
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
-                                
-                                {item.gejalaLain && item.gejalaLain.length > 0 && (
-                                    <div className="bg-yellow-50 p-4 rounded-lg col-span-2">
-                                        <p className="text-sm text-yellow-600 mb-1">Gejala Lain</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {Array.isArray(item.gejalaLain) 
-                                                ? item.gejalaLain.map((gejala, idx) => (
-                                                    <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium text-yellow-800 border border-yellow-200">
-                                                        {gejala}
+                    if (months < 0) {
+                        years--;
+                        months += 12;
+                    }
+                    
+                    return `${years} tahun, ${months} bulan`;
+                } catch (e) {
+                    return dob;
+                }
+            };
+            
+            const getStatusBadge = (status) => {
+                const statusColors = {
+                    'Draft': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+                    'Pending': 'bg-amber-100 text-amber-800 border border-amber-200',
+                    'Final': 'bg-green-100 text-green-800 border border-green-200',
+                    'Proses': 'bg-blue-100 text-blue-800 border border-blue-200',
+                    'Ditolak': 'bg-red-100 text-red-800 border border-red-200',
+                    'Diterima': 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+                    'Transferred': 'bg-purple-100 text-purple-800 border border-purple-200',
+                    'Baru': 'bg-gray-100 text-gray-800 border border-gray-200'
+                };
+                
+                return (
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
+                        {status || 'Unknown'}
+                    </span>
+                );
+            };
+            
+            const currentOwner = typeof determineCurrentOwner !== 'undefined' ? determineCurrentOwner(item) : (item.currentOwner || '-');
+            const isFromOtherUnit = item.createdUnit !== currentOwner;
+            
+            return (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    {/* PERBAIKAN: Ditambahkan 'overflow-hidden' agar sudut rounded-2xl tidak tertutup konten */}
+                    <div className="relative bg-white rounded-2xl w-full sm:w-[95%] md:w-[80%] lg:w-[70%] max-w-4xl shadow-2xl border border-slate-200 flex flex-col max-h-[80vh] overflow-hidden">
+                        
+                        {/* HEADER (Tetap dipertahankan, tidak ikut scroll) */}
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-slate-200 flex-none">
+                            <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="bg-white p-2 rounded-lg shadow-sm">
+                                            <Icons.FileText className="w-6 h-6 text-blue-600" />        
+                                        </div>        
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data</h2>
+                                            <div className="flex items-center gap-3 mt-1 flex-nowrap">
+                                                <span className="font-mono font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white bg-black px-3 py-1 rounded shrink-0">
+                                                    {item.nomorEPID ||'NO-EPID'}
+                                                </span>
+                                            
+                                                {isFromOtherUnit && (
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                                        Eksternal
                                                     </span>
-                                                ))
-                                                : <p className="font-medium text-yellow-800">{item.gejalaLain}</p>
-                                            }
-                                        </div>
-                                    </div>
-                                )}
-                                
-                                {item.komplikasi && item.komplikasi.length > 0 && (
-                                    <div className="bg-red-50 p-4 rounded-lg col-span-2">
-                                        <p className="text-sm text-red-600 mb-1">Komplikasi</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {Array.isArray(item.komplikasi)
-                                                ? item.komplikasi.map((komp, idx) => (
-                                                    <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-800 border border-red-200">
-                                                        {komp}
-                                                    </span>
-                                                ))
-                                                : <p className="font-medium text-red-800">{item.komplikasi}</p>
-                                            }
-                                        </div>
-                                    </div>
-                                )}
-                                
-                                {item.dirawat && (
-                                    <div className="bg-purple-50 p-4 rounded-lg col-span-2">
-                                        <p className="text-sm text-purple-600 mb-1">Rawat Inap</p>
-                                        <p className="font-medium text-purple-800">{item.dirawat === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                        {item.dirawat === 'ya' && item.namaRumahSakit && (
-                                            <div className="mt-2 space-y-2">
-                                                <p className="text-sm font-medium">RS: {item.namaRumahSakit}</p>
-                                                {item.tanggalMasukRawat && (
-                                                    <p className="text-xs">Masuk: {formatDate(item.tanggalMasukRawat)}</p>
-                                                )}
-                                                {item.tanggalKeluarRawat && (
-                                                    <p className="text-xs">Keluar: {formatDate(item.tanggalKeluarRawat)}</p>
                                                 )}
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
-                                )}
+                                    <div className="flex flex-wrap gap-4 mt-3 text-sm text-slate-600">
+                                        <div className="flex items-center gap-1">
+                                            <Icons.Shield className="w-4 h-4" />
+                                            <span>Owner: <strong>{currentOwner}</strong></span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Icons.Clock className="w-4 h-4" />
+                                            <span>Update: <strong>{formatDateTime(item.updatedAt)}</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={onClose}
+                                    className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-10"
+                                >
+                                    <Icons.XCircle className="w-8 h-8" />
+                                </button>
                             </div>
                         </div>
-                    )}
-                    
-                    {item.transferHistory && item.transferHistory.length > 0 && (
-                        <div className="mb-8">
-                            <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                                <Icons.Share className="w-5 h-5 text-green-500" />
-                                Riwayat Transfer
-                            </h3>
-                            <div className="space-y-3">
-                                {item.transferHistory.map((record, idx) => (
-                                    <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                                                    record.action === 'dikirim' ? 'bg-blue-100 text-blue-800' :
-                                                    record.action === 'diterima' ? 'bg-green-100 text-green-800' :
-                                                    record.action === 'ditolak' ? 'bg-red-100 text-red-800' :
-                                                    record.action === 'diteruskan' ? 'bg-purple-100 text-purple-800' :
-                                                    'bg-gray-100 text-gray-800'
-                                                }`}>
-                                                    {record.action || 'transfer'}
-                                                </span>
-                                                <p className="text-sm text-slate-700 mt-2">
-                                                    Dari: <span className="font-bold">{record.from}</span> 
-                                                    <Icons.ChevronLeft className="inline w-4 h-4 mx-2 rotate-180" />
-                                                    Ke: <span className="font-bold">{record.to}</span>
-                                                </p>
-                                                {record.newOwner && (
-                                                    <p className="text-sm text-green-700 mt-1">
-                                                        <span className="font-bold">Ownership berpindah ke:</span> {record.newOwner}
+                        
+                        {/* KONTEN ISI (Bisa discroll) */}
+                        <div className="p-6 overflow-y-auto flex-1">
+                            <div className="mb-8">
+                                <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                                    <Icons.FileText className="w-5 h-5 text-amber-500" />
+                                    Informasi Workflow
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Status Card */}
+                                    <div className={`p-4 rounded-lg border ${
+                                        item.statusData === 'Pending' 
+                                            ? 'bg-amber-50 border-amber-100' 
+                                            : item.statusData === 'Final'
+                                            ? 'bg-green-50 border-green-100'
+                                            : item.statusData === 'Ditolak'
+                                            ? 'bg-red-50 border-red-100'
+                                            : 'bg-blue-50 border-blue-100'
+                                    }`}>
+                                        <p className="text-sm font-semibold mb-1">Status Saat Ini</p>
+                                        <p className={`text-lg font-bold ${
+                                            item.statusData === 'Pending' 
+                                                ? 'text-amber-800' 
+                                                : item.statusData === 'Final'
+                                                ? 'text-green-800'
+                                                : item.statusData === 'Ditolak'
+                                                ? 'text-red-800'
+                                                : 'text-blue-800'
+                                        }`}>
+                                            {item.statusData}
+                                        </p>
+                                        <p className="text-xs mt-1">
+                                            {item.statusData === 'Pending' 
+                                                ? 'Formulir dalam proses verifikasi di Pending Form'
+                                                : item.statusData === 'Final'
+                                                ? 'Formulir sudah final'
+                                                : item.statusData === 'Ditolak'
+                                                ? 'Formulir ditolak oleh unit lain'
+                                                : 'Formulir dalam proses lainnya'}
+                                        </p>
+                                    </div>
+
+                                    {/* Tombol Lokasi (Pindah kesini) */}
+                                    {item.titikLokasi ? (
+                                        <button 
+                                            onClick={() => {
+                                                if (item.titikLokasi) {
+                                                    const coords = item.titikLokasi.split(',').map(c => c.trim());
+                                                    if (coords.length === 2) {
+                                                        const url = `https://www.google.com/maps?q=${coords[0]},${coords[1]}`;
+                                                        window.open(url, '_blank');
+                                                    }
+                                                }
+                                            }}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg border border-blue-700 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group h-full min-h-[100px]"
+                                        >
+                                            <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
+                                                <Icons.MapPin className="w-6 h-6 text-white" />
+                                            </div>
+                                            <span className="font-bold text-sm">Lihat Titik Lokasi</span>
+                                        </button>
+                                    ) : (
+                                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center justify-center text-slate-400 min-h-[100px]">
+                                            <Icons.MapPin className="w-6 h-6 mb-1 text-slate-300" />
+                                            <p className="text-sm">Lokasi tidak tersedia</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            <div className="mb-8">
+                                <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                                    <Icons.User className="w-5 h-5 text-blue-500" />
+                                    Informasi Umum
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-slate-50 p-4 rounded-lg">
+                                        <p className="text-sm text-slate-500 mb-1">Nama Lengkap Kasus</p>
+                                        <p className="font-bold text-slate-800 text-lg">{item.namaKasus || '-'}</p>
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-lg">
+                                        <p className="text-sm text-slate-500 mb-1">Jenis Kelamin</p>
+                                        <p className="font-medium text-slate-800">{item.jenisKelamin || '-'}</p>
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-lg">
+                                        <p className="text-sm text-slate-500 mb-1">Tanggal Lahir / Usia</p>
+                                        <p className="font-medium text-slate-800">
+                                            {formatDate(item.tanggalLahir)} 
+                                            {item.tanggalLahir && (
+                                                <span className="ml-2 text-blue-600">({calculateAgeFromDOB(item.tanggalLahir)})</span>
+                                            )}
+                                        </p>
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-lg">
+                                        <p className="text-sm text-slate-500 mb-1">Alamat Lengkap</p>
+                                        <p className="font-medium text-slate-800">{item.alamat || '-'}</p>
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-lg">
+                                        <p className="text-sm text-slate-500 mb-1">Kecamatan</p>
+                                        <p className="font-medium text-slate-800">{item.kecamatan || '-'}</p>
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-lg">
+                                        <p className="text-sm text-slate-500 mb-1">Kelurahan</p>
+                                        <p className="font-medium text-slate-800">{item.kelurahan || '-'}</p>
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-lg">
+                                        <p className="text-sm text-slate-500 mb-1">RT/RW</p>
+                                        <p className="font-medium text-slate-800">{item.rt || '-'}/{item.rw || '-'}</p>
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-lg">
+                                        <p className="text-sm text-slate-500 mb-1">Sumber Laporan</p>
+                                        <p className="font-medium text-slate-800">{item.sumberLaporan || '-'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {(item.demam || item.ruam || item.dirawat) && (
+                                <div className="mb-8">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                                        <Icons.Thermometer className="w-5 h-5 text-red-500" />
+                                        Data Klinis
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {item.demam && (
+                                            <div className="bg-red-50 p-4 rounded-lg">
+                                                <p className="text-sm text-red-600 mb-1">Demam</p>
+                                                <p className="font-medium text-red-800">{item.demam === 'ya' ? 'Ya' : 'Tidak'}</p>
+                                                {item.demam === 'ya' && item.tanggalMulaiDemam && (
+                                                    <p className="text-xs text-red-500 mt-1">
+                                                        Mulai: {formatDate(item.tanggalMulaiDemam)}
                                                     </p>
                                                 )}
                                             </div>
-                                            <span className="text-sm text-slate-500">
-                                                {new Date(record.date).toLocaleDateString('id-ID')}
-                                            </span>
-                                        </div>
+                                        )}
+                                        
+                                        {item.ruam && (
+                                            <div className="bg-orange-50 p-4 rounded-lg">
+                                                <p className="text-sm text-orange-600 mb-1">Ruam</p>
+                                                <p className="font-medium text-orange-800">{item.ruam === 'ya' ? 'Ya' : 'Tidak'}</p>
+                                                {item.ruam === 'ya' && item.tanggalMulaiRuam && (
+                                                    <p className="text-xs text-orange-500 mt-1">
+                                                        Mulai: {formatDate(item.tanggalMulaiRuam)}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                        
+                                        {item.gejalaLain && item.gejalaLain.length > 0 && (
+                                            <div className="bg-yellow-50 p-4 rounded-lg col-span-2">
+                                                <p className="text-sm text-yellow-600 mb-1">Gejala Lain</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {Array.isArray(item.gejalaLain) 
+                                                        ? item.gejalaLain.map((gejala, idx) => (
+                                                            <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium text-yellow-800 border border-yellow-200">
+                                                                {gejala}
+                                                            </span>
+                                                        ))
+                                                        : <p className="font-medium text-yellow-800">{item.gejalaLain}</p>
+                                                    }
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {item.komplikasi && item.komplikasi.length > 0 && (
+                                            <div className="bg-red-50 p-4 rounded-lg col-span-2">
+                                                <p className="text-sm text-red-600 mb-1">Komplikasi</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {Array.isArray(item.komplikasi)
+                                                        ? item.komplikasi.map((komp, idx) => (
+                                                            <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-800 border border-red-200">
+                                                                {komp}
+                                                            </span>
+                                                        ))
+                                                        : <p className="font-medium text-red-800">{item.komplikasi}</p>
+                                                    }
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {item.dirawat && (
+                                            <div className="bg-purple-50 p-4 rounded-lg col-span-2">
+                                                <p className="text-sm text-purple-600 mb-1">Rawat Inap</p>
+                                                <p className="font-medium text-purple-800">{item.dirawat === 'ya' ? 'Ya' : 'Tidak'}</p>
+                                                {item.dirawat === 'ya' && item.namaRumahSakit && (
+                                                    <div className="mt-2 space-y-2">
+                                                        <p className="text-sm font-medium">RS: {item.namaRumahSakit}</p>
+                                                        {item.tanggalMasukRawat && (
+                                                            <p className="text-xs">Masuk: {formatDate(item.tanggalMasukRawat)}</p>
+                                                        )}
+                                                        {item.tanggalKeluarRawat && (
+                                                            <p className="text-xs">Keluar: {formatDate(item.tanggalKeluarRawat)}</p>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            )}
+                            
+                            {item.transferHistory && item.transferHistory.length > 0 && (
+                                <div className="mb-8">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                                        <Icons.Share className="w-5 h-5 text-green-500" />
+                                        Riwayat Transfer
+                                    </h3>
+                                    <div className="space-y-3">
+                                        {item.transferHistory.map((record, idx) => (
+                                            <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                                                            record.action === 'dikirim' ? 'bg-blue-100 text-blue-800' :
+                                                            record.action === 'diterima' ? 'bg-green-100 text-green-800' :
+                                                            record.action === 'ditolak' ? 'bg-red-100 text-red-800' :
+                                                            record.action === 'diteruskan' ? 'bg-purple-100 text-purple-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                            {record.action || 'transfer'}
+                                                        </span>
+                                                        <p className="text-sm text-slate-700 mt-2">
+                                                            Dari: <span className="font-bold">{record.from}</span> 
+                                                            <Icons.ChevronLeft className="inline w-4 h-4 mx-2 rotate-180" />
+                                                            Ke: <span className="font-bold">{record.to}</span>
+                                                        </p>
+                                                        {record.newOwner && (
+                                                            <p className="text-sm text-green-700 mt-1">
+                                                                <span className="font-bold">Ownership berpindah ke:</span> {record.newOwner}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <span className="text-sm text-slate-500">
+                                                        {new Date(record.date).toLocaleDateString('id-ID')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    )}
+                        
+                    </div>
                 </div>
-                
-            </div>
-        </div>
-    );
-};
+            );
+        };
 
         // BAGIAN 7: RENDER UTAMA
         ReactDOM.render(<App />, document.getElementById('root'));
