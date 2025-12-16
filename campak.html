@@ -1160,7 +1160,7 @@
                             <div className="mt-4">
                                 <Label>Jenis Sample Darah</Label>
                                 <div className="grid grid-cols-2 gap-3 mt-2">
-                                    {['Serum', 'Darah Lengkap'].map(o => (
+                                    {['Serum', 'Darah Kering'].map(o => (
                                         <Checkbox key={o} label={o} name="jenisSampleDarah" value={o} checked={data.jenisSampleDarah?.includes(o)} onChange={onChange} />
                                     ))}
                                 </div>
