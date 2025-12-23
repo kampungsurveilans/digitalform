@@ -370,7 +370,7 @@
             }
         };
 
-        // PERBAIKAN POINT 3: Export CSV dengan SEMUA kontak erat (maksimal 5)
+        // PERBAIKAN POINT 6: Export CSV dengan SEMUA kontak erat (maksimal 30)
         const exportToCSV = (data, filename, isRaw = false) => {
             if (!data || data.length === 0) { alert("Tidak ada data."); return; }
             let headers, csvRows;
@@ -379,9 +379,9 @@
                 headers = Object.keys(data[0]);
                 csvRows = data.map(item => headers.map(header => `"${String(item[header]||'').replace(/"/g, '""')}"`).join(","));
             } else {
-                // Buat headers untuk kontak erat (maksimal 5)
+                // Buat headers untuk kontak erat (maksimal 30)
                 const kontakEratHeaders = [];
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 1; i <= 30; i++) {
                     kontakEratHeaders.push(
                         `Kontak Erat ${i} - Nama`,
                         `Kontak Erat ${i} - Umur`,
@@ -393,8 +393,8 @@
                 }
                 
                 headers = [
-                    "Nomor EPID", "Status", "Nama Kasus", "Jenis Kelamin", "Tanggal Lahir", 
-                    "Alamat", "Kabupaten", "Kecamatan", "Kelurahan", "RT", "RW", 
+                    "Nomor EPID", "Status", "Nama Kasus", "Jenis Kelamin", "Tanggal Lahir", "Usia",
+                    "Alamat", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "RT", "RW", 
                     "Nama Orangtua", "No Kontak Orangtua", "Sumber Laporan", "Unit Pelapor", 
                     "Tanggal Terima Laporan", "Tanggal Pelacakan Kasus", "Demam", "Tanggal Mulai Demam",
                     "Ruam", "Tanggal Mulai Ruam", "Gejala Lain", "Gejala Lain Sebutkan", 
@@ -416,8 +416,8 @@
                 
                 csvRows = data.map(item => {
                     const baseRow = [
-                        `"${item.nomorEPID||''}"`, `"${item.statusData||''}"`, `"${item.namaKasus||''}"`, `"${item.jenisKelamin||''}"`, `"${item.tanggalLahir||''}"`, 
-                        `"${(item.alamat||'').replace(/"/g, '""')}"`, `"${item.kabupaten||'Kota Pontianak'}"`, `"${item.kecamatan||''}"`, `"${item.kelurahan||''}"`, 
+                        `"${item.nomorEPID||''}"`, `"${item.statusData||''}"`, `"${item.namaKasus||''}"`, `"${item.jenisKelamin||''}"`, `"${item.tanggalLahir||''}"`, `"${calculateAge(item.tanggalLahir)}"`,
+                        `"${(item.alamat||'').replace(/"/g, '""')}"`, `"${item.provinsi||'Kalimantan Barat'}"`, `"${item.kabupaten||'Kota Pontianak'}"`, `"${item.kecamatan||''}"`, `"${item.kelurahan||''}"`, 
                         `"${item.rt||''}"`, `"${item.rw||''}"`, `"${item.namaOrangtua||''}"`, `"${item.noKontakOrangtua||''}"`, `"${item.sumberLaporan||''}"`, 
                         `"${item.namaUnitPelapor||''}"`, `"${item.tanggalTerimaLaporan||''}"`, `"${item.tanggalPelacakan||''}"`, `"${item.demam||''}"`, 
                         `"${item.tanggalMulaiDemam||''}"`, `"${item.ruam||''}"`, `"${item.tanggalMulaiRuam||''}"`, `"${Array.isArray(item.gejalaLain) ? item.gejalaLain.join(', ') : item.gejalaLain||''}"`, 
@@ -433,10 +433,10 @@
                         `"${new Date(item.updatedAt).toLocaleDateString()}"`
                     ];
                     
-                    // Tambahkan data kontak erat (maksimal 5)
+                    // PERBAIKAN POINT 6: Tambahkan data kontak erat (maksimal 30)
                     const kontakEratData = [];
                     if (item.kontakErat && Array.isArray(item.kontakErat)) {
-                        for (let i = 0; i < 5; i++) {
+                        for (let i = 0; i < 30; i++) {
                             if (i < item.kontakErat.length) {
                                 const kontak = item.kontakErat[i];
                                 kontakEratData.push(
@@ -453,7 +453,7 @@
                         }
                     } else {
                         // Isi dengan kosong jika tidak ada kontak erat
-                        for (let i = 0; i < 5; i++) {
+                        for (let i = 0; i < 30; i++) {
                             kontakEratData.push('', '', '', '', '', '');
                         }
                     }
@@ -493,18 +493,29 @@
             kontakErat: []
         };
 
+        // PERBAIKAN POINT 3: Fungsi untuk menghitung usia dalam format tahun bulan hari
         const calculateAge = (tanggalLahir) => {
             if (!tanggalLahir) return '';
             try {
                 const birthDate = new Date(tanggalLahir);
                 const today = new Date();
+                
                 let years = today.getFullYear() - birthDate.getFullYear();
                 let months = today.getMonth() - birthDate.getMonth();
+                let days = today.getDate() - birthDate.getDate();
+                
+                if (days < 0) {
+                    months--;
+                    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                    days += lastMonth.getDate();
+                }
+                
                 if (months < 0) {
                     years--;
                     months += 12;
                 }
-                return `${years} tahun, ${months} bulan`;
+                
+                return `${years} tahun ${months} bulan ${days} hari`;
             } catch (e) {
                 return '';
             }
@@ -775,55 +786,94 @@
             );
         };
 
-        const Step2 = ({ data, onChange, onChangeKecamatan, Icons }) => (
-            <div className="animate-fadeIn">
-                <Input label="Nama Lengkap Pasien" name="namaKasus" value={data.namaKasus} onChange={onChange} placeholder="Masukkan nama lengkap" uppercase={true} />
-                
-                <div className="grid grid-cols-2 gap-4">
-                    <Select label="Jenis Kelamin" name="jenisKelamin" value={data.jenisKelamin} onChange={onChange}>
-                        <option value="">jenis kelamin...</option>
-                        <option value="laki-laki">Laki-laki</option>
-                        <option value="perempuan">Perempuan</option>
-                    </Select>
-                    <div>
-                        <Input label="Tanggal Lahir" type="date" name="tanggalLahir" value={data.tanggalLahir} onChange={onChange} />
-                        {data.tanggalLahir && (
-                            <p className="text-sm text-slate-500 mt-1 ml-1">
-                                Usia: {calculateAge(data.tanggalLahir)}
-                            </p>
-                        )}
-                    </div>
-                </div>
-                
-                <Input label="Alamat Lengkap" as="textarea" name="alamat" value={data.alamat} onChange={onChange} placeholder="Jl. Nama Jalan, Nomor, RT/RW" />
-                
-                <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 mb-6">
-                    <Label>Wilayah Administrasi</Label>
-                    <div className="space-y-4 mt-3">
-                        <Select label="Kecamatan" name="kecamatan" value={data.kecamatan} onChange={onChangeKecamatan}>
-                            <option value="">Pilih...</option>
-                            {Object.keys(DATA_WILAYAH_MAPPING).map(k=>
-                                <option key={k} value={k}>{k}</option>
-                            )}
+        // PERBAIKAN POINT 1, 2, 3: Step2 dengan Provinsi, Kabupaten readonly dan usia detail
+        const Step2 = ({ data, onChange, onChangeKecamatan, Icons }) => {
+            // PERBAIKAN POINT 3: Hitung usia detail
+            const ageString = calculateAge(data.tanggalLahir);
+            
+            return (
+                <div className="animate-fadeIn">
+                    <Input label="Nama Lengkap Pasien" name="namaKasus" value={data.namaKasus} onChange={onChange} placeholder="Masukkan nama lengkap" uppercase={true} />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        <Select label="Jenis Kelamin" name="jenisKelamin" value={data.jenisKelamin} onChange={onChange}>
+                            <option value="">jenis kelamin...</option>
+                            <option value="laki-laki">Laki-laki</option>
+                            <option value="perempuan">Perempuan</option>
                         </Select>
-                        <Select label="Kelurahan" name="kelurahan" value={data.kelurahan} onChange={onChange} disabled={!data.kecamatan}>
-                            <option value="">Pilih Kelurahan...</option>
-                            {data.kecamatan && DATA_WILAYAH_MAPPING[data.kecamatan]?.map(k=>
-                                <option key={k} value={k}>{k}</option>
+                        <div>
+                            <Input label="Tanggal Lahir" type="date" name="tanggalLahir" value={data.tanggalLahir} onChange={onChange} />
+                            {data.tanggalLahir && (
+                                <p className="text-sm text-slate-500 mt-1 ml-1">
+                                    Usia: <span className="font-semibold">{ageString}</span>
+                                </p>
                             )}
-                        </Select>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Input label="RT" name="rt" value={data.rt} onChange={onChange} />
-                            <Input label="RW" name="rw" value={data.rw} onChange={onChange} />
                         </div>
                     </div>
+                    
+                    <Input label="Alamat Lengkap" as="textarea" name="alamat" value={data.alamat} onChange={onChange} placeholder="Jl. Nama Jalan, Nomor, RT/RW" />
+                    
+                    {/* PERBAIKAN POINT 1 & 2: Field Provinsi dan Kabupaten readonly */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="mb-4">
+                            <Label>Provinsi</Label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value="Kalimantan Barat"
+                                    readOnly
+                                    className="w-full p-4 bg-slate-100 rounded-xl text-slate-800 font-medium border border-slate-200 text-body cursor-not-allowed"
+                                />
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <Icons.Lock className="w-4 h-4" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <Label>Kabupaten</Label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value="Kota Pontianak"
+                                    readOnly
+                                    className="w-full p-4 bg-slate-100 rounded-xl text-slate-800 font-medium border border-slate-200 text-body cursor-not-allowed"
+                                />
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <Icons.Lock className="w-4 h-4" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 mb-6">
+                        <Label>Wilayah Administrasi</Label>
+                        <div className="space-y-4 mt-3">
+                            <Select label="Kecamatan" name="kecamatan" value={data.kecamatan} onChange={onChangeKecamatan}>
+                                <option value="">Pilih...</option>
+                                {Object.keys(DATA_WILAYAH_MAPPING).map(k=>
+                                    <option key={k} value={k}>{k}</option>
+                                )}
+                            </Select>
+                            <Select label="Kelurahan" name="kelurahan" value={data.kelurahan} onChange={onChange} disabled={!data.kecamatan}>
+                                <option value="">Pilih Kelurahan...</option>
+                                {data.kecamatan && DATA_WILAYAH_MAPPING[data.kecamatan]?.map(k=>
+                                    <option key={k} value={k}>{k}</option>
+                                )}
+                            </Select>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Input label="RT" name="rt" value={data.rt} onChange={onChange} />
+                                <Input label="RW" name="rw" value={data.rw} onChange={onChange} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <Input label="Nama Orangtua / Wali" name="namaOrangtua" value={data.namaOrangtua} onChange={onChange} placeholder="Nama lengkap orangtua" uppercase={true} />
+                    <Input label="Nomor Kontak (HP/WA)" name="noKontakOrangtua" value={data.noKontakOrangtua} onChange={onChange} placeholder="0812XXXXXX" />
                 </div>
+            );
+        };
 
-                <Input label="Nama Orangtua / Wali" name="namaOrangtua" value={data.namaOrangtua} onChange={onChange} placeholder="Nama lengkap orangtua" uppercase={true} />
-                <Input label="Nomor Kontak (HP/WA)" name="noKontakOrangtua" value={data.noKontakOrangtua} onChange={onChange} placeholder="0812XXXXXX" />
-            </div>
-        );
-
+        // PERBAIKAN POINT 4: Step3 dengan input untuk komplikasi lainnya
         const Step3 = ({ data, onChange, Icons }) => {
             const gejalaOptions = ['Batuk', 'Pilek', 'Mata Merah', 'Adenopathy', 'Arthralgia', 'Kehamilan', 'Lainnya'];
             
@@ -868,6 +918,10 @@
                                 <Checkbox key={o} label={o} name="komplikasi" value={o} checked={data.komplikasi?.includes(o)} onChange={onChange}/>
                             )}
                         </div>
+                        {/* PERBAIKAN POINT 4: Input untuk komplikasi lainnya */}
+                        {data.komplikasi?.includes('Lainnya') && (
+                            <Input className="mt-4" placeholder="Sebutkan komplikasi lainnya..." name="komplikasiLainnyaSebutkan" value={data.komplikasiLainnyaSebutkan} onChange={onChange}/>
+                        )}
                     </div>
                     
                     <div className="bg-slate-50 p-5 rounded-xl border border-slate-100">
@@ -944,7 +998,7 @@
             </div>
         );
 
-        // Step5 dengan fitur Pengumpulan Data Kontak Erat
+        // PERBAIKAN POINT 5: Step5 dengan pilihan YA, Tidak, Tidak Tahu
         const Step5 = ({ data, onChange, Icons }) => {
             // Fungsi untuk menambah kontak erat
             const addKontakErat = () => {
@@ -975,20 +1029,22 @@
 
             return (
                 <div className="animate-fadeIn">
+                    {/* PERBAIKAN POINT 5: Ubah pilihan menjadi YA, Tidak, Tidak Tahu */}
                     <div className="mb-8">
                         <Label>Apakah ada kontak dengan kasus serupa?</Label>
-                        <RadioGroup name="adaKontakSakitSama" options={['ya','tidak']} value={data.adaKontakSakitSama} onChange={onChange}/>
-                        {data.adaKontakSakitSama === 'ya' && (
+                        <RadioGroup name="adaKontakSakitSama" options={['Ya','Tidak','Tidak Tahu']} value={data.adaKontakSakitSama} onChange={onChange}/>
+                        {data.adaKontakSakitSama === 'Ya' && (
                             <div className="mt-4">
                                 <Input label="Jumlah Kontak Sakit" name="jumlahKontakSakit" value={data.jumlahKontakSakit} onChange={onChange} placeholder="Misal: 3" />
                             </div>
                         )}
                     </div>
                     
+                    {/* PERBAIKAN POINT 5: Ubah pilihan menjadi YA, Tidak, Tidak Tahu */}
                     <div className="mb-8">
                         <Label>Riwayat Bepergian</Label>
-                        <RadioGroup name="bepergian" options={['ya','tidak']} value={data.bepergian} onChange={onChange}/>
-                        {data.bepergian==='ya' && (
+                        <RadioGroup name="bepergian" options={['Ya','Tidak','Tidak Tahu']} value={data.bepergian} onChange={onChange}/>
+                        {data.bepergian==='Ya' && (
                             <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 mt-5">
                                 <Input label="Lokasi Bepergian" name="lokasiBepergian" value={data.lokasiBepergian} onChange={onChange} placeholder="Kota, provinsi, atau negara tujuan"/>
                                 <div className="grid grid-cols-2 gap-4 mt-4">
