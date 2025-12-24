@@ -397,7 +397,7 @@
                     "Alamat", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "RT", "RW", 
                     "Nama Orangtua", "No Kontak Orangtua", "Sumber Laporan", "Unit Pelapor", 
                     "Tanggal Terima Laporan", "Tanggal Pelacakan Kasus", "Demam", "Tanggal Mulai Demam",
-                    "Ruam", "Tanggal Mulai Ruam", "Gejala Lain", "Gejala Lain Sebutkan", 
+                    "Ruam", "Tanggal Mulai Ruam", "Gejala Lain", "Gejala Lain Sebutkan", "Lokasi Adenopathy","Bagian Sendi Arthralgia", "Umur Kehamilan",
                     "Komplikasi", "Komplikasi Lainnya", "Dirawat", "Nama Rumah Sakit", 
                     "Nomor Rekam Medik", "Tanggal Masuk Rawat", "Tanggal Keluar Rawat",
                     "Imunisasi Campak 1", "Sumber Campak 1", "Imunisasi Campak 2", "Sumber Campak 2",
@@ -410,6 +410,7 @@
                     "Tanggal Ambil Lain", "Tanggal Kirim Lain", "Keadaan Saat Ini",
                     "Pelaksana Investigasi", "Nama Sekolah", "Titik Lokasi", "Petugas Input",
                     "Unit Pembuat", "Current Owner", "Tanggal Terakhir Update",
+                    
                     // Headers kontak erat
                     ...kontakEratHeaders
                 ];
@@ -421,7 +422,7 @@
                         `"${item.rt||''}"`, `"${item.rw||''}"`, `"${item.namaOrangtua||''}"`, `"${item.noKontakOrangtua||''}"`, `"${item.sumberLaporan||''}"`, 
                         `"${item.namaUnitPelapor||''}"`, `"${item.tanggalTerimaLaporan||''}"`, `"${item.tanggalPelacakan||''}"`, `"${item.demam||''}"`, 
                         `"${item.tanggalMulaiDemam||''}"`, `"${item.ruam||''}"`, `"${item.tanggalMulaiRuam||''}"`, `"${Array.isArray(item.gejalaLain) ? item.gejalaLain.join(', ') : item.gejalaLain||''}"`, 
-                        `"${item.gejalaLainSebutkan||''}"`, `"${Array.isArray(item.komplikasi) ? item.komplikasi.join(', ') : item.komplikasi||''}"`, `"${item.komplikasiLainnyaSebutkan||''}"`, 
+                        `"${item.gejalaLainSebutkan||''}"`,`"${item.lokasiAdenopathy||''}"`,`"${item.bagianSendiArthralgia||''}"`,`"${item.umurKehamilan||''}"`, `"${Array.isArray(item.komplikasi) ? item.komplikasi.join(', ') : item.komplikasi||''}"`, `"${item.komplikasiLainnyaSebutkan||''}"`,
                         `"${item.dirawat||''}"`, `"${item.namaRumahSakit||''}"`, `"${item.nomorRekamMedik||''}"`, `"${item.tanggalMasukRawat||''}"`, `"${item.tanggalKeluarRawat||''}"`, 
                         `"${item.imunisasiCampak1||''}"`, `"${item.sumberCampak1||''}"`, `"${item.imunisasiCampak2||''}"`, `"${item.sumberCampak2||''}"`, `"${item.imunisasiBIAS||''}"`, 
                         `"${item.sumberBIAS||''}"`, `"${item.imunisasiMMR||''}"`, `"${item.sumberMMR||''}"`, `"${item.imunisasiTambahan||''}"`, `"${item.sumberTambahan||''}"`, 
@@ -480,8 +481,8 @@
             tanggalLahir: '', alamat: '', provinsi: 'Kalimantan Barat', kabupaten: 'Kota Pontianak', 
             kecamatan: '', kelurahan: '', rw: '', rt: '', namaOrangtua: '', noKontakOrangtua: '',
             demam: '', tanggalMulaiDemam: '', ruam: '', tanggalMulaiRuam: '', gejalaLain: [], 
-            gejalaLainSebutkan: '', komplikasi: [], komplikasiLainnyaSebutkan: '', dirawat: '', 
-            namaRumahSakit: '', nomorRekamMedik: '', tanggalMasukRawat: '', tanggalKeluarRawat: '',
+            gejalaLainSebutkan: '', komplikasi: [], komplikasiLainnyaSebutkan: '',lokasiAdenopathy: '',
+            bagianSendiArthralgia: '', umurKehamilan: '', dirawat: '', namaRumahSakit: '', nomorRekamMedik: '', tanggalMasukRawat: '', tanggalKeluarRawat: '',
             imunisasiCampak1: '', sumberCampak1: '', imunisasiCampak2: '', sumberCampak2: '',
             imunisasiBIAS: '', sumberBIAS: '', imunisasiMMR: '', sumberMMR: '', imunisasiTambahan: '', 
             sumberTambahan: '', tanggalImunisasiTerakhir: '', vitaminA: '', adaKontakSakitSama: '', 
@@ -909,7 +910,43 @@
                         {data.gejalaLain.includes('Lainnya') && (
                             <Input className="mt-4" placeholder="Sebutkan gejala lainnya..." name="gejalaLainSebutkan" value={data.gejalaLainSebutkan} onChange={onChange}/>
                         )}
-                    </div>
+                    </div> 
+                    
+                  {/* 1. INPUT UNTUK ADENOPATHY */}
+        {data.gejalaLain.includes('Adenopathy') && (
+          <Input 
+            className="mt-4" 
+            label="Lokasi Adenopathy" 
+            name="lokasiAdenopathy" 
+            value={data.lokasiAdenopathy} 
+            onChange={onChange}
+            placeholder="Misal: Leher, ketiak, lipat paha, dll"
+          />
+        )}
+        
+        {/* 2. INPUT UNTUK ARTHRALGIA */}
+        {data.gejalaLain.includes('Arthralgia') && (
+          <Input 
+            className="mt-4" 
+            label="Bagian Sendi" 
+            name="bagianSendiArthralgia" 
+            value={data.bagianSendiArthralgia} 
+            onChange={onChange}
+            placeholder="Misal: Lutut, siku, pergelangan tangan"
+          />
+        )}
+        
+        {/* 3. INPUT UNTUK KEHAMILAN */}
+        {data.gejalaLain.includes('Kehamilan') && (
+          <Input 
+            className="mt-4" 
+            label="Umur Kehamilan" 
+            name="umurKehamilan" 
+            value={data.umurKehamilan} 
+            onChange={onChange}
+            placeholder="Misal: 20 minggu, 8 bulan"
+          />
+        )}
                     
                     <div className="mb-8">
                         <Label>Komplikasi</Label>
@@ -929,17 +966,27 @@
                         <RadioGroup name="dirawat" options={['ya','tidak']} value={data.dirawat} onChange={onChange}/>
                         {data.dirawat==='ya' && (
                             <div className="mt-5 space-y-4">
-                                <Input label="Nama Rumah Sakit" name="namaRumahSakit" value={data.namaRumahSakit} onChange={onChange} placeholder="Nama rumah sakit"/>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Input label="Tanggal Masuk Rawat" type="date" name="tanggalMasukRawat" value={data.tanggalMasukRawat} onChange={onChange}/>
-                                    <Input label="Tanggal Keluar Rawat" type="date" name="tanggalKeluarRawat" value={data.tanggalKeluarRawat} onChange={onChange}/>
-                                </div>
-                            </div>
-                        )}
+                                <Input label="Nama Rumah Sakit" name="namaRumahSakit" value={data.namaRumahSakit} onChange={onChange} placeholder="Nama rumah sakit"/> 
+                                
+                                {/* TAMBAHAN: Input untuk Nomor Rekam Medis */}
+                        <Input 
+                            label="Nomor Rekam Medis" 
+                            name="nomorRekamMedik" 
+                            value={data.nomorRekamMedik} 
+                            onChange={onChange} 
+                            placeholder="Nomor rekam medis pasien"
+                        />
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            <Input label="Tanggal Masuk Rawat" type="date" name="tanggalMasukRawat" value={data.tanggalMasukRawat} onChange={onChange}/>
+                            <Input label="Tanggal Keluar Rawat" type="date" name="tanggalKeluarRawat" value={data.tanggalKeluarRawat} onChange={onChange}/>
+                        </div>
                     </div>
-                </div>
-            );
-        };
+                )}
+            </div>
+        </div>
+    );
+};
 
         const Step4 = ({ data, onChange, Icons }) => (
             <div className="animate-fadeIn">
@@ -2161,6 +2208,7 @@
                     showNotification('Nomor EPID wajib diisi!', 'error');
                     return;
                 }
+                    
                 
                 showLoading(true); 
                 try { 
@@ -4734,7 +4782,7 @@
                                                 <p className="font-medium text-red-800">{item.demam === 'ya' ? 'Ya' : 'Tidak'}</p>
                                                 {item.demam === 'ya' && item.tanggalMulaiDemam && (
                                                     <p className="text-xs text-red-500 mt-1">
-                                                        Mulai: {formatDate(item.tanggalMulaiDemam)}
+                                                        {formatDate(item.tanggalMulaiDemam)}
                                                     </p>
                                                 )}
                                             </div>
@@ -4746,7 +4794,7 @@
                                                 <p className="font-medium text-orange-800">{item.ruam === 'ya' ? 'Ya' : 'Tidak'}</p>
                                                 {item.ruam === 'ya' && item.tanggalMulaiRuam && (
                                                     <p className="text-xs text-orange-500 mt-1">
-                                                        Mulai: {formatDate(item.tanggalMulaiRuam)}
+                                                        {formatDate(item.tanggalMulaiRuam)}
                                                     </p>
                                                 )}
                                             </div>
@@ -4766,7 +4814,28 @@
                                                     }
                                                 </div>
                                             </div>
-                                        )}
+                                        )} 
+                                        
+                                        {item.gejalaLain?.includes('Adenopathy') && item.lokasiAdenopathy && (
+                                        <div className="bg-blue-50 p-3 rounded-lg mt-2">
+                                        <p className="text-sm text-blue-600 mb-1">Lokasi Adenopathy:</p>
+                                            <p className="font-medium text-blue-800">{item.lokasiAdenopathy}</p>
+  </div>
+)}
+
+{item.gejalaLain?.includes('Arthralgia') && item.bagianSendiArthralgia && (
+  <div className="bg-orange-50 p-3 rounded-lg mt-2">
+    <p className="text-sm text-orange-600 mb-1">Bagian Sendi Arthralgia:</p>
+    <p className="font-medium text-orange-800">{item.bagianSendiArthralgia}</p>
+  </div>
+)}
+
+{item.gejalaLain?.includes('Kehamilan') && item.umurKehamilan && (
+  <div className="bg-pink-50 p-3 rounded-lg mt-2">
+    <p className="text-sm text-pink-600 mb-1">Umur Kehamilan:</p>
+    <p className="font-medium text-pink-800">{item.umurKehamilan}</p>
+  </div>
+)}
                                         
                                         {item.komplikasi && item.komplikasi.length > 0 && (
                                             <div className="bg-red-50 p-4 rounded-lg col-span-2">
@@ -4790,7 +4859,7 @@
                                                 <p className="font-medium text-purple-800">{item.dirawat === 'ya' ? 'Ya' : 'Tidak'}</p>
                                                 {item.dirawat === 'ya' && item.namaRumahSakit && (
                                                     <div className="mt-2 space-y-2">
-                                                        <p className="text-sm font-medium">RS: {item.namaRumahSakit}</p>
+                                                        <p className="text-sm font-medium"> Dirawat di: {item.namaRumahSakit}</p>
                                                         {item.tanggalMasukRawat && (
                                                             <p className="text-xs">Masuk: {formatDate(item.tanggalMasukRawat)}</p>
                                                         )}
