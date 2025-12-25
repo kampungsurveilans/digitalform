@@ -1909,16 +1909,17 @@
             };
 
             const handleViewForm = (item) => {
-                console.log("handleViewForm called with item:", item);
-                console.log("Opening view modal for item:", item);
-                if (!item) {
-                    showNotification('Data tidak ditemukan', 'error');
-                    return;
-                }
-                setItemToView(item);
-                setShowViewModal(true);
-                console.log("View modal should be visible now");
-            };
+    console.log("handleViewForm called with item:", item);
+    console.log("Opening view modal for item:", item);
+    if (!item) {
+        showNotification('Data tidak ditemukan', 'error');
+        return;
+    }
+    setItemToView(item);
+    setShowViewModal(true);
+    console.log("View modal should be visible now");
+    console.log("showViewModal state should be true");
+};
 
             const handleCloseViewModal = () => {
                 console.log("Closing view modal");
@@ -4648,416 +4649,540 @@
 
         // PERBAIKAN POINT 4: MODAL VIEW FORMULIR (tanpa kontak erat, dengan informasi orang tua)
         const ViewModal = ({ item, onClose, Icons }) => {
-            if (!item) {
-                console.log("ViewModal: No item provided");
-                return null;
+    if (!item) {
+        console.log("ViewModal: No item provided");
+        return null;
+    }
+    
+    console.log("ViewModal rendering with item:", item);
+    
+    // Helper function untuk menentukan current owner (dipindahkan ke dalam komponen)
+    const determineCurrentOwnerForModal = (formData) => {
+        if (formData.currentOwner && formData.currentOwner !== '') {
+            return formData.currentOwner;
+        }
+        
+        if (formData.transferHistory && formData.transferHistory.length > 0) {
+            const successfulTransfers = formData.transferHistory.filter(
+                record => record.action === 'diterima' || record.action === 'dikirim'
+            );
+            
+            if (successfulTransfers.length > 0) {
+                const lastTransfer = successfulTransfers[successfulTransfers.length - 1];
+                
+                if (lastTransfer.newOwner) {
+                    return lastTransfer.newOwner;
+                }
+                
+                if (lastTransfer.action === 'dikirim') {
+                    return lastTransfer.from;
+                }
+                
+                if (lastTransfer.action === 'diterima') {
+                    return lastTransfer.to;
+                }
+            }
+        }
+        
+        if (formData.statusData === 'Final' || formData.statusData === 'Baru' || formData.statusData === 'Draft') {
+            return formData.createdUnit;
+        }
+        
+        if (formData.statusData === 'Pending') {
+            return formData.currentOwner || formData.createdUnit;
+        }
+        
+        if (formData.statusData === 'Proses') {
+            return formData.createdUnit;
+        }
+        
+        if (formData.statusData === 'Ditolak') {
+            if (formData.transferHistory && formData.transferHistory.length > 0) {
+                const sendRecords = formData.transferHistory.filter(r => r.action === 'dikirim');
+                if (sendRecords.length > 0) {
+                    return sendRecords[sendRecords.length - 1].from;
+                }
+            }
+            return formData.createdUnit;
+        }
+        
+        return formData.createdUnit;
+    };
+    
+    const currentOwner = determineCurrentOwnerForModal(item);
+    const isFromOtherUnit = item.createdUnit !== currentOwner;
+    
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        try {
+            if (typeof dateString === 'number') {
+                return new Date(dateString).toLocaleDateString('id-ID');
+            }
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        } catch (e) {
+            console.log("Date formatting error:", e);
+            return dateString;
+        }
+    };
+    
+    const formatDateTime = (timestamp) => {
+        if (!timestamp) return '-';
+        try {
+            const date = new Date(timestamp);
+            if (isNaN(date.getTime())) return timestamp;
+            return date.toLocaleString('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (e) {
+            return timestamp;
+        }
+    };
+    
+    const calculateAgeFromDOB = (dob) => {
+        if (!dob) return '';
+        try {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            
+            if (months < 0) {
+                years--;
+                months += 12;
             }
             
-            console.log("ViewModal rendering with item:", item);
-            
-            const formatDate = (dateString) => {
-                if (!dateString) return '-';
-                try {
-                    if (typeof dateString === 'number') {
-                        return new Date(dateString).toLocaleDateString('id-ID');
-                    }
-                    const date = new Date(dateString);
-                    if (isNaN(date.getTime())) return dateString;
-                    return date.toLocaleDateString('id-ID', {
-                        day: '2-digit',
-                        month: 'long',
-                        year: 'numeric'
-                    });
-                } catch (e) {
-                    console.log("Date formatting error:", e);
-                    return dateString;
-                }
-            };
-            
-            const formatDateTime = (timestamp) => {
-                if (!timestamp) return '-';
-                try {
-                    const date = new Date(timestamp);
-                    if (isNaN(date.getTime())) return timestamp;
-                    return date.toLocaleString('id-ID', {
-                        day: '2-digit',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                } catch (e) {
-                    return timestamp;
-                }
-            };
-            
-            const calculateAgeFromDOB = (dob) => {
-                if (!dob) return '';
-                try {
-                    const birthDate = new Date(dob);
-                    const today = new Date();
-                    
-                    let years = today.getFullYear() - birthDate.getFullYear();
-                    let months = today.getMonth() - birthDate.getMonth();
-                    
-                    if (months < 0) {
-                        years--;
-                        months += 12;
-                    }
-                    
-                    return `${years} tahun, ${months} bulan`;
-                } catch (e) {
-                    return dob;
-                }
-            };
-            
-            const getStatusBadge = (status) => {
-                const statusColors = {
-                    'Draft': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-                    'Pending': 'bg-amber-100 text-amber-800 border border-amber-200',
-                    'Final': 'bg-green-100 text-green-800 border border-green-200',
-                    'Proses': 'bg-blue-100 text-blue-800 border border-blue-200',
-                    'Ditolak': 'bg-red-100 text-red-800 border border-red-200',
-                    'Diterima': 'bg-emerald-100 text-emerald-800 border border-emerald-200',
-                    'Transferred': 'bg-purple-100 text-purple-800 border border-purple-200',
-                    'Baru': 'bg-gray-100 text-gray-800 border border-gray-200'
-                };
+            return `${years} tahun, ${months} bulan`;
+        } catch (e) {
+            return dob;
+        }
+    };
+    
+    const getStatusBadge = (status) => {
+        const statusColors = {
+            'Draft': 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+            'Pending': 'bg-amber-100 text-amber-800 border border-amber-200',
+            'Final': 'bg-green-100 text-green-800 border border-green-200',
+            'Proses': 'bg-blue-100 text-blue-800 border border-blue-200',
+            'Ditolak': 'bg-red-100 text-red-800 border border-red-200',
+            'Diterima': 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+            'Transferred': 'bg-purple-100 text-purple-800 border border-purple-200',
+            'Baru': 'bg-gray-100 text-gray-800 border border-gray-200'
+        };
+        
+        return (
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
+                {status || 'Unknown'}
+            </span>
+        );
+    };
+    
+    // Helper untuk mengekstrak gejala dari format objek atau array
+    const getGejalaList = () => {
+        if (!item.gejalaLain) return [];
+        
+        if (Array.isArray(item.gejalaLain)) {
+            return item.gejalaLain;
+        }
+        
+        if (typeof item.gejalaLain === 'object') {
+            return Object.keys(item.gejalaLain).filter(key => item.gejalaLain[key] === true);
+        }
+        
+        return [];
+    };
+    
+    // Helper untuk mengekstrak komplikasi dari format objek atau array
+    const getKomplikasiList = () => {
+        if (!item.komplikasi) return [];
+        
+        if (Array.isArray(item.komplikasi)) {
+            return item.komplikasi;
+        }
+        
+        if (typeof item.komplikasi === 'object') {
+            return Object.keys(item.komplikasi).filter(key => item.komplikasi[key] === true);
+        }
+        
+        return [];
+    };
+    
+    const gejalaList = getGejalaList();
+    const komplikasiList = getKomplikasiList();
+    
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="relative bg-white rounded-2xl w-full sm:w-[95%] md:w-[80%] lg:w-[70%] max-w-4xl shadow-2xl border border-slate-200 flex flex-col max-h-[80vh] overflow-hidden">
                 
-                return (
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
-                        {status || 'Unknown'}
-                    </span>
-                );
-            };
-            
-            const currentOwner = typeof determineCurrentOwner !== 'undefined' ? determineCurrentOwner(item) : (item.currentOwner || '-');
-            const isFromOtherUnit = item.createdUnit !== currentOwner;
-            
-            return (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="relative bg-white rounded-2xl w-full sm:w-[95%] md:w-[80%] lg:w-[70%] max-w-4xl shadow-2xl border border-slate-200 flex flex-col max-h-[80vh] overflow-hidden">
-                        
-                        {/* HEADER */}
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-slate-200 flex-none">
-                            <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="bg-white p-2 rounded-lg shadow-sm">
-                                            <Icons.FileText className="w-6 h-6 text-blue-600" />        
-                                        </div>        
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data</h2>
-                                            <div className="flex items-center gap-3 mt-1 flex-nowrap">
-                                                <span className="font-mono font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white bg-black px-3 py-1 rounded shrink-0">
-                                                    {item.nomorEPID ||'NO-EPID'}
-                                                </span>
-                                                {getStatusBadge(item.statusData)}
-                                                {isFromOtherUnit && (
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
-                                                        Eksternal
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-wrap gap-4 mt-3 text-sm text-slate-600">
-                                        <div className="flex items-center gap-1">
-                                            <Icons.Shield className="w-4 h-4" />
-                                            <span>Owner: <strong>{currentOwner}</strong></span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <Icons.Clock className="w-4 h-4" />
-                                            <span>Update: <strong>{formatDateTime(item.updatedAt)}</strong></span>
-                                        </div>
+                {/* HEADER */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-slate-200 flex-none">
+                    <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="bg-white p-2 rounded-lg shadow-sm">
+                                    <Icons.FileText className="w-6 h-6 text-blue-600" />        
+                                </div>        
+                                <div>
+                                    <h2 className="text-2xl font-bold text-slate-800">Ringkasan Data</h2>
+                                    <div className="flex items-center gap-3 mt-1 flex-nowrap">
+                                        <span className="font-mono font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white bg-black px-3 py-1 rounded shrink-0">
+                                            {item.nomorEPID ||'NO-EPID'}
+                                        </span>
+                                        {getStatusBadge(item.statusData)}
+                                        {isFromOtherUnit && (
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                                Eksternal
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
-                                <button 
-                                    onClick={onClose}
-                                    className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-10"
-                                >
-                                    <Icons.XCircle className="w-8 h-8" />
-                                </button>
+                            </div>
+                            <div className="flex flex-wrap gap-4 mt-3 text-sm text-slate-600">
+                                <div className="flex items-center gap-1">
+                                    <Icons.Shield className="w-4 h-4" />
+                                    <span>Owner: <strong>{currentOwner}</strong></span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <Icons.Clock className="w-4 h-4" />
+                                    <span>Update: <strong>{formatDateTime(item.updatedAt)}</strong></span>
+                                </div>
                             </div>
                         </div>
-                        
-                        {/* KONTEN ISI */}
-                        <div className="p-6 overflow-y-auto flex-1">
-                            <div className="mb-8">
-                                <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                                    <Icons.FileText className="w-5 h-5 text-amber-500" />
-                                    Informasi Workflow
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Status Card */}
-                                    <div className={`p-4 rounded-lg border ${
-                                        item.statusData === 'Pending' 
-                                            ? 'bg-amber-50 border-amber-100' 
-                                            : item.statusData === 'Final'
-                                            ? 'bg-green-50 border-green-100'
-                                            : item.statusData === 'Ditolak'
-                                            ? 'bg-red-50 border-red-100'
-                                            : 'bg-blue-50 border-blue-100'
-                                    }`}>
-                                        <p className="text-sm font-semibold mb-1">Status Saat Ini</p>
-                                        <p className={`text-lg font-bold ${
-                                            item.statusData === 'Pending' 
-                                                ? 'text-amber-800' 
-                                                : item.statusData === 'Final'
-                                                ? 'text-green-800'
-                                                : item.statusData === 'Ditolak'
-                                                ? 'text-red-800'
-                                                : 'text-blue-800'
-                                        }`}>
-                                            {item.statusData}
-                                        </p>
-                                        <p className="text-xs mt-1">
-                                            {item.statusData === 'Pending' 
-                                                ? 'Formulir dalam proses verifikasi di Pending Form'
-                                                : item.statusData === 'Final'
-                                                ? 'Formulir sudah final'
-                                                : item.statusData === 'Ditolak'
-                                                ? 'Formulir ditolak oleh unit lain'
-                                                : 'Formulir dalam proses lainnya'}
-                                        </p>
-                                    </div>
-
-                                    {/* Tombol Lokasi */}
-                                    {item.titikLokasi ? (
-                                        <button 
-                                            onClick={() => {
-                                                if (item.titikLokasi) {
-                                                    const coords = item.titikLokasi.split(',').map(c => c.trim());
-                                                    if (coords.length === 2) {
-                                                        const url = `https://www.google.com/maps?q=${coords[0]},${coords[1]}`;
-                                                        window.open(url, '_blank');
-                                                    }
-                                                }
-                                            }}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg border border-blue-700 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group h-full min-h-[100px]"
-                                        >
-                                            <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
-                                                <Icons.MapPin className="w-6 h-6 text-white" />
-                                            </div>
-                                            <span className="font-bold text-sm">Lihat Titik Lokasi</span>
-                                        </button>
-                                    ) : (
-                                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center justify-center text-slate-400 min-h-[100px]">
-                                            <Icons.MapPin className="w-6 h-6 mb-1 text-slate-300" />
-                                            <p className="text-sm">Lokasi tidak tersedia</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            
-                            {/* PERBAIKAN POINT 4: Informasi Umum dengan data orang tua */}
-                            <div className="mb-8">
-                                <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                                    <Icons.User className="w-5 h-5 text-blue-500" />
-                                    Informasi Umum
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <p className="text-sm text-slate-500 mb-1">Nama Lengkap Kasus</p>
-                                        <p className="font-bold text-slate-800 text-lg">{item.namaKasus || '-'}</p>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <p className="text-sm text-slate-500 mb-1">Jenis Kelamin</p>
-                                        <p className="font-medium text-slate-800">{item.jenisKelamin || '-'}</p>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <p className="text-sm text-slate-500 mb-1">Tanggal Lahir / Usia</p>
-                                        <p className="font-medium text-slate-800">
-                                            {formatDate(item.tanggalLahir)} 
-                                            {item.tanggalLahir && (
-                                                <span className="ml-2 text-blue-600">({calculateAgeFromDOB(item.tanggalLahir)})</span>
-                                            )}
-                                        </p>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <p className="text-sm text-slate-500 mb-1">Alamat Lengkap</p>
-                                        <p className="font-medium text-slate-800">{item.alamat || '-'}</p>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <p className="text-sm text-slate-500 mb-1">Kecamatan</p>
-                                        <p className="font-medium text-slate-800">{item.kecamatan || '-'}</p>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <p className="text-sm text-slate-500 mb-1">Kelurahan</p>
-                                        <p className="font-medium text-slate-800">{item.kelurahan || '-'}</p>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <p className="text-sm text-slate-500 mb-1">RT/RW</p>
-                                        <p className="font-medium text-slate-800">{item.rt || '-'}/{item.rw || '-'}</p>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <p className="text-sm text-slate-500 mb-1">Sumber Laporan</p>
-                                        <p className="font-medium text-slate-800">{item.sumberLaporan || '-'}</p>
-                                    </div>
-                                    {/* PERBAIKAN POINT 4: Tambah informasi orang tua */}
-                                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
-                                        <p className="text-sm text-blue-600 mb-1 font-semibold">Nama Orang Tua/Wali</p>
-                                        <p className="font-bold text-slate-800 text-lg">{item.namaOrangtua || '-'}</p>
-                                    </div>
-                                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
-                                        <p className="text-sm text-blue-600 mb-1 font-semibold">Nomor Kontak Orang Tua/Wali</p>
-                                        <p className="font-bold text-slate-800 text-lg">{item.noKontakOrangtua || '-'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {(item.demam || item.ruam || item.dirawat) && (
-                                <div className="mb-8">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                                        <Icons.Thermometer className="w-5 h-5 text-red-500" />
-                                        Data Klinis
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {item.demam && (
-                                            <div className="bg-red-50 p-4 rounded-lg">
-                                                <p className="text-sm text-red-600 mb-1">Demam</p>
-                                                <p className="font-medium text-red-800">{item.demam === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                                {item.demam === 'ya' && item.tanggalMulaiDemam && (
-                                                    <p className="text-xs text-red-500 mt-1">
-                                                        {formatDate(item.tanggalMulaiDemam)}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )}
-                                        
-                                        {item.ruam && (
-                                            <div className="bg-orange-50 p-4 rounded-lg">
-                                                <p className="text-sm text-orange-600 mb-1">Ruam</p>
-                                                <p className="font-medium text-orange-800">{item.ruam === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                                {item.ruam === 'ya' && item.tanggalMulaiRuam && (
-                                                    <p className="text-xs text-orange-500 mt-1">
-                                                        {formatDate(item.tanggalMulaiRuam)}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )}
-                                        
-                                        {item.gejalaLain && item.gejalaLain.length > 0 && (
-                                            <div className="bg-yellow-50 p-4 rounded-lg col-span-2">
-                                                <p className="text-sm text-yellow-600 mb-1">Gejala Lain</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {Array.isArray(item.gejalaLain) 
-                                                        ? item.gejalaLain.map((gejala, idx) => (
-                                                            <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium text-yellow-800 border border-yellow-200">
-                                                                {gejala}
-                                                            </span>
-                                                        ))
-                                                        : <p className="font-medium text-yellow-800">{item.gejalaLain}</p>
-                                                    }
-                                                </div>
-                                            </div>
-                                        )} 
-                                        
-                                        {item.gejalaLain?.includes('Adenopathy') && item.lokasiAdenopathy && (
-                                        <div className="bg-blue-50 p-3 rounded-lg mt-2">
-                                        <p className="text-sm text-blue-600 mb-1">Lokasi Adenopathy:</p>
-                                            <p className="font-medium text-blue-800">{item.lokasiAdenopathy}</p>
-  </div>
-)}
-
-{item.gejalaLain?.includes('Arthralgia') && item.bagianSendiArthralgia && (
-  <div className="bg-orange-50 p-3 rounded-lg mt-2">
-    <p className="text-sm text-orange-600 mb-1">Bagian Sendi Arthralgia:</p>
-    <p className="font-medium text-orange-800">{item.bagianSendiArthralgia}</p>
-  </div>
-)}
-
-{item.gejalaLain?.includes('Kehamilan') && item.umurKehamilan && (
-  <div className="bg-pink-50 p-3 rounded-lg mt-2">
-    <p className="text-sm text-pink-600 mb-1">Umur Kehamilan:</p>
-    <p className="font-medium text-pink-800">{item.umurKehamilan}</p>
-  </div>
-)}
-                                        
-                                        {item.komplikasi && item.komplikasi.length > 0 && (
-                                            <div className="bg-red-50 p-4 rounded-lg col-span-2">
-                                                <p className="text-sm text-red-600 mb-1">Komplikasi</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {Array.isArray(item.komplikasi)
-                                                        ? item.komplikasi.map((komp, idx) => (
-                                                            <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-800 border border-red-200">
-                                                                {komp}
-                                                            </span>
-                                                        ))
-                                                        : <p className="font-medium text-red-800">{item.komplikasi}</p>
-                                                    }
-                                                </div>
-                                            </div>
-                                        )}
-                                        
-                                        {item.dirawat && (
-                                            <div className="bg-purple-50 p-4 rounded-lg col-span-2">
-                                                <p className="text-sm text-purple-600 mb-1">Rawat Inap</p>
-                                                <p className="font-medium text-purple-800">{item.dirawat === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                                {item.dirawat === 'ya' && item.namaRumahSakit && (
-                                                    <div className="mt-2 space-y-2">
-                                                        <p className="text-sm font-medium"> Dirawat di: {item.namaRumahSakit}</p>
-                                                        {item.tanggalMasukRawat && (
-                                                            <p className="text-xs">Masuk: {formatDate(item.tanggalMasukRawat)}</p>
-                                                        )}
-                                                        {item.tanggalKeluarRawat && (
-                                                            <p className="text-xs">Keluar: {formatDate(item.tanggalKeluarRawat)}</p>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                            
-                            {/* PERBAIKAN POINT 4: HAPUS bagian kontak erat dari View Modal */}
-                            
-                            {item.transferHistory && item.transferHistory.length > 0 && (
-                                <div className="mb-8">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
-                                        <Icons.Share className="w-5 h-5 text-green-500" />
-                                        Riwayat Transfer
-                                    </h3>
-                                    <div className="space-y-3">
-                                        {item.transferHistory.map((record, idx) => (
-                                            <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                                                            record.action === 'dikirim' ? 'bg-blue-100 text-blue-800' :
-                                                            record.action === 'diterima' ? 'bg-green-100 text-green-800' :
-                                                            record.action === 'ditolak' ? 'bg-red-100 text-red-800' :
-                                                            record.action === 'diteruskan' ? 'bg-purple-100 text-purple-800' :
-                                                            'bg-gray-100 text-gray-800'
-                                                        }`}>
-                                                            {record.action || 'transfer'}
-                                                        </span>
-                                                        <p className="text-sm text-slate-700 mt-2">
-                                                            Dari: <span className="font-bold">{record.from}</span> 
-                                                            <Icons.ChevronLeft className="inline w-4 h-4 mx-2 rotate-180" />
-                                                            Ke: <span className="font-bold">{record.to}</span>
-                                                        </p>
-                                                        {record.newOwner && (
-                                                            <p className="text-sm text-green-700 mt-1">
-                                                                <span className="font-bold">Ownership berpindah ke:</span> {record.newOwner}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                    <span className="text-sm text-slate-500">
-                                                        {new Date(record.date).toLocaleDateString('id-ID')}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        
+                        <button 
+                            onClick={onClose}
+                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-10"
+                        >
+                            <Icons.XCircle className="w-8 h-8" />
+                        </button>
                     </div>
                 </div>
-            );
-        };
+                
+                {/* KONTEN ISI */}
+                <div className="p-6 overflow-y-auto flex-1">
+                    <div className="mb-8">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                            <Icons.FileText className="w-5 h-5 text-amber-500" />
+                            Informasi Workflow
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Status Card */}
+                            <div className={`p-4 rounded-lg border ${
+                                item.statusData === 'Pending' 
+                                    ? 'bg-amber-50 border-amber-100' 
+                                    : item.statusData === 'Final'
+                                    ? 'bg-green-50 border-green-100'
+                                    : item.statusData === 'Ditolak'
+                                    ? 'bg-red-50 border-red-100'
+                                    : 'bg-blue-50 border-blue-100'
+                            }`}>
+                                <p className="text-sm font-semibold mb-1">Status Saat Ini</p>
+                                <p className={`text-lg font-bold ${
+                                    item.statusData === 'Pending' 
+                                        ? 'text-amber-800' 
+                                        : item.statusData === 'Final'
+                                        ? 'text-green-800'
+                                        : item.statusData === 'Ditolak'
+                                        ? 'text-red-800'
+                                        : 'text-blue-800'
+                                }`}>
+                                    {item.statusData}
+                                </p>
+                                <p className="text-xs mt-1">
+                                    {item.statusData === 'Pending' 
+                                        ? 'Formulir dalam proses verifikasi di Pending Form'
+                                        : item.statusData === 'Final'
+                                        ? 'Formulir sudah final'
+                                        : item.statusData === 'Ditolak'
+                                        ? 'Formulir ditolak oleh unit lain'
+                                        : 'Formulir dalam proses lainnya'}
+                                </p>
+                            </div>
+
+                            {/* Tombol Lokasi */}
+                            {item.titikLokasi ? (
+                                <button 
+                                    onClick={() => {
+                                        if (item.titikLokasi) {
+                                            const coords = item.titikLokasi.split(',').map(c => c.trim());
+                                            if (coords.length === 2) {
+                                                const url = `https://www.google.com/maps?q=${coords[0]},${coords[1]}`;
+                                                window.open(url, '_blank');
+                                            }
+                                        }
+                                    }}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg border border-blue-700 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group h-full min-h-[100px]"
+                                >
+                                    <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
+                                        <Icons.MapPin className="w-6 h-6 text-white" />
+                                    </div>
+                                    <span className="font-bold text-sm">Lihat Titik Lokasi</span>
+                                </button>
+                            ) : (
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center justify-center text-slate-400 min-h-[100px]">
+                                    <Icons.MapPin className="w-6 h-6 mb-1 text-slate-300" />
+                                    <p className="text-sm">Lokasi tidak tersedia</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Informasi Umum dengan data orang tua */}
+                    <div className="mb-8">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                            <Icons.User className="w-5 h-5 text-blue-500" />
+                            Informasi Umum
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <p className="text-sm text-slate-500 mb-1">Nama Lengkap Kasus</p>
+                                <p className="font-bold text-slate-800 text-lg">{item.namaKasus || '-'}</p>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <p className="text-sm text-slate-500 mb-1">Jenis Kelamin</p>
+                                <p className="font-medium text-slate-800">{item.jenisKelamin || '-'}</p>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <p className="text-sm text-slate-500 mb-1">Tanggal Lahir / Usia</p>
+                                <p className="font-medium text-slate-800">
+                                    {formatDate(item.tanggalLahir)} 
+                                    {item.tanggalLahir && (
+                                        <span className="ml-2 text-blue-600">({calculateAgeFromDOB(item.tanggalLahir)})</span>
+                                    )}
+                                </p>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <p className="text-sm text-slate-500 mb-1">Alamat Lengkap</p>
+                                <p className="font-medium text-slate-800">{item.alamat || '-'}</p>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <p className="text-sm text-slate-500 mb-1">Kecamatan</p>
+                                <p className="font-medium text-slate-800">{item.kecamatan || '-'}</p>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <p className="text-sm text-slate-500 mb-1">Kelurahan</p>
+                                <p className="font-medium text-slate-800">{item.kelurahan || '-'}</p>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <p className="text-sm text-slate-500 mb-1">RT/RW</p>
+                                <p className="font-medium text-slate-800">{item.rt || '-'}/{item.rw || '-'}</p>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <p className="text-sm text-slate-500 mb-1">Sumber Laporan</p>
+                                <p className="font-medium text-slate-800">{item.sumberLaporan || '-'}</p>
+                            </div>
+                            {/* Tambah informasi orang tua */}
+                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                                <p className="text-sm text-blue-600 mb-1 font-semibold">Nama Orang Tua/Wali</p>
+                                <p className="font-bold text-slate-800 text-lg">{item.namaOrangtua || '-'}</p>
+                            </div>
+                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                                <p className="text-sm text-blue-600 mb-1 font-semibold">Nomor Kontak Orang Tua/Wali</p>
+                                <p className="font-bold text-slate-800 text-lg">{item.noKontakOrangtua || '-'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {(item.demam || item.ruam || item.dirawat || gejalaList.length > 0 || komplikasiList.length > 0) && (
+                        <div className="mb-8">
+                            <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                                <Icons.Thermometer className="w-5 h-5 text-red-500" />
+                                Data Klinis
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {item.demam && (
+                                    <div className="bg-red-50 p-4 rounded-lg">
+                                        <p className="text-sm text-red-600 mb-1">Demam</p>
+                                        <p className="font-medium text-red-800">{item.demam === 'ya' ? 'Ya' : 'Tidak'}</p>
+                                        {item.demam === 'ya' && item.tanggalMulaiDemam && (
+                                            <p className="text-xs text-red-500 mt-1">
+                                                {formatDate(item.tanggalMulaiDemam)}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                                
+                                {item.ruam && (
+                                    <div className="bg-orange-50 p-4 rounded-lg">
+                                        <p className="text-sm text-orange-600 mb-1">Ruam</p>
+                                        <p className="font-medium text-orange-800">{item.ruam === 'ya' ? 'Ya' : 'Tidak'}</p>
+                                        {item.ruam === 'ya' && item.tanggalMulaiRuam && (
+                                            <p className="text-xs text-orange-500 mt-1">
+                                                {formatDate(item.tanggalMulaiRuam)}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                                
+                                {gejalaList.length > 0 && (
+                                    <div className="bg-yellow-50 p-4 rounded-lg col-span-2">
+                                        <p className="text-sm text-yellow-600 mb-1">Gejala Lain</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {gejalaList.map((gejala, idx) => (
+                                                <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium text-yellow-800 border border-yellow-200">
+                                                    {gejala}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        {item.gejalaLainSebutkan && (
+                                            <p className="text-sm text-yellow-700 mt-2">
+                                                <strong>Sebutkan:</strong> {item.gejalaLainSebutkan}
+                                            </p>
+                                        )}
+                                    </div>
+                                )} 
+                                
+                                {gejalaList.includes('Adenopathy') && item.lokasiAdenopathy && (
+                                    <div className="bg-blue-50 p-3 rounded-lg">
+                                        <p className="text-sm text-blue-600 mb-1">Lokasi Adenopathy:</p>
+                                        <p className="font-medium text-blue-800">{item.lokasiAdenopathy}</p>
+                                    </div>
+                                )}
+
+                                {gejalaList.includes('Arthralgia') && item.bagianSendiArthralgia && (
+                                    <div className="bg-orange-50 p-3 rounded-lg">
+                                        <p className="text-sm text-orange-600 mb-1">Bagian Sendi Arthralgia:</p>
+                                        <p className="font-medium text-orange-800">{item.bagianSendiArthralgia}</p>
+                                    </div>
+                                )}
+
+                                {gejalaList.includes('Kehamilan') && item.umurKehamilan && (
+                                    <div className="bg-pink-50 p-3 rounded-lg">
+                                        <p className="text-sm text-pink-600 mb-1">Umur Kehamilan:</p>
+                                        <p className="font-medium text-pink-800">{item.umurKehamilan}</p>
+                                    </div>
+                                )}
+                                
+                                {komplikasiList.length > 0 && (
+                                    <div className="bg-red-50 p-4 rounded-lg col-span-2">
+                                        <p className="text-sm text-red-600 mb-1">Komplikasi</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {komplikasiList.map((komp, idx) => (
+                                                <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-800 border border-red-200">
+                                                    {komp}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        {item.komplikasiLainnyaSebutkan && (
+                                            <p className="text-sm text-red-700 mt-2">
+                                                <strong>Sebutkan:</strong> {item.komplikasiLainnyaSebutkan}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                                
+                                {item.dirawat && (
+                                    <div className="bg-purple-50 p-4 rounded-lg col-span-2">
+                                        <p className="text-sm text-purple-600 mb-1">Rawat Inap</p>
+                                        <p className="font-medium text-purple-800">{item.dirawat === 'ya' ? 'Ya' : 'Tidak'}</p>
+                                        {item.dirawat === 'ya' && item.namaRumahSakit && (
+                                            <div className="mt-2 space-y-2">
+                                                <p className="text-sm font-medium">Dirawat di: {item.namaRumahSakit}</p>
+                                                {item.tanggalMasukRawat && (
+                                                    <p className="text-xs">Masuk: {formatDate(item.tanggalMasukRawat)}</p>
+                                                )}
+                                                {item.tanggalKeluarRawat && (
+                                                    <p className="text-xs">Keluar: {formatDate(item.tanggalKeluarRawat)}</p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* Kontak Erat (Jika ada) */}
+                    {item.kontakErat && item.kontakErat.length > 0 && (
+                        <div className="mb-8">
+                            <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                                <Icons.Users className="w-5 h-5 text-green-500" />
+                                Data Kontak Erat ({item.kontakErat.length} orang)
+                            </h3>
+                            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                                {item.kontakErat.slice(0, 10).map((kontak, index) => (
+                                    <div key={index} className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <p className="font-medium text-slate-800">{kontak.nama || 'Tanpa Nama'}</p>
+                                                <div className="text-sm text-slate-600 mt-1 space-y-1">
+                                                    <p>Umur: {kontak.umur || '-'}</p>
+                                                    <p>Hubungan: {kontak.hubungan || '-'}</p>
+                                                    <p>Kondisi: 
+                                                        <span className={`ml-1 px-2 py-0.5 rounded text-xs ${kontak.kondisi === 'sakit' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                            {kontak.kondisi || 'Tidak diketahui'}
+                                                        </span>
+                                                    </p>
+                                                    <p>Imunisasi: {kontak.imunisasiCampakRubella || '-'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                {item.kontakErat.length > 10 && (
+                                    <p className="text-sm text-slate-500 text-center">
+                                        + {item.kontakErat.length - 10} kontak erat lainnya...
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {item.transferHistory && item.transferHistory.length > 0 && (
+                        <div className="mb-8">
+                            <h3 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+                                <Icons.Share className="w-5 h-5 text-green-500" />
+                                Riwayat Transfer
+                            </h3>
+                            <div className="space-y-3">
+                                {item.transferHistory.map((record, idx) => (
+                                    <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                                                    record.action === 'dikirim' ? 'bg-blue-100 text-blue-800' :
+                                                    record.action === 'diterima' ? 'bg-green-100 text-green-800' :
+                                                    record.action === 'ditolak' ? 'bg-red-100 text-red-800' :
+                                                    record.action === 'diteruskan' ? 'bg-purple-100 text-purple-800' :
+                                                    'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                    {record.action || 'transfer'}
+                                                </span>
+                                                <p className="text-sm text-slate-700 mt-2">
+                                                    Dari: <span className="font-bold">{record.from}</span> 
+                                                    <Icons.ChevronLeft className="inline w-4 h-4 mx-2 rotate-180" />
+                                                    Ke: <span className="font-bold">{record.to}</span>
+                                                </p>
+                                                {record.newOwner && (
+                                                    <p className="text-sm text-green-700 mt-1">
+                                                        <span className="font-bold">Ownership berpindah ke:</span> {record.newOwner}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <span className="text-sm text-slate-500">
+                                                {new Date(record.date).toLocaleDateString('id-ID')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                
+            </div>
+        </div>
+    );
+};
 
         // BAGIAN 7: RENDER UTAMA
         ReactDOM.render(<App />, document.getElementById('root'));
