@@ -323,8 +323,14 @@
         console.log("Saving data to Firebase:", data.id);
         if (dbStore) {
             try {
+                // HITUNG USIA DARI TANGGAL LAHIR
+                const usia = calculateAge(data.tanggalLahir);
+                
                 // Konversi data gejala dan komplikasi ke format Firestore
-                const firestoreData = { ...data };
+                const firestoreData = { 
+                    ...data, 
+                    usia: usia // TAMBAHKAN FIELD USIA DI SINI
+                };
                 
                 // Konversi gejalaLain objek ke format YA/TIDAK
                 if (firestoreData.gejalaLain && typeof firestoreData.gejalaLain === 'object') {
@@ -341,13 +347,14 @@
                 }
                 
                 await dbStore.collection('forms').doc(data.id).set(firestoreData, { merge: true });
-                console.log("Data saved successfully with YA/TIDAK format");
+                console.log("Data saved successfully with usia field:", usia);
             } catch (e) {
                 console.error("Error saving to Firebase:", e);
                 throw e;
             }
         }
     },
+    
             delete: async (id) => { 
                 console.log("Deleting data from Firebase:", id);
                 if (dbStore) {
@@ -602,31 +609,36 @@
 
         // PERBAIKAN POINT 3: Fungsi untuk menghitung usia dalam format tahun bulan hari
         const calculateAge = (tanggalLahir) => {
-            if (!tanggalLahir) return '';
-            try {
-                const birthDate = new Date(tanggalLahir);
-                const today = new Date();
-                
-                let years = today.getFullYear() - birthDate.getFullYear();
-                let months = today.getMonth() - birthDate.getMonth();
-                let days = today.getDate() - birthDate.getDate();
-                
-                if (days < 0) {
-                    months--;
-                    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                    days += lastMonth.getDate();
-                }
-                
-                if (months < 0) {
-                    years--;
-                    months += 12;
-                }
-                
-                return `${years} tahun ${months} bulan ${days} hari`;
-            } catch (e) {
-                return '';
-            }
-        };
+    if (!tanggalLahir) return '';
+    try {
+        const birthDate = new Date(tanggalLahir);
+        const today = new Date();
+        
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+        
+        // Koreksi jika hari negatif
+        if (days < 0) {
+            months--;
+            // Dapatkan jumlah hari di bulan sebelumnya
+            const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += lastMonth.getDate();
+        }
+        
+        // Koreksi jika bulan negatif
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        
+        // Format: "X tahun Y bulan Z hari"
+        return `${years} tahun ${months} bulan ${days} hari`;
+    } catch (e) {
+        console.error("Error calculating age:", e);
+        return '';
+    }
+};
 
         let lastEPIDNumber = 0;
 
