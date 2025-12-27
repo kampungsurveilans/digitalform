@@ -183,11 +183,26 @@
 };
 
         let dbAuth, dbStore;
-        try {
-            if (!firebase.apps.length) { firebase.initializeApp(FIREBASE_CONFIG); }
-            dbAuth = firebase.auth();
-            dbStore = firebase.firestore();
-        } catch (e) { console.error("Firebase Error:", e); }
+try {
+    // Periksa apakah Firebase sudah diinisialisasi
+    const firebaseApp = firebase.apps.length 
+        ? firebase.apps[0] 
+        : firebase.initializeApp(FIREBASE_CONFIG);
+    
+    console.log("Firebase App Name:", firebaseApp.name);
+    
+    // Inisialisasi auth dan firestore
+    dbAuth = firebase.auth();
+    dbStore = firebase.firestore();
+    
+    console.log("Firebase initialized successfully");
+    console.log("Auth available:", !!dbAuth);
+    console.log("Firestore available:", !!dbStore);
+    
+} catch (e) { 
+    console.error("Firebase Initialization Error:", e); 
+    console.error("Error details:", e.code, e.message);
+}
 
         const DATA_PUSKESMAS = [
             "Puskesmas Alianyang", "Puskesmas Banjar Serasan", "Puskesmas Gang Sehat",
@@ -263,20 +278,12 @@
 
         const mockUserDB = {
     checkAndCreateDefaultAdmin: async () => {
-        if(!dbStore) return;
-        try {
-            const snap = await dbStore.collection('users').limit(1).get();
-            if(snap.empty) {
-                // Buat admin default dengan email
-                await dbStore.collection('users').add({ 
-                    email: 'admin@example.com', 
-                    name: 'Administrator Utama', 
-                    role: 'admin', 
-                    unitName: 'Puskesmas Alianyang'
-                });
-            }
-        } catch(e) {}
+        // HAPUS fungsi pembuatan admin default
+        // Biarkan kosong atau hanya log saja
+        console.log("Admin default creation disabled - manual admin setup required");
     },
+    
+    // ... fungsi lainnya tetap sama
     getUsers: async () => { 
         if (!dbStore) return []; 
         try { 
@@ -286,6 +293,7 @@
             return []; 
         } 
     },
+    
     addUser: async (user) => { 
         if (!dbStore) return false; 
         try { 
@@ -298,10 +306,12 @@
             return false; 
         } 
     },
-            deleteUser: async (id) => { 
-                if (dbStore) await dbStore.collection('users').doc(id).delete(); 
-            },
-            authenticate: async (u, p) => { 
+    
+    deleteUser: async (id) => { 
+        if (dbStore) await dbStore.collection('users').doc(id).delete(); 
+    },
+    
+    authenticate: async (u, p) => { 
         return null; // Dinonaktifkan
     }
 };
@@ -1582,6 +1592,28 @@
                     // Cleanup jika ada event listeners
                 };
             }, []);
+            
+            useEffect(() => {
+    // Cek status Firebase
+    const checkFirebase = async () => {
+        try {
+            console.log("Firebase apps:", firebase.apps.length);
+            console.log("Current domain:", window.location.hostname);
+            console.log("Full URL:", window.location.href);
+            
+            // Coba ping Firebase
+            if (dbAuth) {
+                dbAuth.onAuthStateChanged((user) => {
+                    console.log("Auth state changed:", user ? user.email : "No user");
+                });
+            }
+        } catch (e) {
+            console.error("Firebase check error:", e);
+        }
+    };
+    
+    checkFirebase();
+}, []);
 
             // PERBAIKAN POINT 1: Handle browser back/forward hanya dengan modal kita
             useEffect(() => {
@@ -1805,14 +1837,39 @@ useEffect(() => {
             const handleLogin = async (e) => {
     e.preventDefault(); 
     showLoading(true);
+    
     try {
-        // Login dengan Google Auth Provider
+        console.log("Starting Google login...");
+        
+        // Periksa Firebase auth
+        if (!dbAuth) {
+            throw new Error("Firebase Auth not initialized");
+        }
+        
+        // Buat Google Auth Provider
         const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('profile');
+        provider.addScope('email');
+        
+        console.log("Signing in with popup...");
+        
+        // Sign in dengan popup
         const result = await dbAuth.signInWithPopup(provider);
         const user = result.user;
         
+        console.log("Google login successful:", user.email);
+        
+        // Periksa Firestore
+        if (!dbStore) {
+            throw new Error("Firestore not initialized");
+        }
+        
         // Cek apakah user terdaftar di Firestore
-        const snap = await dbStore.collection('users').where('email', '==', user.email).limit(1).get();
+        const snap = await dbStore.collection('users')
+            .where('email', '==', user.email)
+            .limit(1)
+            .get();
+            
         if (snap.empty) {
             // User tidak terdaftar
             showNotification('Akun Google Anda tidak terdaftar. Hubungi administrator.', 'error');
@@ -1834,6 +1891,7 @@ useEffect(() => {
         // Simpan session dan update state
         sessionManager.save(sessionUser);
         setCurrentUser(sessionUser);
+        
         if (sessionUser.role === 'admin') {
             setView('admin-dashboard');
             showNotification('Welcome Admin', 'success');
@@ -1841,8 +1899,31 @@ useEffect(() => {
             setView('start');
             showNotification(`Halo, ${sessionUser.name}`, 'success');
         }
+        
     } catch (error) {
-        showNotification('Error login dengan Google: ' + error.message, 'error');
+        console.error("Login error details:", error);
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
+        
+        if (error.code === 'auth/unauthorized-domain') {
+            showNotification(
+                'DOMAIN TIDAK DIOTORISASI! \n' +
+                'Langkah perbaikan:\n' + 
+                '1. Buka Firebase Console\n' +
+                '2. Pilih proyek "campak-e836a"\n' +
+                '3. Buka Authentication → Sign-in method\n' +
+                '4. Scroll ke "Authorized domains"\n' +
+                '5. Tambahkan: ' + window.location.hostname + '\n' +
+                '6. Coba lagi dalam 2 menit',
+                'error'
+            );
+        } else if (error.code === 'auth/popup-blocked') {
+            showNotification('Popup login diblokir browser. Izinkan popup untuk situs ini.', 'error');
+        } else if (error.code === 'auth/popup-closed-by-user') {
+            showNotification('Popup login ditutup sebelum selesai.', 'error');
+        } else {
+            showNotification('Error login: ' + error.message, 'error');
+        }
     } finally {
         showLoading(false);
     }
@@ -4183,28 +4264,47 @@ useEffect(() => {
                 user.role?.toLowerCase().includes(userSearchTerm.toLowerCase())
             ) : allUsers;
 
-            const handleAddUser = async (e) => { 
-                e.preventDefault(); 
-                
-                if (!newUser.name || !newUser.username || !newUser.password || !newUser.unitName) {
-                    showNotification('Semua field wajib diisi', 'error');
-                    return;
-                }
-                
-                const existingUser = allUsers.find(u => u.username === newUser.username);
-                if (existingUser) {
-                    showNotification('Username sudah digunakan', 'error');
-                    return;
-                }
-                
-                if(await mockUserDB.addUser(newUser)) { 
-                    showNotification('User berhasil ditambahkan', 'success'); 
-                    setNewUser({ name: '', username: '', password: '', role: 'user', unitName: '' }); 
-                    setAllUsers(await mockUserDB.getUsers()); 
-                } else {
-                    showNotification('Gagal menambahkan user', 'error'); 
-                }
-            };
+            // GANTI fungsi handleAddUser dengan ini:
+const handleAddUser = async (e) => { 
+    e.preventDefault(); 
+    
+    // Validasi baru hanya untuk email
+    if (!newUser.name || !newUser.email || !newUser.unitName) {
+        showNotification('Nama, Email, dan Unit wajib diisi', 'error');
+        return;
+    }
+    
+    // Cek duplikasi email
+    const existingUser = allUsers.find(u => u.email === newUser.email);
+    if (existingUser) {
+        showNotification('Email sudah terdaftar', 'error');
+        return;
+    }
+    
+    try {
+        // Simpan ke Firestore TANPA password
+        const userToSave = {
+            email: newUser.email,
+            name: newUser.name,
+            role: newUser.role,
+            unitName: newUser.unitName,
+            createdAt: new Date().toISOString()
+        };
+        
+        await dbStore.collection('users').add(userToSave);
+        
+        showNotification('User berhasil ditambahkan', 'success'); 
+        setNewUser({ name: '', email: '', role: 'user', unitName: '' });
+        
+        // Refresh user list
+        const users = await mockUserDB.getUsers();
+        setAllUsers(users);
+        
+    } catch (error) {
+        console.error("Error adding user:", error);
+        showNotification('Gagal menambahkan user: ' + error.message, 'error'); 
+    }
+};
             
             const handleUpdateUser = async (e) => {
                 e.preventDefault();
@@ -4281,6 +4381,38 @@ useEffect(() => {
             const handleViewFormInAdmin = (form) => {
                 onViewForm(form);
             };
+            
+            // Di dalam AdminDashboard component, tambahkan:
+const handleDeleteDefaultAdmin = async () => {
+    if (window.confirm("Hapus akun admin default (admin@example.com)?")) {
+        try {
+            const querySnapshot = await dbStore.collection('users')
+                .where('email', '==', 'admin@example.com')
+                .get();
+            
+            let deletedCount = 0;
+            querySnapshot.forEach(async (doc) => {
+                await doc.ref.delete();
+                deletedCount++;
+            });
+            
+            showNotification(`Berhasil menghapus ${deletedCount} akun admin default`, 'success');
+            // Refresh user list
+            const users = await mockUserDB.getUsers();
+            setAllUsers(users);
+        } catch (e) {
+            showNotification('Error menghapus akun default: ' + e.message, 'error');
+        }
+    }
+};
+
+// Tambahkan tombol di UI AdminDashboard:
+<button 
+    onClick={handleDeleteDefaultAdmin}
+    className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-sm"
+>
+    Hapus Admin Default
+</button>
 
             return (
                 <div className="fixed inset-0 h-[100dvh] w-full flex flex-col bg-slate-50 overflow-hidden">
@@ -4598,9 +4730,7 @@ useEffect(() => {
                                                                 {u.role}
                                                             </span>
                                                         </p>
-                                                        <p className="text-xs text-slate-400 font-mono mt-2">
-                                                            Username: @{u.username} | Password: {u.password}
-                                                        </p>
+                                                      
                                                     </div>
                                                     <div className="flex gap-2">
                                                         <button 
