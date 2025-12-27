@@ -262,62 +262,49 @@
         };
 
         const mockUserDB = {
-            checkAndCreateDefaultAdmin: async () => {
-                if(!dbStore) return;
-                try {
-                    const snap = await dbStore.collection('users').limit(1).get();
-                    if(snap.empty) await dbStore.collection('users').add({ 
-                        username: 'admin', 
-                        password: 'admin123', 
-                        role: 'admin', 
-                        name: 'Administrator Utama', 
-                        unitName: 'Puskesmas Alianyang'
-                    });
-                } catch(e) {}
-            },
-            getUsers: async () => { 
-                if (!dbStore) return []; 
-                try { 
-                    const snapshot = await dbStore.collection('users').get(); 
-                    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
-                } catch (e) { 
-                    return []; 
-                } 
-            },
-            addUser: async (user) => { 
-                if (!dbStore) return false; 
-                try { 
-                    const snap = await dbStore.collection('users').where('username', '==', user.username).get(); 
-                    if(!snap.empty) return false; 
-                    await dbStore.collection('users').add(user); 
-                    return true; 
-                } catch (e) { 
-                    return false; 
-                } 
-            },
-            updateUser: async (id, userData) => {
-                if (!dbStore) return false;
-                try {
-                    await dbStore.collection('users').doc(id).update(userData);
-                    return true;
-                } catch (e) {
-                    console.error("Error updating user:", e);
-                    return false;
-                }
-            },
+    checkAndCreateDefaultAdmin: async () => {
+        if(!dbStore) return;
+        try {
+            const snap = await dbStore.collection('users').limit(1).get();
+            if(snap.empty) {
+                // Buat admin default dengan email
+                await dbStore.collection('users').add({ 
+                    email: 'admin@example.com', 
+                    name: 'Administrator Utama', 
+                    role: 'admin', 
+                    unitName: 'Puskesmas Alianyang'
+                });
+            }
+        } catch(e) {}
+    },
+    getUsers: async () => { 
+        if (!dbStore) return []; 
+        try { 
+            const snapshot = await dbStore.collection('users').get(); 
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
+        } catch (e) { 
+            return []; 
+        } 
+    },
+    addUser: async (user) => { 
+        if (!dbStore) return false; 
+        try { 
+            // Cek duplikasi email
+            const snap = await dbStore.collection('users').where('email', '==', user.email).get(); 
+            if(!snap.empty) return false; 
+            await dbStore.collection('users').add(user); 
+            return true; 
+        } catch (e) { 
+            return false; 
+        } 
+    },
             deleteUser: async (id) => { 
                 if (dbStore) await dbStore.collection('users').doc(id).delete(); 
             },
             authenticate: async (u, p) => { 
-                if (!dbStore) return null; 
-                try { 
-                    const snap = await dbStore.collection('users').where('username', '==', u).where('password', '==', p).get(); 
-                    return snap.empty ? null : { id: snap.docs[0].id, ...snap.docs[0].data() }; 
-                } catch(e) { 
-                    return null; 
-                } 
-            }
-        };
+        return null; // Dinonaktifkan
+    }
+};
 
         const mockDB = {
     save: async (data) => { 
@@ -1585,8 +1572,7 @@
             const [receivedList, setReceivedList] = useState([]); 
             const [rejectedList, setRejectedList] = useState([]);
             
-            const [username, setUsername] = useState('');
-            const [password, setPassword] = useState('');
+            
             const formContainerRef = useRef(null);
             const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
@@ -1677,7 +1663,7 @@
             const loadDataForView = async () => {
                 if (!currentUser) return;
                 
-                console.log(`Loading data for user: ${currentUser.username}, unit: ${currentUser.unitName}`);
+                console.log(`Loading data for user: ${currentUser.email}, unit: ${currentUser.unitName}`);
                 showLoading(true);
                 try {
                     const allForms = await mockDB.getAllForms();
@@ -1685,7 +1671,7 @@
                     
                     // 1. Drafts
                     const drafts = allForms.filter(d => 
-                        d.createdBy === currentUser.username && 
+                        d.createdBy === currentUser.email && 
                         d.statusData === 'Draft'
                     );
                     console.log(`Drafts found: ${drafts.length}`);
@@ -1713,7 +1699,7 @@
                     
                     // 4. Formulir Keluar
                     const outgoing = allForms.filter(i => {
-                        const isCreatedByMe = i.createdBy === currentUser.username;
+                        const isCreatedByMe = i.createdBy === currentUser.email;
                         const hasBeenShared = i.sharedTo && i.sharedTo !== '';
                         const notToMyself = i.sharedTo !== currentUser.unitName;
                         
@@ -1770,44 +1756,113 @@
             useEffect(() => { 
                 if(view === 'form') window.scrollTo({ top: 0, behavior: 'smooth' }); 
             }, [step, view]);
+            
+            // Listener untuk status auth Firebase
+useEffect(() => {
+    if (!dbAuth) return;
+    const unsubscribe = dbAuth.onAuthStateChanged(async (firebaseUser) => {
+        if (firebaseUser) {
+            try {
+                const snap = await dbStore.collection('users').where('email', '==', firebaseUser.email).limit(1).get();
+                if (!snap.empty) {
+                    const userData = snap.docs[0].data();
+                    const sessionUser = {
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        name: firebaseUser.displayName || userData.name,
+                        role: userData.role,
+                        unitName: userData.unitName
+                    };
+                    sessionManager.save(sessionUser);
+                    setCurrentUser(sessionUser);
+                    // Redirect otomatis jika di halaman login
+                    if (view === 'login') {
+                        setView(sessionUser.role === 'admin' ? 'admin-dashboard' : 'start');
+                    }
+                } else {
+                    // User tidak terdaftar
+                    await dbAuth.signOut();
+                    sessionManager.clear();
+                    setCurrentUser(null);
+                    setView('login');
+                    showNotification('Akun tidak terdaftar. Hubungi administrator.', 'error');
+                }
+            } catch (e) {
+                console.error("Error checking user:", e);
+            }
+        } else {
+            // Tidak ada user yang login
+            sessionManager.clear();
+            setCurrentUser(null);
+            if (view !== 'login') {
+                setView('login');
+            }
+        }
+    });
+    return () => unsubscribe();
+}, [dbAuth, dbStore, view]);
 
             const handleLogin = async (e) => {
-                e.preventDefault(); 
-                showLoading(true);
-                try {
-                    const user = await mockUserDB.authenticate(username, password);
-                    if (user) {
-                        sessionManager.save(user); 
-                        setCurrentUser(user);
-                        if (user.role === 'admin') { 
-                            setView('admin-dashboard'); 
-                            showNotification('Welcome Admin', 'success'); 
-                        } else { 
-                            setView('start'); 
-                            showNotification(`Halo, ${user.name}`, 'success'); 
-                        }
-                    } else { 
-                        showNotification('Akun tidak ditemukan', 'error'); 
-                    }
-                } catch (error) {
-                    showNotification('Error: ' + error.message, 'error');
-                } finally {
-                    showLoading(false);
-                }
-            };
+    e.preventDefault(); 
+    showLoading(true);
+    try {
+        // Login dengan Google Auth Provider
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await dbAuth.signInWithPopup(provider);
+        const user = result.user;
+        
+        // Cek apakah user terdaftar di Firestore
+        const snap = await dbStore.collection('users').where('email', '==', user.email).limit(1).get();
+        if (snap.empty) {
+            // User tidak terdaftar
+            showNotification('Akun Google Anda tidak terdaftar. Hubungi administrator.', 'error');
+            await dbAuth.signOut();
+            showLoading(false);
+            return;
+        }
+        
+        // Ambil data user dari Firestore
+        const userData = snap.docs[0].data();
+        const sessionUser = {
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName || userData.name,
+            role: userData.role,
+            unitName: userData.unitName
+        };
+        
+        // Simpan session dan update state
+        sessionManager.save(sessionUser);
+        setCurrentUser(sessionUser);
+        if (sessionUser.role === 'admin') {
+            setView('admin-dashboard');
+            showNotification('Welcome Admin', 'success');
+        } else {
+            setView('start');
+            showNotification(`Halo, ${sessionUser.name}`, 'success');
+        }
+    } catch (error) {
+        showNotification('Error login dengan Google: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+    }
+};
             
             const handleLogout = () => { 
                 setShowLogoutModal(true);
             };
 
-            const confirmLogout = () => {
-                sessionManager.clear(); 
-                setUsername(''); 
-                setPassword(''); 
-                setCurrentUser(null); 
-                setView('login'); 
-                setShowLogoutModal(false);
-            };
+            const confirmLogout = async () => {
+    try {
+        await dbAuth.signOut(); // Logout dari Firebase
+    } catch (e) {
+        console.error("Error signing out:", e);
+    }
+    sessionManager.clear(); 
+    setCurrentUser(null); 
+    setView('login'); 
+    setShowLogoutModal(false);
+};
 
             const handleStartNew = async () => { 
                 const newId = Date.now().toString(); 
@@ -1815,7 +1870,7 @@
                     ...INITIAL_DATA, 
                     id: newId, 
                     nomorEPID: '', 
-                    createdBy: currentUser.username, 
+                    createdBy: currentUser.email, 
                     createdUnit: currentUser.unitName,
                     originalUnit: currentUser.unitName,
                     currentOwner: currentUser.unitName,
@@ -2317,7 +2372,7 @@
                         ...formData, 
                         statusData: 'Draft', 
                         updatedAt: Date.now(), 
-                        createdBy: currentUser?.username, 
+                        createdBy: currentUser?.email, 
                         createdUnit: currentUser?.unitName,
                         originalUnit: currentUser?.unitName,
                         currentOwner: formData.currentOwner || currentUser?.unitName
@@ -2353,7 +2408,7 @@
                         ...formData, 
                         statusData: 'Pending',
                         updatedAt: Date.now(), 
-                        createdBy: currentUser?.username, 
+                        createdBy: currentUser?.email, 
                         createdUnit: currentUser?.unitName,
                         originalUnit: currentUser?.unitName,
                         currentOwner: currentUser?.unitName
@@ -2458,70 +2513,52 @@
                                         
             const renderCurrentView = () => {
                 if (view === 'login') return (
-                    <div className="fixed inset-0 h-[100dvh] w-full bg-gradient-to-br from-slate-900 to-slate-800 overflow-y-auto">
-                        <div className="min-h-full flex items-center justify-center p-6 relative z-10">
-                            <div className="w-full max-w-sm bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-2xl">
-                                <div className="text-center mb-8">
-                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/40 mb-4">
-                                        <Icons.Shield className="w-8 h-8 text-white" />
-                                    </div>
-                                    <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Surveilans Campak/Rubella</h1>
-                                    <p className="text-slate-300 text-body font-medium">Masuk untuk melanjutkan</p>
-                                </div>
-                                
-                                <form onSubmit={handleLogin} className="space-y-5">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-300 mb-2 text-caption">Username</label>
-                                        <div className="bg-white/10 rounded-xl p-1 flex items-center border border-white/20 focus-within:border-blue-400 transition">
-                                            <div className="p-3 text-slate-400"><Icons.User className="w-5 h-5"/></div>
-                                            <input 
-                                                type="text" 
-                                                value={username} 
-                                                onChange={e=>setUsername(e.target.value)} 
-                                                placeholder="Masukkan username" 
-                                                className="bg-transparent w-full p-2 text-white placeholder-slate-500 outline-none font-medium text-body" 
-                                            />
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-300 mb-2 text-caption">Password</label>
-                                        <div className="bg-white/10 rounded-xl p-1 flex items-center border border-white/20 focus-within:border-blue-400 transition">
-                                            <div className="p-3 text-slate-400"><Icons.Lock className="w-5 h-5"/></div>
-                                            <input 
-                                                type="password" 
-                                                value={password} 
-                                                onChange={e=>setPassword(e.target.value)} 
-                                                placeholder="Masukkan password" 
-                                                className="bg-transparent w-full p-2 text-white placeholder-slate-500 outline-none font-medium text-body" 
-                                            />
-                                        </div>
-                                    </div>
-                                    
-                                    <button className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transition-all active:scale-[0.98] text-subtitle mt-6">
-                                        Masuk Sekarang
-                                    </button>
-                                </form>
-                                
-                                {/* Tombol Beranda di Login */}
-                                <div className="mt-6">
-                                    <button 
-                                        onClick={() => window.location.href = 'index.html'}
-                                        className="w-full py-3.5 bg-gradient-to-r from-slate-700 to-slate-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:shadow-slate-800/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                                    >
-                                        <Icons.Home className="w-5 h-5" /> Kembali ke Beranda
-                                    </button>
-                                </div>
-                                
-                                <div className="mt-8 text-center">
-                                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest text-micro">by UPT Puskesmas Kampung Dalam</p>
-                                </div>
-                            </div>
-                        </div>
-                        {showLoadingOverlay && <LoadingOverlay />} 
-                        <Toast notification={notification} />
+    <div className="fixed inset-0 h-[100dvh] w-full bg-gradient-to-br from-slate-900 to-slate-800 overflow-y-auto">
+        <div className="min-h-full flex items-center justify-center p-6 relative z-10">
+            <div className="w-full max-w-sm bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-2xl">
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/40 mb-4">
+                        <Icons.Shield className="w-8 h-8 text-white" />
                     </div>
-                );
+                    <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Surveilans Campak/Rubella</h1>
+                    <p className="text-slate-300 text-body font-medium">Login dengan akun Google</p>
+                    <p className="text-slate-400 text-sm mt-2">*Akun harus didaftarkan oleh administrator</p>
+                </div>
+                
+                {/* Tombol Login Google */}
+                <button 
+                    onClick={handleLogin}
+                    className="w-full py-4 bg-white text-slate-800 rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-slate-100 transition-all active:scale-[0.98] text-subtitle flex items-center justify-center gap-3"
+                >
+                    {/* Ikon Google SVG */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21.8 12.2c0-1.6-.2-3.2-.6-4.7H12v8.9h5.8c-.3 1.5-1.2 2.8-2.5 3.7v3.1h4.1c2.4-2.2 3.8-5.5 3.8-9.2z"/>
+                        <path d="M12 23c3.3 0 6.1-1.1 8.1-3l-4.1-3.1c-1.1.8-2.5 1.2-4 1.2-3.1 0-5.7-2.1-6.6-5H1.3v3.2C3.3 20.4 7.3 23 12 23z"/>
+                        <path d="M5.4 13.1c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V5.9H1.3C.5 7.4 0 9.2 0 11s.5 3.6 1.3 5.1l4.1-3z"/>
+                        <path d="M12 4.6c1.7 0 3.2.6 4.4 1.8l3.3-3.3C18.1 1.2 15.3 0 12 0 7.3 0 3.3 2.6 1.3 5.9l4.1 3.2c.9-2.9 3.5-5 6.6-5z"/>
+                    </svg>
+                    Login dengan Google
+                </button>
+
+                {/* Tombol Beranda */}
+                <div className="mt-6">
+                    <button 
+                        onClick={() => window.location.href = 'index.html'}
+                        className="w-full py-3.5 bg-gradient-to-r from-slate-700 to-slate-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:shadow-slate-800/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                        <Icons.Home className="w-5 h-5" /> Kembali ke Beranda
+                    </button>
+                </div>
+                
+                <div className="mt-8 text-center">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest text-micro">by UPT Puskesmas Kampung Dalam</p>
+                </div>
+            </div>
+        </div>
+        {showLoadingOverlay && <LoadingOverlay />} 
+        <Toast notification={notification} />
+    </div>
+);
 
                 if (view === 'admin-dashboard') return <AdminDashboard 
                     currentUser={currentUser} 
@@ -4499,32 +4536,20 @@
                                                 </select>
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-sm font-semibold text-slate-600 mb-2 text-caption">Username</label>
-                                                    <input 
-                                                        className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-body"
-                                                        placeholder="user123" 
-                                                        value={editingUser ? editingUser.username : newUser.username} 
-                                                        onChange={e => editingUser 
-                                                            ? setEditingUser({...editingUser, username:e.target.value}) 
-                                                            : setNewUser({...newUser, username:e.target.value})} 
-                                                        required
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-semibold text-slate-600 mb-2 text-caption">Password</label>
-                                                    <input 
-                                                        className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-body"
-                                                        placeholder="***" 
-                                                        type="password"
-                                                        value={editingUser ? editingUser.password : newUser.password} 
-                                                        onChange={e => editingUser 
-                                                            ? setEditingUser({...editingUser, password:e.target.value}) 
-                                                            : setNewUser({...newUser, password:e.target.value})} 
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
+    <div>
+        <label className="block text-sm font-semibold text-slate-600 mb-2 text-caption">Email</label>
+        <input 
+            className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-body"
+            placeholder="user@example.com" 
+            value={editingUser ? editingUser.email : newUser.email} 
+            onChange={e => editingUser 
+                ? setEditingUser({...editingUser, email:e.target.value}) 
+                : setNewUser({...newUser, email:e.target.value})} 
+            required
+        />
+    </div>
+    {/* Hapus input password */}
+</div>
                                             <div className="flex gap-3">
                                                 {editingUser && (
                                                     <button 
