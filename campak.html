@@ -1525,7 +1525,7 @@ try {
                             value={data.kabupatenUnitPelapor} 
                             onChange={handleKabupatenUnitPelaporChange}
                         >
-                            <option value="">Pilih Kabupaten/Kota...</option>
+                            <option value="">Pilih...</option>
                             {DAFTAR_KABUPATEN.map(kab => (
                                 <option key={kab} value={kab}>{kab}</option>
                             ))}
@@ -1572,7 +1572,7 @@ try {
                     <div className="bg-gradient-to-r from-emerald-50 to-green-50 p-5 rounded-xl border border-emerald-200">
                         <h4 className="font-bold text-lg text-slate-800 mb-3 flex items-center gap-2">
                             <Icons.Search className="w-5 h-5 text-emerald-600" />
-                            Cari langsung {data.sumberLaporan}
+                            Cari {data.sumberLaporan}
                         </h4>
                         <p className="text-sm text-slate-500 mb-3">
                             Ketik nama {data.sumberLaporan.toLowerCase()} - akan otomatis mengisi kabupaten
@@ -1586,7 +1586,7 @@ try {
                                 type="text"
                                 value={searchTerm}
                                 onChange={handleSearchChange}
-                                placeholder={`Contoh: ${data.sumberLaporan === 'Puskesmas' ? 'Puskesmas Galing' : 'RS Santa Elizabeth'}...`}
+                                placeholder={`Cari`}
                                 className="w-full pl-12 pr-4 py-4 bg-white rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500 transition-all outline-none border border-emerald-200 text-body placeholder-slate-400 hover:border-emerald-300"
                             />
                             {searchTerm && (
@@ -1726,7 +1726,7 @@ try {
                     value={data.jenisKelamin} 
                     onChange={onChange}
                 >
-                    <option value="">Pilih jenis kelamin...</option>
+                    <option value="">Pilih...</option>
                     <option value="laki-laki">Laki-laki</option>
                     <option value="perempuan">Perempuan</option>
                 </Select>
@@ -1785,7 +1785,7 @@ try {
                         }}
                         className="w-full p-4 bg-slate-50 rounded-xl text-slate-800 font-medium appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none border border-slate-200 text-body hover:border-slate-300"
                     >
-                        <option value="">Pilih Kabupaten/Kota...</option>
+                        <option value="">Pilih...</option>
                         {DAFTAR_KABUPATEN.map(kab => (
                             <option key={kab} value={kab}>{kab}</option>
                         ))}
@@ -1802,7 +1802,7 @@ try {
                     onChange={handleKecamatanChange}
                     disabled={!data.kabupaten}
                 >
-                    <option value="">Pilih Kecamatan...</option>
+                    <option value="">Pilih...</option>
                     {data.kabupaten && DATA_WILAYAH_MAPPING[data.kabupaten] 
                         ? Object.keys(DATA_WILAYAH_MAPPING[data.kabupaten]).map(kec => (
                             <option key={kec} value={kec}>{kec}</option>
