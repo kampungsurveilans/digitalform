@@ -201,37 +201,562 @@ try {
     console.error("Error details:", e.code, e.message);
 }
 
-        const DATA_PUSKESMAS = [
-            "Puskesmas Alianyang", "Puskesmas Banjar Serasan", "Puskesmas Gang Sehat",
-            "Puskesmas Kampung Bali", "Puskesmas Kampung Bangka", "Puskesmas Kampung Dalam",
-            "Puskesmas Karya Mulia", "Puskesmas Khatulistiwa", "Puskesmas Kom. Yos Sudarso",
-            "Puskesmas Pal Lima", "Puskesmas Pal Tiga", "Puskesmas Parit Haji Husin II",
-            "Puskesmas Parit Mayor", "Puskesmas Perumnas I", "Puskesmas Perumnas II",
-            "Puskesmas Purnama", "Puskesmas Saigon", "Puskesmas Siantan Hilir",
-            "Puskesmas Siantan Hulu", "Puskesmas Siantan Tengah", "Puskesmas Tambelan Sampit",
-            "Puskesmas Tanjung Hulu", "Puskesmas Telaga Biru"
-        ];
+        const LAYANAN_BY_KABUPATEN = {
+    "Sambas": [
+        { nama: "Puskesmas Galing", jenis: "Puskesmas" },
+        { nama: "Puskesmas Matang Suri", jenis: "Puskesmas" },
+        { nama: "Puskesmas Paloh", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pemangkat", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pimpinan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sajad", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sajingan Besar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Salatiga", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sambas", jenis: "Puskesmas" },
+        { nama: "Puskesmas Satai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sebangkau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sebawi", jenis: "Puskesmas" },
+        { nama: "Puskesmas Segarau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sejangkung", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sekura", jenis: "Puskesmas" },
+        { nama: "Puskesmas Selakau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Selakau Timur", jenis: "Puskesmas" },
+        { nama: "Puskesmas Semberang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Semparuk", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sentebang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Simpang Empat", jenis: "Puskesmas" },
+        { nama: "Puskesmas Subah", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Baru", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Kelambu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tebas", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tekarang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Temajuk", jenis: "Puskesmas" },
+        { nama: "Puskesmas Terigas", jenis: "Puskesmas" },
+        { nama: "RS Santa Elizabeth", jenis: "Rumah Sakit" },
+        { nama: "RSUD Pemangkat", jenis: "Rumah Sakit" },
+        { nama: "RSUD Sambas", jenis: "Rumah Sakit" },
+        { nama: "RSUD Teluk Keramat", jenis: "Rumah Sakit" }
+    ],
+    "Bengkayang": [
+        { nama: "Puskesmas Bengkayang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Capkala", jenis: "Puskesmas" },
+        { nama: "Puskesmas Jagoi Babang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Ledo", jenis: "Puskesmas" },
+        { nama: "Puskesmas Lembah Bawang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Lumar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Monterado", jenis: "Puskesmas" },
+        { nama: "Puskesmas Samalantan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sanggau Ledo", jenis: "Puskesmas" },
+        { nama: "Puskesmas Seluas", jenis: "Puskesmas" },
+        { nama: "Puskesmas Siding", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Betung", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Duri", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Raya", jenis: "Puskesmas" },
+        { nama: "Puskesmas Suti Semarang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Teriak", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tujuh Belas", jenis: "Puskesmas" },
+        { nama: "RS Bethesda Serukam", jenis: "Rumah Sakit" },
+        { nama: "RSUD Drs. Jacobus Luna, M. Si Bengkayang", jenis: "Rumah Sakit" }
+    ],
+    "Landak": [
+        { nama: "Puskesmas Darit", jenis: "Puskesmas" },
+        { nama: "Puskesmas Jelimpo", jenis: "Puskesmas" },
+        { nama: "Puskesmas Karangan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kuala Behe", jenis: "Puskesmas" },
+        { nama: "Puskesmas Mandor", jenis: "Puskesmas" },
+        { nama: "Puskesmas Menjalin", jenis: "Puskesmas" },
+        { nama: "Puskesmas Meranti", jenis: "Puskesmas" },
+        { nama: "Puskesmas Ngabang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pahauman", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sebangki", jenis: "Puskesmas" },
+        { nama: "Puskesmas Semata", jenis: "Puskesmas" },
+        { nama: "Puskesmas Senakin", jenis: "Puskesmas" },
+        { nama: "Puskesmas Serimbu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sidas", jenis: "Puskesmas" },
+        { nama: "Puskesmas Simpang Tiga", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sompak", jenis: "Puskesmas" },
+        { nama: "RSUD Landak", jenis: "Rumah Sakit" }
+    ],
+    "Mempawah": [
+        { nama: "Puskesmas Anjungan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Antibar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Jungkat", jenis: "Puskesmas" },
+        { nama: "Puskesmas Mempawah", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sadaniang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Segedong", jenis: "Puskesmas" },
+        { nama: "Puskesmas Semudun", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Bakau Kecil", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Kunyit", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Pinyuh", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Purun Kecil", jenis: "Puskesmas" },
+        { nama: "Puskesmas Takong", jenis: "Puskesmas" },
+        { nama: "Puskesmas Toho", jenis: "Puskesmas" },
+        { nama: "Puskesmas Wajok Hulu", jenis: "Puskesmas" },
+        { nama: "RSUD dr. Rubini Mempawah", jenis: "Rumah Sakit" }
+    ],
+    "Sanggau": [
+        { nama: "Puskesmas Balai Karangan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Balai Sebut", jenis: "Puskesmas" },
+        { nama: "Puskesmas Batang Tarang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Beduwai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Belangin III", jenis: "Puskesmas" },
+        { nama: "Puskesmas Bonti", jenis: "Puskesmas" },
+        { nama: "Puskesmas Entikong", jenis: "Puskesmas" },
+        { nama: "Puskesmas Harapan Makmur", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kampung Kawat", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kedukul", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kembayan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Meliau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Noyan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pusat Damai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sanggau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sosok", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tanjung Sekayam", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tayan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Teraju", jenis: "Puskesmas" },
+        { nama: "RS Parindu", jenis: "Rumah Sakit" },
+        { nama: "RS Sentra Medika Sanggau", jenis: "Rumah Sakit" },
+        { nama: "RSUD M. Th. Djaman Sanggau", jenis: "Rumah Sakit" },
+        { nama: "RSUD Temenggung Gergaji", jenis: "Rumah Sakit" }
+    ],
+    "Ketapang": [
+        { nama: "Puskesmas Air Upas", jenis: "Puskesmas" },
+        { nama: "Puskesmas Balai Berkuak", jenis: "Puskesmas" },
+        { nama: "Puskesmas Hulu Sungai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kedondong", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kendawangan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kuala Satong", jenis: "Puskesmas" },
+        { nama: "Puskesmas Manis Mata", jenis: "Puskesmas" },
+        { nama: "Puskesmas Marau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Mulia Baru", jenis: "Puskesmas" },
+        { nama: "Puskesmas Nanga Tayap", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pemahan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pesaguan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Riam", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sandai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Simpang Dua", jenis: "Puskesmas" },
+        { nama: "Puskesmas ***** Bangun", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sukamulya", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Awan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Besar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Laur", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Melayu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tanjung Pura", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tuan Tuan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tumbang Titi", jenis: "Puskesmas" },
+        { nama: "RS Fatima Ketapang", jenis: "Rumah Sakit" },
+        { nama: "RSIA Permata Bunda Ketapang", jenis: "Rumah Sakit" },
+        { nama: "RSUD dr. Agoesdjam", jenis: "Rumah Sakit" }
+    ],
+    "Sintang": [
+        { nama: "Puskesmas Dara Juanti", jenis: "Puskesmas" },
+        { nama: "Puskesmas Dedai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Emparu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Jasa", jenis: "Puskesmas" },
+        { nama: "Puskesmas Jelimpau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kebong", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kemangai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Mensiku", jenis: "Puskesmas" },
+        { nama: "Puskesmas Merakai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Nanga Ketungau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Nanga Lebang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Nanga Mau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pandan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sekubang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Senaning", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sepauk", jenis: "Puskesmas" },
+        { nama: "Puskesmas Serangas", jenis: "Puskesmas" },
+        { nama: "Puskesmas Serawai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Durian", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tanjung Puri", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tebidah", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tempunak", jenis: "Puskesmas" },
+        { nama: "RS Anugrah Bunda Jaya", jenis: "Rumah Sakit" },
+        { nama: "RS Sayang Ibu Sintang", jenis: "Rumah Sakit" },
+        { nama: "RS Tk. IV 12.07.02 Sintang", jenis: "Rumah Sakit" },
+        { nama: "RSIA Bujang Dara", jenis: "Rumah Sakit" },
+        { nama: "RSUD Ade Muhammad Djoen Sintang", jenis: "Rumah Sakit" },
+        { nama: "RSUD Serawai", jenis: "Rumah Sakit" }
+    ],
+    "Kapuas Hulu": [
+        { nama: "Puskesmas Badau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Batang Lupar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Bika", jenis: "Puskesmas" },
+        { nama: "Puskesmas Boyan Tanjung", jenis: "Puskesmas" },
+        { nama: "Puskesmas Bunut Hilir", jenis: "Puskesmas" },
+        { nama: "Puskesmas Bunut Hulu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Embaloh Hilir", jenis: "Puskesmas" },
+        { nama: "Puskesmas Embaloh Hulu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Empanang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Hulu Gurung", jenis: "Puskesmas" },
+        { nama: "Puskesmas Jongkong", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kalis", jenis: "Puskesmas" },
+        { nama: "Puskesmas Mentebah", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pengkadan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Puring Kencana", jenis: "Puskesmas" },
+        { nama: "Puskesmas Putussibau Selatan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Putussibau Utara", jenis: "Puskesmas" },
+        { nama: "Puskesmas Seberuang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Selimbau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Semitau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Silat Hilir", jenis: "Puskesmas" },
+        { nama: "Puskesmas Silat Hulu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Suhaid", jenis: "Puskesmas" },
+        { nama: "RS Bergerak Badau Kapuas Hulu", jenis: "Rumah Sakit" },
+        { nama: "RSUD dr. Achmad Diponegoro Putussibau", jenis: "Rumah Sakit" },
+        { nama: "RSUD Semitau", jenis: "Rumah Sakit" }
+    ],
+    "Sekadau": [
+        { nama: "Puskesmas Balai Sepuak", jenis: "Puskesmas" },
+        { nama: "Puskesmas Bukit Rambat", jenis: "Puskesmas" },
+        { nama: "Puskesmas Nanga Belitang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Nanga Mahap", jenis: "Puskesmas" },
+        { nama: "Puskesmas Nanga Taman", jenis: "Puskesmas" },
+        { nama: "Puskesmas Rawak", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sebetung", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sekadau", jenis: "Puskesmas" },
+        { nama: "Puskesmas Selalong", jenis: "Puskesmas" },
+        { nama: "Puskesmas Simpang Empat Kayu Lapis", jenis: "Puskesmas" },
+        { nama: "Puskesmas SP III Trans", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Ayak", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tapang Perodah", jenis: "Puskesmas" },
+        { nama: "RSUD Sekadau", jenis: "Rumah Sakit" }
+    ],
+    "Melawi": [
+        { nama: "Puskesmas Ella Hilir", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kota Baru", jenis: "Puskesmas" },
+        { nama: "Puskesmas Manding", jenis: "Puskesmas" },
+        { nama: "Puskesmas Manggala", jenis: "Puskesmas" },
+        { nama: "Puskesmas Menukung", jenis: "Puskesmas" },
+        { nama: "Puskesmas Nanga Pinoh", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pemuar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sayan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sokan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tiong Keranjik", jenis: "Puskesmas" },
+        { nama: "Puskesmas Ulak Muid", jenis: "Puskesmas" },
+        { nama: "RS Citra Husada Nanga Pinoh", jenis: "Rumah Sakit" },
+        { nama: "RS Kasih Bunda Jaya Nanga Pinoh", jenis: "Rumah Sakit" },
+        { nama: "RSUD Belimbing", jenis: "Rumah Sakit" },
+        { nama: "RSUD Melawi", jenis: "Rumah Sakit" }
+    ],
+    "Kayong Utara": [
+        { nama: "Puskesmas Dusun Besar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Matan Jaya", jenis: "Puskesmas" },
+        { nama: "Puskesmas Padang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pelapis", jenis: "Puskesmas" },
+        { nama: "Puskesmas Siduk", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sukadana", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Paduan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tanjung Satai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Telaga Arum", jenis: "Puskesmas" },
+        { nama: "Puskesmas Teluk Batang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Teluk Melano", jenis: "Puskesmas" },
+        { nama: "RSUD Sultan Muhammad Jamaludin I", jenis: "Rumah Sakit" }
+    ],
+    "Kubu Raya": [
+        { nama: "Puskesmas Air Putih", jenis: "Puskesmas" },
+        { nama: "Puskesmas Batu Ampar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kakap", jenis: "Puskesmas" },
+        { nama: "Puskesmas Korpri", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kuala Mandor B", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kubu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Lingga", jenis: "Puskesmas" },
+        { nama: "Puskesmas Padang Tikar", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pal Sembilan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Parit Timur", jenis: "Puskesmas" },
+        { nama: "Puskesmas Punggur", jenis: "Puskesmas" },
+        { nama: "Puskesmas Rasau Jaya", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Ambawang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Asam", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Durian", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Kerawang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Radak", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Raya Dalam", jenis: "Puskesmas" },
+        { nama: "Puskesmas Sungai Rengas", jenis: "Puskesmas" },
+        { nama: "Puskesmas Teluk Pakedai", jenis: "Puskesmas" },
+        { nama: "Puskesmas Terentang", jenis: "Puskesmas" },
+        { nama: "RS Tk. II Kartika Husada Kesdam XII Tanjungpura", jenis: "Rumah Sakit" },
+        { nama: "RSAU dr. Mohammad Sutomo", jenis: "Rumah Sakit" },
+        { nama: "RSIA Anugrah", jenis: "Rumah Sakit" },
+        { nama: "RSUD Kubu Raya", jenis: "Rumah Sakit" }
+    ],
+    "Kota Pontianak": [
+        { nama: "Puskesmas Alianyang", jenis: "Puskesmas" },
+        { nama: "Puskesmas Banjar Serasan", jenis: "Puskesmas" },
+        { nama: "Puskesmas Gang Sehat", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kampung Bali", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kampung Bangka", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kampung Dalam", jenis: "Puskesmas" },
+        { nama: "Puskesmas Karya Mulia", jenis: "Puskesmas" },
+        { nama: "Puskesmas Khatulistiwa", jenis: "Puskesmas" },
+        { nama: "Puskesmas Kom. Yos Sudarso", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pal Lima", jenis: "Puskesmas" },
+        { nama: "Puskesmas Pal Tiga", jenis: "Puskesmas" },
+        { nama: "Puskesmas Parit Haji Husin II", jenis: "Puskesmas" },
+        { nama: "Puskesmas Parit Mayor", jenis: "Puskesmas" },
+        { nama: "Puskesmas Perumnas I", jenis: "Puskesmas" },
+        { nama: "Puskesmas Perumnas II", jenis: "Puskesmas" },
+        { nama: "Puskesmas Purnama", jenis: "Puskesmas" },
+        { nama: "Puskesmas Saigon", jenis: "Puskesmas" },
+        { nama: "Puskesmas Siantan Hilir", jenis: "Puskesmas" },
+        { nama: "Puskesmas Siantan Hulu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Siantan Tengah", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tambelan Sampit", jenis: "Puskesmas" },
+        { nama: "Puskesmas Tanjung Hulu", jenis: "Puskesmas" },
+        { nama: "Puskesmas Telaga Biru", jenis: "Puskesmas" },
+        { nama: "RS Anugerah Bunda Khatulistiwa", jenis: "Rumah Sakit" },
+        { nama: "RS Bersalin Jeumpa Pontianak", jenis: "Rumah Sakit" },
+        { nama: "RS Bhayangkara Tk. III Anton Soedjarwo Pontianak", jenis: "Rumah Sakit" },
+        { nama: "RS Islam Yarsi Pontianak", jenis: "Rumah Sakit" },
+        { nama: "RS Jiwa Daerah Sungai Bangkong", jenis: "Rumah Sakit" },
+        { nama: "RS Kharitas Bhakti", jenis: "Rumah Sakit" },
+        { nama: "RS Medika Djaya", jenis: "Rumah Sakit" },
+        { nama: "RS Mitra Medika Pontianak", jenis: "Rumah Sakit" },
+        { nama: "RS Pro Medika Pontianak", jenis: "Rumah Sakit" },
+        { nama: "RS St. Antonius", jenis: "Rumah Sakit" },
+        { nama: "RS Universitas Tanjungpura", jenis: "Rumah Sakit" },
+        { nama: "RSIA Nabasa", jenis: "Rumah Sakit" },
+        { nama: "RSUD dr. Soedarso", jenis: "Rumah Sakit" },
+        { nama: "RSUD Pontianak Utara", jenis: "Rumah Sakit" },
+        { nama: "RSUD Sultan Syarif Mohammad Alkadrie", jenis: "Rumah Sakit" }
+    ],
+    "Kota Singkawang": [
+        { nama: "Puskesmas Singkawang Barat I", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Barat II", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Selatan I", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Selatan II", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Tengah I", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Tengah II", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Timur I", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Timur II", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Utara I", jenis: "Puskesmas" },
+        { nama: "Puskesmas Singkawang Utara II", jenis: "Puskesmas" },
+        { nama: "RS Harapan Bersama", jenis: "Rumah Sakit" },
+        { nama: "RS Jiwa Provinsi Kalimantan Barat", jenis: "Rumah Sakit" },
+        { nama: "RS Kusta Alverno Singkawang", jenis: "Rumah Sakit" },
+        { nama: "RS Sa'adah", jenis: "Rumah Sakit" },
+        { nama: "RS Santo Vincentius", jenis: "Rumah Sakit" },
+        { nama: "RS Tk. IV 12.07.01 Singkawang", jenis: "Rumah Sakit" },
+        { nama: "RSIA Wempe Singkawang", jenis: "Rumah Sakit" },
+        { nama: "RSUD dr. Abdul Aziz", jenis: "Rumah Sakit" }
+    ]
+};
 
-        const DATA_RUMAH_SAKIT = [
-            "RS Anugerah Bunda Khatulistiwa", "RS Bersalin Jeumpa Pontianak",
-            "RS Bhayangkara Tk. III Anton Soedjarwo Pontianak", "RS Islam Yarsi Pontianak",
-            "RS Jiwa Daerah Sungai Bangkong", "RS Kharitas Bhakti", "RS Medika Djaya",
-            "RS Mitra Medika Pontianak", "RS Pro Medika Pontianak", "RS St. Antonius",
-            "RS Universitas Tanjungpura", "RSIA Nabasa", "RSUD dr. Soedarso",
-            "RSUD Pontianak Utara", "RSUD Sultan Syarif Mohammad Alkadrie"
-        ];
+        const DAFTAR_KABUPATEN = [
+    "Sambas", "Bengkayang", "Landak", "Mempawah", "Sanggau", 
+    "Ketapang", "Sintang", "Kapuas Hulu", "Sekadau", "Melawi",
+    "Kayong Utara", "Kubu Raya", "Kota Pontianak", "Kota Singkawang"
+];
 
         const DATA_WILAYAH_MAPPING = {
-            "Kecamatan Pontianak Kota": ["Darat sekip", "Mariana", "Sungai bangkong", "Sungai jawi", "Tengah"],
-            "Kecamatan Pontianak Timur": ["Dalam Bugis", "Parit Mayor", "Saigon", "Tanjung Hulu", "Tanjung Hilir", "Tambelan Sampit", "Banjar Serasan"],
-            "Kecamatan Pontianak Barat": ["Pal Lima", "Sungai Beliung", "Sungai Jawi Luar", "Sungai Jawi Dalam", "Kota Baru"],
-            "Kecamatan Pontianak Selatan": ["Akcaya", "Benua melayu Darat", "Benua melayu Laut", "Kotabaru", "Parit tokaya"],
-            "Kecamatan Pontianak Utara": ["Batulayang", "Siantan Hilir", "Siantan Hulu", "Siantan Tengah"],
-            "Kecamatan Pontianak Tenggara": ["Bangka Belitung Laut", "Bangka Belitung Darat", "Bansir Laut", "Bansir Darat"]
-        };
+    "Kota Pontianak": {
+        "Pontianak Barat": ["Pal Lima", "Sungai Beliung", "Sungai Jawi Dalam", "Sungai Jawi Luar"],
+        "Pontianak Kota": ["Darat Sekip", "Mariana", "Sungai Bangkong", "Sungai Jawi", "Tengah"],
+        "Pontianak Selatan": ["Akcaya", "Benua Melayu Darat", "Benua Melayu Laut", "Kota Baru", "Parit Tokaya"],
+        "Pontianak Tenggara": ["Bangka Belitung Darat", "Bangka Belitung Laut", "Bansir Darat", "Bansir Laut"],
+        "Pontianak Timur": ["Banjar Serasan", "Dalam Bugis", "Parit Mayor", "Saigon", "Tambelan Sampit", "Tanjung Hilir", "Tanjung Hulu"],
+        "Pontianak Utara": ["Batulayang", "Siantan Hilir", "Siantan Hulu", "Siantan Tengah"]
+    },
+    "Kota Singkawang": {
+        "Singkawang Barat": ["Kuala", "Pasiran", "Melayu", "Tengah"],
+        "Singkawang Selatan": ["Pangmilang", "Sagatani", "Sedau", "Sijangkung"],
+        "Singkawang Tengah": ["Bukit Batu", "Condong", "Jawa", "Roban", "Sekip Lama", "Sungai Wie"],
+        "Singkawang Timur": ["Bagak Sahwa", "Mayasopa", "Nyarumkop", "Pajintan", "Sanggau Kulor"],
+        "Singkawang Utara": ["Naram", "Semelagi Kecil", "Setapuk Besar", "Setapuk Kecil", "Sungai Bulan", "Sungai Garam Hilir", "Sungai Rasau"]
+    },
+    "Kubu Raya": {
+        "Batu Ampar": ["Ambarawa", "Batu Ampar", "Muara Tiga", "Nipah Panjang", "Padang Tikar I", "Padang Tikar II", "Sumber Agung", "Sungai Besar", "Sungai Jawi", "Sungai Kerawang", "Tasik Malaya", "Teluk Nibung", "Tanjung Harapan", "Medan Mas", "Sungai Krawang"],
+        "Kuala Mandor B": ["Kuala Mandor A", "Kuala Mandor B", "Kubu Padi", "Retok", "Sungai Enau"],
+        "Kubu": ["Air Putih", "Ambarawa", "Dabong", "Jangkang Dua", "Jangkang Satu", "Kampung Baru", "Kubu", "Mengkalang", "Mengkalang Jambu", "Olak-Olak Kubu", "Pelita Jaya", "Pinang Dalam", "Pinang Luar", "Sei Bemban", "Sepakat Baru", "Seruat Dua", "Seruat Tiga", "Sungai Selamat", "Sungai Terus", "Teluk Nangka"],
+        "Rasau Jaya": ["Bintang Mas", "Pematang Tujuh", "Rasau Jaya Dua", "Rasau Jaya Satu", "Rasau Jaya Tiga", "Rasau Jaya Umum"],
+        "Sungai Ambawang": ["Ampera Raya", "Bengkarek", "Durian", "Jawa Tengah", "Korek", "Lingga", "Mega Timur", "Pancaroba", "Pasak", "Pasak Piang", "Puguk", "Simpang Kanan", "Simpang Kiri", "Sungai Ambawang Kuala", "Sungai Malaya", "Teluk Bakung"],
+        "Sungai Kakap": ["Jeruju Besar", "Kalimas", "Pal Sembilan", "Punggur Besar", "Punggur Kapuas", "Punggur Kecil", "Sungai Belidak", "Sungai Itik", "Sungai Kakap", "Sungai Kupah", "Sungai Rengas", "Sepuk Laut", "Tanjung Saleh"],
+        "Sungai Raya": ["Arang Limbung", "Gunung Tamang", "Kapur", "Kuala Dua", "Limbung", "Madusari", "Mekar Baru", "Mekar Sari", "Parit Baru", "Pulau Limbung", "Sungai Ambangah", "Sungai Asam", "Sungai Bulan", "Sungai Raya", "Sungai Raya Dalam", "Tebang Kacang", "Teluk Kapuas"],
+        "Teluk Pakedai": ["Arus Deras", "Kuala Karang", "Madura", "Pasir Putih", "Selat Remis", "Seruat I", "Sungai Deras", "Sungai Nibung", "Tanjung Bunga", "Teluk Pakedai I", "Teluk Pakedai II", "Teluk Pakedai Hulu", "Sungai Nipah"],
+        "Terentang": ["Betuah", "Permata", "Radak Baru", "Radak Dua", "Radak Satu", "Sungai Dungun", "Sungai Radak", "Teluk Bayur", "Terentang Hilir", "Terentang Hulu"]
+    },
+    "Sambas": {
+        "Galing": [],
+        "Jawai": [],
+        "Jawai Selatan": [],
+        "Paloh": [],
+        "Pemangkat": [],
+        "Sajad": [],
+        "Sajingan Besar": [],
+        "Salatiga": [],
+        "Sambas": [],
+        "Sebawi": [],
+        "Sejangkung": [],
+        "Selakau": [],
+        "Selakau Timur": [],
+        "Semparuk": [],
+        "Subah": [],
+        "Tangaran": [],
+        "Tebas": [],
+        "Tekarang": [],
+        "Teluk Keramat": []
+    },
+    "Mempawah": {
+        "Anjongan": [],
+        "Mempawah Hilir": [],
+        "Mempawah Timur": [],
+        "Sadaniang": [],
+        "Segedong": [],
+        "Siantan": [],
+        "Sungai Kunyit": [],
+        "Sungai Pinyuh": [],
+        "Toho": []
+    },
+    "Sanggau": {
+        "Balai": [],
+        "Beduai": [],
+        "Bonti": [],
+        "Entikong": [],
+        "Jangkang": [],
+        "Kapuas": [],
+        "Kembayan": [],
+        "Meliau": [],
+        "Mukok": [],
+        "Noyan": [],
+        "Parindu": [],
+        "Sekayam": [],
+        "Tayan Hilir": [],
+        "Tayan Hulu": [],
+        "Toba": []
+    },
+    "Ketapang": {
+        "Air Upas": [],
+        "Benua Kayong": [],
+        "Delta Pawan": [],
+        "Hulu Sungai": [],
+        "Jelai Hulu": [],
+        "Kendawangan": [],
+        "Manis Mata": [],
+        "Marau": [],
+        "Matan Hilir Selatan": [],
+        "Matan Hilir Utara": [],
+        "Muara Pawan": [],
+        "Nanga Tayap": [],
+        "Pemahan": [],
+        "Sandai": [],
+        "Simpang Dua": [],
+        "Simpang Hulu": [],
+        "Singkup": [],
+        "Sungai Laur": [],
+        "Sungai Melayu Rayak": [],
+        "Tumbang Titi": []
+    },
+    "Sintang": {
+        "Ambalau": [],
+        "Binjai Hulu": [],
+        "Dedai": [],
+        "Kayan Hilir": [],
+        "Kayan Hulu": [],
+        "Kelam Permai": [],
+        "Ketungau Hilir": [],
+        "Ketungau Hulu": [],
+        "Ketungau Tengah": [],
+        "Sintang": [],
+        "Sepauk": [],
+        "Serawai": [],
+        "Sungai Tebelian": [],
+        "Tempunak": []
+    },
+    "Kapuas Hulu": {
+        "Badau": [],
+        "Batang Lupar": [],
+        "Bika": [],
+        "Boyan Tanjung": [],
+        "Bunut Hilir": [],
+        "Bunut Hulu": [],
+        "Embaloh Hilir": [],
+        "Embaloh Hulu": [],
+        "Empanang": [],
+        "Hulu Gurung": [],
+        "Jongkong": [],
+        "Kalis": [],
+        "Mentebah": [],
+        "Pengkadan": [],
+        "Puring Kencana": [],
+        "Putussibau Selatan": [],
+        "Putussibau Utara": [],
+        "Seberuang": [],
+        "Selimbau": [],
+        "Semitau": [],
+        "Silat Hilir": [],
+        "Silat Hulu": [],
+        "Suhaid": []
+    },
+    "Bengkayang": {
+        "Bengkayang": [],
+        "Capkala": [],
+        "Jagoi Babang": [],
+        "Ledo": [],
+        "Lembah Bawang": [],
+        "Lumar": [],
+        "Monterado": [],
+        "Samalantan": [],
+        "Sanggau Ledo": [],
+        "Seluas": [],
+        "Siding": [],
+        "Sungai Betung": [],
+        "Sungai Raya": [],
+        "Sungai Raya Kepulauan": [],
+        "Suti Semarang": [],
+        "Teriak": [],
+        "Tujuh Belas": []
+    },
+    "Landak": {
+        "Air Besar": [],
+        "Banyuke Hulu": [],
+        "Jelimpo": [],
+        "Kuala Behe": [],
+        "Mandor": [],
+        "Mempawah Hulu": [],
+        "Menjalin": [],
+        "Menyuke": [],
+        "Meranti": [],
+        "Ngabang": [],
+        "Sebangki": [],
+        "Sengah Temila": [],
+        "Sompak": []
+    },
+    "Sekadau": {
+        "Belitang": [],
+        "Belitang Hilir": [],
+        "Belitang Hulu": [],
+        "Nanga Mahap": [],
+        "Nanga Taman": [],
+        "Sekadau Hilir": [],
+        "Sekadau Hulu": []
+    },
+    "Melawi": {
+        "Belimbing": [],
+        "Belimbing Hulu": [],
+        "Ella Hilir": [],
+        "Menukung": [],
+        "Nanga Pinoh": [],
+        "Pinoh Selatan": [],
+        "Pinoh Utara": [],
+        "Sayan": [],
+        "Sokan": [],
+        "Tanah Pinoh": [],
+        "Tanah Pinoh Barat": []
+    },
+    "Kayong Utara": {
+        "Kepulauan Karimata": [],
+        "Pulau Maya": [],
+        "Seponti": [],
+        "Simpang Hilir": [],
+        "Sukadana": [],
+        "Teluk Batang": []
+    }
+};
 
         const DATA_KOMPLIKASI = ["Diare", "B. Pneumonia", "Kebutaan", "Otitis media", "Pneumonia", "Encephalitis", "Malnutrisi", "Ulkus mukasa mulut", "Lainnya"];
-        const ALL_SERVICES = [...DATA_PUSKESMAS, ...DATA_RUMAH_SAKIT].filter((value, index, self) => self.indexOf(value) === index);
+        const ALL_SERVICES = Object.values(LAYANAN_BY_KABUPATEN)
+    .flat()
+    .map(item => item.nama)
+    .filter((value, index, self) => self.indexOf(value) === index);
 
         const IconBase = ({ children, className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>);
         const Icons = {
@@ -270,7 +795,8 @@ try {
             Database: (p) => <IconBase {...p}><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></IconBase>,
             Home: (p) => <IconBase {...p}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></IconBase>,
             School: (p) => <IconBase {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></IconBase>,
-            Hourglass: (p) => <IconBase {...p}><path d="M5 22h14"/><path d="M5 2h14"/><path d="M12 2v20"/><path d="M12 8l4 4-4 4"/><path d="M8 12l-4 4 4 4"/></IconBase>
+            Hourglass: (p) => <IconBase {...p}><path d="M5 22h14"/><path d="M5 2h14"/><path d="M12 2v20"/><path d="M12 8l4 4-4 4"/><path d="M8 12l-4 4 4 4"/></IconBase>,
+            X: (p) => <IconBase {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></IconBase>
         };
 
         const mockUserDB = {
@@ -380,6 +906,87 @@ try {
                 const snap = await dbStore.collection('forms').where('statusData', 'in', statuses).get(); 
                 return snap.docs.map(d => d.data()).sort((a, b) => b.updatedAt - a.updatedAt); 
             }
+        };
+        
+        // PERBAIKAN POINT 3: Fungsi untuk menghitung usia dalam format tahun bulan hari
+        const calculateAge = (tanggalLahir) => {
+            if (!tanggalLahir) return '';
+            try {
+                const birthDate = new Date(tanggalLahir);
+                const today = new Date();
+                
+                let years = today.getFullYear() - birthDate.getFullYear();
+                let months = today.getMonth() - birthDate.getMonth();
+                let days = today.getDate() - birthDate.getDate();
+                
+                if (days < 0) {
+                    months--;
+                    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                    days += lastMonth.getDate();
+                }
+                
+                if (months < 0) {
+                    years--;
+                    months += 12;
+                }
+                
+                return `${years} tahun ${months} bulan ${days} hari`;
+            } catch (e) {
+                return '';
+            }
+        };
+        
+        // Fungsi untuk menentukan current owner dengan logika yang benar
+        const determineCurrentOwner = (formData) => {
+            if (formData.currentOwner && formData.currentOwner !== '') {
+                return formData.currentOwner;
+            }
+            
+            if (formData.transferHistory && formData.transferHistory.length > 0) {
+                const successfulTransfers = formData.transferHistory.filter(
+                    record => record.action === 'diterima' || record.action === 'dikirim'
+                );
+                
+                if (successfulTransfers.length > 0) {
+                    const lastTransfer = successfulTransfers[successfulTransfers.length - 1];
+                    
+                    if (lastTransfer.newOwner) {
+                        return lastTransfer.newOwner;
+                    }
+                    
+                    if (lastTransfer.action === 'dikirim') {
+                        return lastTransfer.from;
+                    }
+                    
+                    if (lastTransfer.action === 'diterima') {
+                        return lastTransfer.to;
+                    }
+                }
+            }
+            
+            if (formData.statusData === 'Final' || formData.statusData === 'Baru' || formData.statusData === 'Draft') {
+                return formData.createdUnit;
+            }
+            
+            if (formData.statusData === 'Pending') {
+                return formData.currentOwner || formData.createdUnit;
+            }
+            
+            if (formData.statusData === 'Proses') {
+                return formData.createdUnit;
+            }
+            
+            if (formData.statusData === 'Ditolak') {
+                if (formData.transferHistory && formData.transferHistory.length > 0) {
+                    const sendRecords = formData.transferHistory.filter(r => r.action === 'dikirim');
+                    if (sendRecords.length > 0) {
+                        return sendRecords[sendRecords.length - 1].from;
+                    }
+                }
+                return formData.createdUnit;
+            }
+            
+            return formData.createdUnit;
         };
 
         // PERBAIKAN POINT 6: Export CSV dengan SEMUA kontak erat (maksimal 30)
@@ -555,7 +1162,7 @@ try {
             originalUnit: '', currentOwner: '', transferHistory: [], nomorEPID: '', kasusKLB: '', 
             klbKe: '', nomorKLB: '', sumberLaporan: '', sumberLainnya: '', namaUnitPelapor: '',
             tanggalTerimaLaporan: '', tanggalPelacakan: '', namaKasus: '', jenisKelamin: '', 
-            tanggalLahir: '', alamat: '', provinsi: 'Kalimantan Barat', kabupaten: 'Kota Pontianak', 
+            tanggalLahir: '', alamat: '', provinsi: 'Kalimantan Barat', kabupaten: '', 
             kecamatan: '', kelurahan: '', rw: '', rt: '', namaOrangtua: '', noKontakOrangtua: '',
             demam: '', tanggalMulaiDemam: '', ruam: '', tanggalMulaiRuam: '', 
             
@@ -595,33 +1202,7 @@ try {
             kontakErat: []
         };
 
-        // PERBAIKAN POINT 3: Fungsi untuk menghitung usia dalam format tahun bulan hari
-        const calculateAge = (tanggalLahir) => {
-            if (!tanggalLahir) return '';
-            try {
-                const birthDate = new Date(tanggalLahir);
-                const today = new Date();
-                
-                let years = today.getFullYear() - birthDate.getFullYear();
-                let months = today.getMonth() - birthDate.getMonth();
-                let days = today.getDate() - birthDate.getDate();
-                
-                if (days < 0) {
-                    months--;
-                    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                    days += lastMonth.getDate();
-                }
-                
-                if (months < 0) {
-                    years--;
-                    months += 12;
-                }
-                
-                return `${years} tahun ${months} bulan ${days} hari`;
-            } catch (e) {
-                return '';
-            }
-        };
+        
 
         let lastEPIDNumber = 0;
 
@@ -630,58 +1211,7 @@ try {
             return { valid: true, message: '' };
         };
 
-        // Fungsi untuk menentukan current owner dengan logika yang benar
-        const determineCurrentOwner = (formData) => {
-            if (formData.currentOwner && formData.currentOwner !== '') {
-                return formData.currentOwner;
-            }
-            
-            if (formData.transferHistory && formData.transferHistory.length > 0) {
-                const successfulTransfers = formData.transferHistory.filter(
-                    record => record.action === 'diterima' || record.action === 'dikirim'
-                );
-                
-                if (successfulTransfers.length > 0) {
-                    const lastTransfer = successfulTransfers[successfulTransfers.length - 1];
-                    
-                    if (lastTransfer.newOwner) {
-                        return lastTransfer.newOwner;
-                    }
-                    
-                    if (lastTransfer.action === 'dikirim') {
-                        return lastTransfer.from;
-                    }
-                    
-                    if (lastTransfer.action === 'diterima') {
-                        return lastTransfer.to;
-                    }
-                }
-            }
-            
-            if (formData.statusData === 'Final' || formData.statusData === 'Baru' || formData.statusData === 'Draft') {
-                return formData.createdUnit;
-            }
-            
-            if (formData.statusData === 'Pending') {
-                return formData.currentOwner || formData.createdUnit;
-            }
-            
-            if (formData.statusData === 'Proses') {
-                return formData.createdUnit;
-            }
-            
-            if (formData.statusData === 'Ditolak') {
-                if (formData.transferHistory && formData.transferHistory.length > 0) {
-                    const sendRecords = formData.transferHistory.filter(r => r.action === 'dikirim');
-                    if (sendRecords.length > 0) {
-                        return sendRecords[sendRecords.length - 1].from;
-                    }
-                }
-                return formData.createdUnit;
-            }
-            
-            return formData.createdUnit;
-        };
+        
 
         const createTransferRecord = (action, fromUnit, toUnit, newOwner = null) => {
             const record = {
@@ -822,158 +1352,505 @@ try {
 
         // Step1 dengan input manual untuk nomor EPID
         const Step1 = ({ data, onChange, onSumberChange, Icons }) => {
-            return (
-                <div className="animate-fadeIn">
-                    <div className="mb-8">
-                        <Label>Nomor EPID</Label>
-                        <input
-                            type="text"
-                            name="nomorEPID"
-                            value={data.nomorEPID}
-                            onChange={onChange}
-                            placeholder="Masukkan nomor EPID"
-                            className="w-full p-4 bg-slate-50 rounded-xl text-slate-800 font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 focus:shadow-sm transition-all outline-none border border-slate-200 text-body placeholder-slate-400 hover:border-slate-300"
-                        />
-                        <p className="text-sm text-slate-500 mt-2">Nomor EPID disesuaikan dengan ketentuan</p>
-                    </div>
-                    
-                    <div className="mb-8">
-                        <Label>Apakah kasus KLB?</Label>
-                        <RadioGroup name="kasusKLB" options={['ya', 'tidak']} value={data.kasusKLB} onChange={onChange} />
-                    </div>
-                    
-                    {data.kasusKLB === 'ya' && (
-                        <div className="bg-orange-50 p-5 rounded-xl border border-orange-100 mb-6 animate-fadeIn">
-                            <p className="text-sm font-semibold text-orange-700 mb-3">Detail KLB</p>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="KLB Ke-" name="klbKe" value={data.klbKe} onChange={onChange} className="mb-0" />
-                                <Input label="Nomor KLB" name="nomorKLB" value={data.nomorKLB} onChange={onChange} className="mb-0" />
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="mb-6">
-                        <Label>Sumber Laporan</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
-                            {['Puskesmas', 'Rumah Sakit', 'Bidan', 'Klinik Swasta', 'Lainnya'].map(src => (
-                                <label key={src} className={`p-4 rounded-lg cursor-pointer text-center border transition-all text-sm font-medium ${data.sumberLaporan === src ? 'bg-slate-800 text-white border-slate-800 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}>
-                                    <input type="radio" name="sumberLaporan" value={src} checked={data.sumberLaporan === src} onChange={onSumberChange} className="hidden" />
-                                    <span>{src}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-
-                    {data.sumberLaporan === 'Puskesmas' && (
-                        <Select label="Pilih Puskesmas" name="namaUnitPelapor" value={data.namaUnitPelapor} onChange={onChange}>
-                            <option value="">Pilih Puskesmas...</option>
-                            {DATA_PUSKESMAS.map(p=><option key={p} value={p}>{p}</option>)}
-                        </Select>
-                    )}
-                    {data.sumberLaporan === 'Rumah Sakit' && (
-                        <Select label="Pilih Rumah Sakit" name="namaUnitPelapor" value={data.namaUnitPelapor} onChange={onChange}>
-                            <option value="">Pilih Rumah Sakit...</option>
-                            {DATA_RUMAH_SAKIT.map(p=><option key={p} value={p}>{p}</option>)}
-                        </Select>
-                    )}
-                    {['Lainnya', 'Bidan', 'Klinik Swasta'].includes(data.sumberLaporan) && (
-                        <Input label="Nama Unit Pelapor" name="namaUnitPelapor" value={data.namaUnitPelapor} onChange={onChange} />
-                    )}
-
-                    <div className="grid grid-cols-2 gap-4 mt-6">
-                        <Input label="Tanggal Terima Laporan" type="date" name="tanggalTerimaLaporan" value={data.tanggalTerimaLaporan} onChange={onChange} />
-                        <Input label="Tanggal Pelacakan Kasus" type="date" name="tanggalPelacakan" value={data.tanggalPelacakan} onChange={onChange} />
+    // State untuk pencarian
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [showSearchResults, setShowSearchResults] = useState(false);
+    
+    // Fungsi untuk mencari di SEMUA layanan (tanpa filter kabupaten)
+    const searchAllLayanan = (term) => {
+    if (!term.trim()) {
+        setSearchResults([]);
+        return;
+    }
+    
+    const lowerTerm = term.toLowerCase();
+    const results = [];
+    
+    // Cari di semua kabupaten
+    for (const [kabupaten, layananList] of Object.entries(LAYANAN_BY_KABUPATEN)) {
+        const filtered = layananList.filter(item => {
+            // Filter berdasarkan jenis layanan sesuai sumber laporan
+            // Pastikan data.sumberLaporan ada
+            if (data.sumberLaporan) {
+                if (data.sumberLaporan === 'Puskesmas' && item.jenis !== 'Puskesmas') return false;
+                if (data.sumberLaporan === 'Rumah Sakit' && item.jenis !== 'Rumah Sakit') return false;
+            }
+            
+            // Cari berdasarkan nama
+            return item.nama.toLowerCase().includes(lowerTerm);
+        });
+        
+        // Tambahkan dengan informasi kabupaten
+        results.push(...filtered.map(item => ({
+            ...item,
+            kabupaten: kabupaten
+        })));
+    }
+    
+    setSearchResults(results);
+};
+    
+    // Fungsi untuk menangani pencarian
+    const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    if (value.trim()) {
+        try {
+            searchAllLayanan(value);
+            setShowSearchResults(true);
+        } catch (error) {
+            console.error("Search error:", error);
+            setSearchResults([]);
+            setShowSearchResults(false);
+        }
+    } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
+        // Hanya reset pencarian, tidak reset pilihan yang sudah ada
+    }
+};
+    
+    // Fungsi untuk memilih hasil pencarian
+    const handleSelectLayanan = (layanan) => {
+        onChange({ target: { name: 'namaUnitPelapor', value: layanan.nama } });
+        onChange({ target: { name: 'kabupatenUnitPelapor', value: layanan.kabupaten } });
+        setSearchTerm(layanan.nama);
+        setShowSearchResults(false);
+    };
+    
+    // Filter layanan berdasarkan kabupaten yang dipilih (untuk dropdown)
+    const layananByKabupaten = data.kabupatenUnitPelapor 
+        ? LAYANAN_BY_KABUPATEN[data.kabupatenUnitPelapor] || []
+        : [];
+    
+    const filteredLayanan = (data.sumberLaporan === 'Puskesmas' || data.sumberLaporan === 'Rumah Sakit')
+        ? layananByKabupaten.filter(item => {
+            if (data.sumberLaporan === 'Puskesmas' && item.jenis !== 'Puskesmas') return false;
+            if (data.sumberLaporan === 'Rumah Sakit' && item.jenis !== 'Rumah Sakit') return false;
+            return true;
+        })
+        : [];
+    
+    // Fungsi untuk reset pencarian saja (tidak reset data yang sudah dipilih)
+    const resetSearch = () => {
+        setSearchTerm('');
+        setSearchResults([]);
+        setShowSearchResults(false);
+    };
+    
+    // Fungsi untuk reset pilihan layanan
+    const resetPilihanLayanan = () => {
+        onChange({ target: { name: 'namaUnitPelapor', value: '' } });
+        onChange({ target: { name: 'kabupatenUnitPelapor', value: '' } });
+        resetSearch();
+    };
+    
+    // Fungsi untuk menangani perubahan kabupaten
+    const handleKabupatenUnitPelaporChange = (e) => {
+        const kabupaten = e.target.value;
+        onChange({ target: { name: 'kabupatenUnitPelapor', value: kabupaten } });
+        onChange({ target: { name: 'namaUnitPelapor', value: '' } });
+        resetSearch();
+    };
+    
+    // Fungsi untuk menangani perubahan dropdown layanan
+    const handleNamaUnitPelaporChange = (e) => {
+        const namaLayanan = e.target.value;
+        onChange({ target: { name: 'namaUnitPelapor', value: namaLayanan } });
+        
+        // Jika memilih layanan dari dropdown, update searchTerm untuk konsistensi
+        if (namaLayanan) {
+            setSearchTerm(namaLayanan);
+        }
+    };
+    
+    return (
+        <div className="animate-fadeIn">
+            <div className="mb-8">
+                <Label>Nomor EPID</Label>
+                <input
+                    type="text"
+                    name="nomorEPID"
+                    value={data.nomorEPID}
+                    onChange={onChange}
+                    placeholder="Masukkan nomor EPID"
+                    className="w-full p-4 bg-slate-50 rounded-xl text-slate-800 font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 focus:shadow-sm transition-all outline-none border border-slate-200 text-body placeholder-slate-400 hover:border-slate-300"
+                />
+                <p className="text-sm text-slate-500 mt-2">Nomor EPID disesuaikan dengan ketentuan</p>
+            </div>
+            
+            <div className="mb-8">
+                <Label>Apakah kasus KLB?</Label>
+                <RadioGroup name="kasusKLB" options={['ya', 'tidak']} value={data.kasusKLB} onChange={onChange} />
+            </div>
+            
+            {data.kasusKLB === 'ya' && (
+                <div className="bg-orange-50 p-5 rounded-xl border border-orange-100 mb-6 animate-fadeIn">
+                    <p className="text-sm font-semibold text-orange-700 mb-3">Detail KLB</p>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="KLB Ke-" name="klbKe" value={data.klbKe} onChange={onChange} className="mb-0" />
+                        <Input label="Nomor KLB" name="nomorKLB" value={data.nomorKLB} onChange={onChange} className="mb-0" />
                     </div>
                 </div>
-            );
-        };
+            )}
 
-        // PERBAIKAN POINT 1, 2, 3: Step2 dengan Provinsi, Kabupaten readonly dan usia detail
-        const Step2 = ({ data, onChange, onChangeKecamatan, Icons }) => {
-            // PERBAIKAN POINT 3: Hitung usia detail
-            const ageString = calculateAge(data.tanggalLahir);
-            
-            return (
-                <div className="animate-fadeIn">
-                    <Input label="Nama Lengkap Pasien" name="namaKasus" value={data.namaKasus} onChange={onChange} placeholder="Masukkan nama lengkap" uppercase={true} />
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        <Select label="Jenis Kelamin" name="jenisKelamin" value={data.jenisKelamin} onChange={onChange}>
-                            <option value="">jenis kelamin...</option>
-                            <option value="laki-laki">Laki-laki</option>
-                            <option value="perempuan">Perempuan</option>
+            <div className="mb-6">
+                <Label>Sumber Laporan</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                    {['Puskesmas', 'Rumah Sakit', 'Bidan', 'Klinik Swasta', 'Lainnya'].map(src => (
+                        <label key={src} className={`p-4 rounded-lg cursor-pointer text-center border transition-all text-sm font-medium ${data.sumberLaporan === src ? 'bg-slate-800 text-white border-slate-800 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}>
+                            <input type="radio" name="sumberLaporan" value={src} checked={data.sumberLaporan === src} onChange={onSumberChange} className="hidden" />
+                            <span>{src}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+
+            {/* PERBAIKAN: Dua cara memilih layanan */}
+            {(data.sumberLaporan === 'Puskesmas' || data.sumberLaporan === 'Rumah Sakit') ? (
+                <div className="space-y-6">
+                    {/* SOLUSI 1: Pilih berdasarkan Kabupaten */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200">
+                        <h4 className="font-bold text-lg text-slate-800 mb-3 flex items-center gap-2">
+                            <Icons.MapPin className="w-5 h-5 text-blue-600" />
+                            Pilih berdasarkan Kabupaten
+                        </h4>
+                        
+                        {/* Pilih Kabupaten */}
+                        <Select 
+                            label="Pilih Kabupaten/Kota" 
+                            name="kabupatenUnitPelapor" 
+                            value={data.kabupatenUnitPelapor} 
+                            onChange={handleKabupatenUnitPelaporChange}
+                        >
+                            <option value="">Pilih Kabupaten/Kota...</option>
+                            {DAFTAR_KABUPATEN.map(kab => (
+                                <option key={kab} value={kab}>{kab}</option>
+                            ))}
                         </Select>
-                        <div>
-                            <Input label="Tanggal Lahir" type="date" name="tanggalLahir" value={data.tanggalLahir} onChange={onChange} />
-                            {data.tanggalLahir && (
-                                <p className="text-sm text-slate-500 mt-1 ml-1">
-                                    Usia: <span className="font-semibold">{ageString}</span>
-                                </p>
+                        
+                        {/* Pilih Layanan setelah memilih kabupaten */}
+                        {data.kabupatenUnitPelapor && (
+                            <div className="mt-4">
+                                <div className="flex justify-between items-center mb-2">
+                                    <Label>Pilih {data.sumberLaporan} di {data.kabupatenUnitPelapor}</Label>
+                                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                                        {filteredLayanan.length} tersedia
+                                    </span>
+                                </div>
+                                <select
+                                    name="namaUnitPelapor"
+                                    value={data.namaUnitPelapor}
+                                    onChange={handleNamaUnitPelaporChange}
+                                    className="w-full p-4 bg-white rounded-xl text-slate-800 font-medium appearance-none focus:ring-2 focus:ring-blue-500 transition-all outline-none border border-blue-200 text-body hover:border-blue-300"
+                                >
+                                    <option value="">Pilih {data.sumberLaporan}...</option>
+                                    {filteredLayanan.map(layanan => (
+                                        <option key={layanan.nama} value={layanan.nama}>
+                                            {layanan.nama}
+                                        </option>
+                                    ))}
+                                </select>
+                                {data.namaUnitPelapor && (
+                                    <div className="mt-2 flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={() => onChange({ target: { name: 'namaUnitPelapor', value: '' } })}
+                                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                            Hapus pilihan
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* SOLUSI 2: Pencarian langsung (MENCARI SEMUA DATA) */}
+                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 p-5 rounded-xl border border-emerald-200">
+                        <h4 className="font-bold text-lg text-slate-800 mb-3 flex items-center gap-2">
+                            <Icons.Search className="w-5 h-5 text-emerald-600" />
+                            Cari langsung {data.sumberLaporan}
+                        </h4>
+                        <p className="text-sm text-slate-500 mb-3">
+                            Ketik nama {data.sumberLaporan.toLowerCase()} - akan otomatis mengisi kabupaten
+                        </p>
+                        
+                        <div className="relative">
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400">
+                                <Icons.Search className="w-5 h-5" />
+                            </div>
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                placeholder={`Contoh: ${data.sumberLaporan === 'Puskesmas' ? 'Puskesmas Galing' : 'RS Santa Elizabeth'}...`}
+                                className="w-full pl-12 pr-4 py-4 bg-white rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500 transition-all outline-none border border-emerald-200 text-body placeholder-slate-400 hover:border-emerald-300"
+                            />
+                            {searchTerm && (
+                                <button
+                                    type="button"
+                                    onClick={resetSearch}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                >
+                                    <Icons.X className="w-5 h-5" />
+                                </button>
                             )}
                         </div>
+                        
+                        {/* Hasil pencarian - MENCARI DI SEMUA LAYANAN */}
+                        {showSearchResults && searchTerm && (
+    <div className="mt-3 border border-emerald-200 rounded-lg overflow-hidden max-h-60 overflow-y-auto bg-white shadow-sm">
+        {searchResults.length > 0 ? (
+            <div className="divide-y divide-emerald-50">
+                {searchResults.slice(0, 20).map((layanan, index) => ( // Batasi hasil untuk performa
+                    <div
+                        key={`${layanan.nama}-${index}-${layanan.kabupaten}`} // Pastikan key unik
+                        className={`p-3 cursor-pointer hover:bg-emerald-50 transition ${data.namaUnitPelapor === layanan.nama ? 'bg-emerald-100' : ''}`}
+                        onClick={() => handleSelectLayanan(layanan)}
+                    >
+                        <div className="font-medium text-slate-800">{layanan.nama}</div>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            <span className={`px-2 py-0.5 rounded text-xs ${layanan.jenis === 'Puskesmas' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
+                                {layanan.jenis}
+                            </span>
+                            <span className="text-xs text-slate-500">•</span>
+                            <span className="text-xs text-slate-600 font-medium">
+                                Kabupaten: <span className="text-emerald-700">{layanan.kabupaten}</span>
+                            </span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        ) : (
+            <div className="p-4 text-center text-slate-400">
+                <Icons.Search className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                <p>Tidak ditemukan {data.sumberLaporan} dengan nama "{searchTerm}"</p>
+                <p className="text-xs mt-1">Coba gunakan kata kunci yang lebih spesifik</p>
+            </div>
+        )}
+    </div>
+)}
                     </div>
                     
-                    <Input label="Alamat Lengkap" as="textarea" name="alamat" value={data.alamat} onChange={onChange} placeholder="Jl. Nama Jalan, Nomor, RT/RW" />
-                    
-                    {/* PERBAIKAN POINT 1 & 2: Field Provinsi dan Kabupaten readonly */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="mb-4">
-                            <Label>Provinsi</Label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value="Kalimantan Barat"
-                                    readOnly
-                                    className="w-full p-4 bg-slate-100 rounded-xl text-slate-800 font-medium border border-slate-200 text-body cursor-not-allowed"
-                                />
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                                    <Icons.Lock className="w-4 h-4" />
+                    {/* Status pilihan saat ini */}
+                    {(data.namaUnitPelapor && data.kabupatenUnitPelapor) && (
+                        <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                            <h4 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                <Icons.CheckCircle className="w-5 h-5 text-green-600" />
+                                {data.sumberLaporan} Terpilih
+                            </h4>
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <p className="font-bold text-lg text-slate-800">{data.namaUnitPelapor}</p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <span className="px-2 py-1 bg-slate-200 text-slate-700 text-xs rounded font-medium">
+                                            Kabupaten: {data.kabupatenUnitPelapor}
+                                        </span>
+                                        <span className={`px-2 py-1 text-xs rounded font-medium ${data.sumberLaporan === 'Puskesmas' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
+                                            {data.sumberLaporan}
+                                        </span>
+                                    </div>
                                 </div>
+                                <button
+                                    type="button"
+                                    onClick={resetPilihanLayanan}
+                                    className="text-sm text-slate-600 hover:text-red-600 font-medium px-3 py-2 bg-white rounded-lg border border-slate-200 hover:border-red-200 transition"
+                                >
+                                    Ganti
+                                </button>
                             </div>
                         </div>
-                        <div className="mb-4">
-                            <Label>Kabupaten</Label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value="Kota Pontianak"
-                                    readOnly
-                                    className="w-full p-4 bg-slate-100 rounded-xl text-slate-800 font-medium border border-slate-200 text-body cursor-not-allowed"
-                                />
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                                    <Icons.Lock className="w-4 h-4" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    )}
                     
-                    <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 mb-6">
-                        <Label>Wilayah Administrasi</Label>
-                        <div className="space-y-4 mt-3">
-                            <Select label="Kecamatan" name="kecamatan" value={data.kecamatan} onChange={onChangeKecamatan}>
-                                <option value="">Pilih...</option>
-                                {Object.keys(DATA_WILAYAH_MAPPING).map(k=>
-                                    <option key={k} value={k}>{k}</option>
-                                )}
-                            </Select>
-                            <Select label="Kelurahan" name="kelurahan" value={data.kelurahan} onChange={onChange} disabled={!data.kecamatan}>
-                                <option value="">Pilih Kelurahan...</option>
-                                {data.kecamatan && DATA_WILAYAH_MAPPING[data.kecamatan]?.map(k=>
-                                    <option key={k} value={k}>{k}</option>
-                                )}
-                            </Select>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="RT" name="rt" value={data.rt} onChange={onChange} />
-                                <Input label="RW" name="rw" value={data.rw} onChange={onChange} />
-                            </div>
-                        </div>
+                    {/* Informasi bahwa keduanya terhubung */}
+                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                        <p className="text-sm text-slate-600">
+                            <span className="font-bold">Catatan:</span> Kedua metode di atas saling terhubung. 
+                            Pilihan dari satu metode akan terlihat di metode lainnya.
+                        </p>
                     </div>
-
-                    <Input label="Nama Orangtua / Wali" name="namaOrangtua" value={data.namaOrangtua} onChange={onChange} placeholder="Nama lengkap orangtua" uppercase={true} />
-                    <Input label="Nomor Kontak (HP/WA)" name="noKontakOrangtua" value={data.noKontakOrangtua} onChange={onChange} placeholder="0812XXXXXX" />
                 </div>
-            );
-        };
+            ) : ['Lainnya', 'Bidan', 'Klinik Swasta'].includes(data.sumberLaporan) ? (
+                <Input label="Nama Unit Pelapor" name="namaUnitPelapor" value={data.namaUnitPelapor} onChange={onChange} />
+            ) : null}
+
+            <div className="grid grid-cols-2 gap-4 mt-6">
+                <Input label="Tanggal Terima Laporan" type="date" name="tanggalTerimaLaporan" value={data.tanggalTerimaLaporan} onChange={onChange} />
+                <Input label="Tanggal Pelacakan Kasus" type="date" name="tanggalPelacakan" value={data.tanggalPelacakan} onChange={onChange} />
+            </div>
+        </div>
+    );
+};
+
+       // PERBAIKAN POINT 1, 2, 3: Step2 dengan Provinsi, Kabupaten readonly dan usia detail
+        const Step2 = ({ data, onChange, Icons }) => {
+    // PERBAIKAN POINT 3: Hitung usia detail
+    const ageString = calculateAge(data.tanggalLahir);
+    
+    // PERBAIKAN: Fungsi untuk menangani perubahan kecamatan
+    const handleKecamatanChange = (e) => {
+        const v = e.target.value;
+        onChange({ target: { name: 'kecamatan', value: v } });
+        // Reset kelurahan ketika kecamatan berubah
+        onChange({ target: { name: 'kelurahan', value: '' } });
+    };
+    
+    // Fungsi untuk mendapatkan daftar kelurahan berdasarkan kecamatan
+    const getKelurahanOptions = () => {
+        if (!data.kabupaten || !data.kecamatan) return [];
+        
+        const kabupatenData = DATA_WILAYAH_MAPPING[data.kabupaten];
+        if (!kabupatenData) return [];
+        
+        return kabupatenData[data.kecamatan] || [];
+    };
+    
+    return (
+        <div className="animate-fadeIn">
+            <Input 
+                label="Nama Lengkap Pasien" 
+                name="namaKasus" 
+                value={data.namaKasus} 
+                onChange={onChange} 
+                placeholder="Masukkan nama lengkap" 
+                uppercase={true} 
+            />
+            
+            <div className="grid grid-cols-2 gap-4">
+                <Select 
+                    label="Jenis Kelamin" 
+                    name="jenisKelamin" 
+                    value={data.jenisKelamin} 
+                    onChange={onChange}
+                >
+                    <option value="">Pilih jenis kelamin...</option>
+                    <option value="laki-laki">Laki-laki</option>
+                    <option value="perempuan">Perempuan</option>
+                </Select>
+                <div>
+                    <Input 
+                        label="Tanggal Lahir" 
+                        type="date" 
+                        name="tanggalLahir" 
+                        value={data.tanggalLahir} 
+                        onChange={onChange} 
+                    />
+                    {data.tanggalLahir && (
+                        <p className="text-sm text-slate-500 mt-1 ml-1">
+                            Usia: <span className="font-semibold">{ageString}</span>
+                        </p>
+                    )}
+                </div>
+            </div>
+            
+            <Input 
+                label="Alamat Lengkap" 
+                as="textarea" 
+                name="alamat" 
+                value={data.alamat} 
+                onChange={onChange} 
+                placeholder="Jl. Nama Jalan, Nomor, RT/RW" 
+            />
+            
+            {/* PERBAIKAN POINT 1 & 2: Field Provinsi dan Kabupaten */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="mb-4">
+                    <Label>Provinsi</Label>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value="Kalimantan Barat"
+                            readOnly
+                            className="w-full p-4 bg-slate-100 rounded-xl text-slate-800 font-medium border border-slate-200 text-body cursor-not-allowed"
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                            <Icons.Lock className="w-4 h-4" />
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="mb-4">
+                    <Label>Kabupaten/Kota</Label>
+                    <select
+                        name="kabupaten"
+                        value={data.kabupaten}
+                        onChange={(e) => {
+                            onChange(e);
+                            // Reset kecamatan dan kelurahan ketika kabupaten berubah
+                            onChange({ target: { name: 'kecamatan', value: '' } });
+                            onChange({ target: { name: 'kelurahan', value: '' } });
+                        }}
+                        className="w-full p-4 bg-slate-50 rounded-xl text-slate-800 font-medium appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none border border-slate-200 text-body hover:border-slate-300"
+                    >
+                        <option value="">Pilih Kabupaten/Kota...</option>
+                        {DAFTAR_KABUPATEN.map(kab => (
+                            <option key={kab} value={kab}>{kab}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            {/* PERBAIKAN: Kecamatan dan Kelurahan */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+                <Select 
+                    label="Kecamatan" 
+                    name="kecamatan" 
+                    value={data.kecamatan} 
+                    onChange={handleKecamatanChange}
+                    disabled={!data.kabupaten}
+                >
+                    <option value="">Pilih Kecamatan...</option>
+                    {data.kabupaten && DATA_WILAYAH_MAPPING[data.kabupaten] 
+                        ? Object.keys(DATA_WILAYAH_MAPPING[data.kabupaten]).map(kec => (
+                            <option key={kec} value={kec}>{kec}</option>
+                        ))
+                        : null
+                    }
+                </Select>
+                
+                <Select 
+                    label="Kelurahan/Desa" 
+                    name="kelurahan" 
+                    value={data.kelurahan} 
+                    onChange={onChange}
+                    disabled={!data.kecamatan}
+                >
+                    <option value="">Pilih Kelurahan...</option>
+                    {data.kabupaten && data.kecamatan && DATA_WILAYAH_MAPPING[data.kabupaten] 
+                        ? getKelurahanOptions().map(kel => (
+                            <option key={kel} value={kel}>{kel}</option>
+                        ))
+                        : null
+                    }
+                </Select>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+                <Input label="RT" name="rt" value={data.rt} onChange={onChange} />
+                <Input label="RW" name="rw" value={data.rw} onChange={onChange} />
+            </div>
+
+            <Input 
+                label="Nama Orangtua / Wali" 
+                name="namaOrangtua" 
+                value={data.namaOrangtua} 
+                onChange={onChange} 
+                placeholder="Nama lengkap orangtua" 
+                uppercase={true} 
+            />
+            <Input 
+                label="Nomor Kontak (HP/WA)" 
+                name="noKontakOrangtua" 
+                value={data.noKontakOrangtua} 
+                onChange={onChange} 
+                placeholder="0812XXXXXX" 
+            />
+        </div>
+    );
+};
 
         // PERBAIKAN POINT 4: Step3 dengan input untuk komplikasi lainnya
         const Step3 = ({ data, onChange, Icons }) => {
@@ -2377,22 +3254,22 @@ useEffect(() => {
             };
 
             const handleChange = (e) => { 
-                const { name, value, type, checked } = e.target; 
-                
-                let processedValue = value;
-                if (name === 'namaKasus' || name === 'namaOrangtua' || name === 'pelaksanaInvestigasi' || name === 'namaSekolah') {
-                    processedValue = value.toUpperCase();
-                }
-                
-                if (name === 'noKontakOrangtua') {
-                    processedValue = value.replace(/\D/g, '');
-                }
-                
-                if (name === 'nomorEPID') {
-                    processedValue = value.toUpperCase();
-                } 
-                
-                if (type === 'checkbox') { 
+    const { name, value, type, checked } = e.target; 
+    
+    let processedValue = value;
+    if (name === 'namaKasus' || name === 'namaOrangtua' || name === 'pelaksanaInvestigasi' || name === 'namaSekolah') {
+        processedValue = value.toUpperCase();
+    }
+    
+    if (name === 'noKontakOrangtua') {
+        processedValue = value.replace(/\D/g, '');
+    }
+    
+    if (name === 'nomorEPID') {
+        processedValue = value.toUpperCase();
+    } 
+    
+    if (type === 'checkbox') { 
         if (name === 'gejalaLain' || name === 'komplikasi') {
             const fieldName = value; // Nama field seperti "Diare", "Pilek", dll
             setFormData(prev => ({ 
@@ -2430,9 +3307,16 @@ useEffect(() => {
             };
             
             const handleSumberLaporanChange = (e) => { 
-                const v = e.target.value; 
-                setFormData(p => ({ ...p, sumberLaporan: v, namaUnitPelapor: '', sumberLainnya: '' })); 
-            };
+    const v = e.target.value; 
+    setFormData(p => ({ 
+        ...p, 
+        sumberLaporan: v, 
+        namaUnitPelapor: '', 
+        sumberLainnya: '',
+        // Reset kabupaten saat sumber laporan berubah
+        kabupatenUnitPelapor: ''
+    })); 
+};
             
             const getGeoLocation = () => { 
                 showLoading(true); 
@@ -2449,30 +3333,31 @@ useEffect(() => {
                 ); 
             };
             
-            const handleSaveDraft = async () => { 
-                showLoading(true); 
-                try { 
-                    const d = { 
-                        ...formData, 
-                        statusData: 'Draft', 
-                        updatedAt: Date.now(), 
-                        createdBy: currentUser?.email, 
-                        createdUnit: currentUser?.unitName,
-                        originalUnit: currentUser?.unitName,
-                        currentOwner: formData.currentOwner || currentUser?.unitName
-                    }; 
-                    
-                    await mockDB.save(d); 
-                    setFormData(d); 
-                    showLoading(false); 
-                    showNotification('Draft tersimpan', 'success'); 
-                    return Promise.resolve();
-                } catch (e) { 
-                    showLoading(false); 
-                    showNotification('Error Save: ' + e.message, 'error'); 
-                    return Promise.reject(e);
-                } 
-            };
+            // GANTI fungsi handleSaveDraft menjadi:
+const handleSaveDraft = async () => { 
+    showLoading(true); 
+    try { 
+        const d = { 
+            ...formData, 
+            statusData: 'Draft', 
+            updatedAt: Date.now(), 
+            createdBy: currentUser?.email, 
+            createdUnit: currentUser?.unitName,
+            originalUnit: currentUser?.unitName,
+            currentOwner: formData.currentOwner || currentUser?.unitName
+        }; 
+        
+        await mockDB.save(d); 
+        setFormData(d); 
+        showLoading(false); 
+        showNotification('Draft tersimpan', 'success'); 
+        return Promise.resolve();
+    } catch (e) { 
+        showLoading(false); 
+        showNotification('Error Save: ' + e.message, 'error'); 
+        return Promise.reject(e);
+    } 
+};
             
             const handleSaveToPending = async () => { 
                 if (!formData.namaKasus) { 
@@ -2484,6 +3369,11 @@ useEffect(() => {
                     showNotification('Nomor EPID wajib diisi!', 'error');
                     return;
                 }
+                
+                if (!formData.kabupaten) { 
+    showNotification('Kabupaten/Kota wajib dipilih!', 'error'); 
+    return; 
+}; 
                     
                 
                 showLoading(true); 
@@ -4618,13 +5508,14 @@ useEffect(() => {
                                                         ? setEditingUser({...editingUser, unitName:e.target.value}) 
                                                         : setNewUser({...newUser, unitName:e.target.value})} 
                                                     required
-                                                >
-                                                    <option value="">-- Pilih Unit --</option>
-                                                    {ALL_SERVICES.map(p=>
-                                                        <option key={p} value={p}>{p}</option>
-                                                    )}
-                                                </select>
-                                            </div>
+    >
+        <option value="">-- Pilih Unit --</option>
+        {Object.values(LAYANAN_BY_KABUPATEN)
+            .flat()
+            .map(p => <option key={p.nama} value={p.nama}>{p.nama}</option>)
+        }
+    </select>
+</div>
                                             <div>
     <label className="block text-sm font-semibold text-slate-600 mb-2 text-caption">Email</label>
     <input 
