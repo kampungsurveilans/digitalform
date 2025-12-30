@@ -3587,8 +3587,8 @@ const handleSaveDraft = async () => {
                                         <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3 text-white">
                                             <Icons.FileText className="w-6 h-6"/>
                                         </div>
-                                        <h3 className="font-bold text-lg tracking-tight">Buat Laporan Baru</h3>
-                                        <p className="text-blue-100 text-body font-medium">Input kasus surveilans baru</p>
+                                        <h3 className="font-bold text-lg tracking-tight">Buat formulir MR-01</h3>
+                                        <p className="text-blue-100 text-body font-medium">Input kasus Campak/Rubella</p>
                                     </div>
                                     <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                                         <Icons.ChevronLeft className="rotate-180 w-5 h-5"/>
@@ -4085,19 +4085,32 @@ const handleSaveDraft = async () => {
             </div>
             <h3 className="font-bold text-xl mb-2 text-red-600">Konfirmasi Logout</h3>
             <p className="text-slate-500 mb-6 text-body">Apakah Anda yakin ingin keluar dari akun ini?</p>
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3">
+                
+                <button 
+                    onClick={confirmLogout} 
+                    className="w-full p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                >
+                    Keluar Akun Campak
+                </button>
+                
+                <button 
+                    onClick={() => {
+                        setShowLogoutModal(false);
+                        window.location.href = 'index.html';
+                    }} 
+                    className="w-full p-3.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-bold hover:shadow-lg transition"
+                >
+                    Ke Beranda
+                </button>
+                
                 <button 
                     onClick={() => setShowLogoutModal(false)} 
-                    className="flex-1 p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
+                    className="w-full p-3.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition"
                 >
                     Batal
                 </button>
-                <button 
-                    onClick={confirmLogout} 
-                    className="flex-1 p-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg font-bold hover:shadow-lg transition"
-                >
-                    Ya, Logout
-                </button>
+                
             </div>
         </div>
     </div>
