@@ -1,19 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DIGULIS</title>
+    <title>DIGULIS - Digitalisasi Unit Lapor & Integrasi Surveilans</title>
 
-    <!-- PWA Setup (PENTING UNTUK NAMA & LOGO) -->
     <meta name="theme-color" content="#0B0C15">
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Konfigurasi Khusus iOS/Apple -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="DIGULIS"> <!-- Nama Aplikasi di Home Screen -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="logo.svg"> <!-- Logo Aplikasi -->
 
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -218,39 +211,6 @@
             font-size: 1.1rem;
             max-width: 500px;
             margin: 0 auto;
-        }
-
-        /* NEW: Install Button Style - Forced Display with JS logic */
-        .install-btn-wrapper {
-            margin-top: 16px;
-            display: none; /* Controlled by JS */
-            justify-content: center;
-        }
-
-        .install-btn {
-            background: linear-gradient(135deg, #38bdf8, #818cf8);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-            animation: pulseBtn 2s infinite;
-        }
-
-        .install-btn:active { transform: scale(0.95); }
-        .install-btn i { font-size: 1.1rem; }
-
-        @keyframes pulseBtn {
-            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
         }
 
         .search-wrapper {
@@ -488,39 +448,6 @@
         .btn-cancel { background: rgba(255,255,255,0.05); color: #94A3B8; }
         .btn-confirm { background: white; color: black; }
 
-        /* INSTALL INSTRUCTIONS STEPS */
-        .install-steps {
-            text-align: left;
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-        .step-item {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-            align-items: center;
-        }
-        .step-item:last-child { margin-bottom: 0; }
-        .step-num {
-            background: #38bdf8;
-            color: black;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-        }
-        .step-text {
-            color: #cbd5e1;
-            font-size: 0.9rem;
-        }
-
         /* Footer */
         footer {
             text-align: center;
@@ -565,13 +492,6 @@
             <div class="brand-badge"><i class="fas fa-shield-alt"></i> Sistem Informasi Surveilans</div>
             <h1>Digulis<br>Application</h1>
             <p>Digitalisasi Unit Lapor & Integrasi Surveilans</p>
-
-            <!-- TOMBOL INSTALL: SEKARANG MUNCUL SECARA DEFAULT DENGAN FALLBACK MANUAL -->
-            <div class="install-btn-wrapper" id="installContainer" style="display: flex;">
-                <button class="install-btn" id="installBtn">
-                    <i class="fas fa-download"></i> Install Aplikasi
-                </button>
-            </div>
         </header>
 
         <div class="search-wrapper">
@@ -679,7 +599,7 @@
                 <!-- Tombol Dashboard -->
                 <div class="choice-btn" id="btnGoToDash">
                     <i class="fas fa-chart-pie"></i>
-                    <span>Dashboard</span>
+                    <span>Data</span>
                 </div>
                 <!-- Tombol Migrasi (NEW) -->
                 <div class="choice-btn" id="btnGoToMigrasi">
@@ -702,134 +622,11 @@
             </div>
         </div>
 
-        <!-- MODAL 3: INSTALL INSTRUCTIONS (MANUAL FALLBACK) -->
-        <div class="modal-box" id="installHelpModal">
-            <div class="modal-header-icon" style="background: linear-gradient(135deg, #38bdf8, #818cf8);">
-                <i class="fas fa-mobile-alt"></i>
-            </div>
-            <h2 class="modal-title">Install Aplikasi</h2>
-            <p class="modal-desc" id="installHelpText">Ikuti langkah berikut untuk menginstall:</p>
-            
-            <div class="install-steps" id="iosSteps" style="display: none;">
-                <div class="step-item">
-                    <div class="step-num">1</div>
-                    <div class="step-text">Tekan tombol <strong>Share</strong> <i class="fas fa-share-square"></i> di browser Safari.</div>
-                </div>
-                <div class="step-item">
-                    <div class="step-num">2</div>
-                    <div class="step-text">Geser ke bawah dan pilih <strong>"Add to Home Screen"</strong> (Tambah ke Layar Utama).</div>
-                </div>
-            </div>
-
-            <div class="install-steps" id="androidSteps">
-                <div class="step-item">
-                    <div class="step-num">1</div>
-                    <div class="step-text">Tekan tombol <strong>Menu</strong> <i class="fas fa-ellipsis-v"></i> di pojok kanan atas browser.</div>
-                </div>
-                <div class="step-item">
-                    <div class="step-num">2</div>
-                    <div class="step-text">Pilih <strong>"Install App"</strong> atau <strong>"Add to Home screen"</strong>.</div>
-                </div>
-            </div>
-
-            <button class="action-btn btn-confirm" style="width: 100%;" id="closeInstallHelp">Mengerti</button>
-        </div>
-
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // --- LOGIKA PWA INSTALL BUTTON (UPDATED) ---
-            let deferredPrompt;
-            const installContainer = document.getElementById('installContainer');
-            const installBtn = document.getElementById('installBtn');
-            const mainOverlay = document.getElementById('mainOverlay');
-            const installHelpModal = document.getElementById('installHelpModal');
-            const closeInstallHelp = document.getElementById('closeInstallHelp');
-            const iosSteps = document.getElementById('iosSteps');
-            const androidSteps = document.getElementById('androidSteps');
-
-            // Cek apakah iOS
-            const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            
-            // Cek apakah sudah dalam mode Standalone (sudah diinstall)
-            const isInStandaloneMode = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
-
-            // Logic Visibilitas Tombol
-            if (isInStandaloneMode) {
-                installContainer.style.display = 'none'; // Sembunyikan jika sudah diinstall
-            } else {
-                installContainer.style.display = 'flex'; // Selalu tampilkan untuk memancing user
-            }
-
-            // 1. Tangkap event 'beforeinstallprompt' (Hanya Chrome/Android yang mendukung ini)
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                console.log('DIGULIS: Native Install Prompt siap');
-            });
-
-            // 2. Handle Klik Tombol Install
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    // KASUS A: Browser mendukung install otomatis (Chrome Android/Desktop)
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`User response: ${outcome}`);
-                    deferredPrompt = null;
-                } else {
-                    // KASUS B: Browser tidak mendukung / belum siap (iOS, atau file://, atau PWA kriteria kurang)
-                    // Tampilkan Modal Bantuan Manual
-                    showInstallHelp();
-                }
-            });
-
-            function showInstallHelp() {
-                // Tentukan konten berdasarkan OS
-                if (isIos) {
-                    iosSteps.style.display = 'block';
-                    androidSteps.style.display = 'none';
-                } else {
-                    iosSteps.style.display = 'none';
-                    androidSteps.style.display = 'block';
-                }
-
-                // Buka Modal
-                mainOverlay.classList.add('active');
-                installHelpModal.classList.add('show');
-                
-                // Tutup modal lain jika ada yang terbuka
-                document.getElementById('choiceModal').classList.remove('show');
-                document.getElementById('confirmModal').classList.remove('show');
-                
-                document.body.classList.add('modal-open');
-            }
-
-            closeInstallHelp.addEventListener('click', () => {
-                mainOverlay.classList.remove('active');
-                installHelpModal.classList.remove('show');
-                document.body.classList.remove('modal-open');
-            });
-
-            // 3. Sembunyikan tombol jika aplikasi berhasil diinstall
-            window.addEventListener('appinstalled', () => {
-                installContainer.style.display = 'none';
-                console.log('DIGULIS: Aplikasi berhasil diinstall');
-            });
-
-            // --- SERVICE WORKER REGISTRATION ---
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('service-worker.js')
-                .then(function(registration) {
-                    console.log('Service Worker Registered');
-                })
-                .catch(function(error) {
-                    console.log('Service Worker Failed', error);
-                });
-            }
-
-            // --- LOGIKA SPLASH SCREEN & LAINNYA ---
+            // Splash & Reveal
             setTimeout(() => {
                 document.getElementById('splashScreen').classList.add('hide');
                 initScrollReveal();
@@ -869,6 +666,7 @@
             });
 
             // --- DUAL MODAL LOGIC ---
+            const mainOverlay = document.getElementById('mainOverlay');
             const choiceModal = document.getElementById('choiceModal');
             const confirmModal = document.getElementById('confirmModal');
 
@@ -877,7 +675,7 @@
             const choiceTitle = document.getElementById('choiceTitle');
             const btnForm = document.getElementById('btnGoToForm');
             const btnDash = document.getElementById('btnGoToDash');
-            const btnMigrasi = document.getElementById('btnGoToMigrasi'); 
+            const btnMigrasi = document.getElementById('btnGoToMigrasi'); // NEW BUTTON
 
             // Elements in Confirm Modal
             const confirmIcon = document.getElementById('confirmIcon');
@@ -912,7 +710,6 @@
                     mainOverlay.classList.add('active');
                     choiceModal.classList.add('show');
                     confirmModal.classList.remove('show');
-                    installHelpModal.classList.remove('show'); // Pastikan help modal tutup
                     
                     // Lock Body Scroll
                     document.body.classList.add('modal-open');
@@ -969,13 +766,10 @@
                 choiceModal.classList.add('show');
             });
 
-            // Click outside to close (Updated to handle multiple modals)
+            // Click outside to close
             mainOverlay.addEventListener('click', (e) => {
                 if(e.target === mainOverlay) {
                     mainOverlay.classList.remove('active');
-                    choiceModal.classList.remove('show');
-                    confirmModal.classList.remove('show');
-                    installHelpModal.classList.remove('show');
                     // Unlock Body Scroll
                     document.body.classList.remove('modal-open');
                 }
