@@ -45,6 +45,11 @@
             position: relative;
         }
 
+        /* Mencegah scroll saat modal aktif */
+        body.modal-open {
+            overflow: hidden;
+        }
+
         /* Background Effects */
         .bg-fx {
             position: fixed;
@@ -477,7 +482,7 @@
             <i class="fas fa-wave-square splash-icon"></i>
         </div>
         <div class="splash-title">DIGULIS</div>
-        <div style="color: #64748b; font-size: 0.9rem; letter-spacing: 2px;">UPT Puskesmas Kampung Dalam</div> 
+        <div style="color: #64748b; font-size: 0.9rem; letter-spacing: 2px;">v1.0</div>
         <div class="loading-line"><div class="loading-bar"></div></div>
     </div>
 
@@ -491,7 +496,7 @@
         <div class="search-wrapper">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari penyakit (contoh: DBD, Rabies)...">
+                <input type="text" id="searchInput" placeholder="Cari penyakit...">
             </div>
         </div>
 
@@ -698,6 +703,9 @@
                     mainOverlay.classList.add('active');
                     choiceModal.classList.add('show');
                     confirmModal.classList.remove('show');
+                    
+                    // Lock Body Scroll
+                    document.body.classList.add('modal-open');
                 });
             });
 
@@ -735,6 +743,8 @@
             // 4. Close / Back Logic
             document.getElementById('closeChoice').addEventListener('click', () => {
                 mainOverlay.classList.remove('active');
+                // Unlock Body Scroll
+                document.body.classList.remove('modal-open');
             });
 
             document.getElementById('btnBackToChoice').addEventListener('click', () => {
@@ -744,7 +754,11 @@
 
             // Click outside to close
             mainOverlay.addEventListener('click', (e) => {
-                if(e.target === mainOverlay) mainOverlay.classList.remove('active');
+                if(e.target === mainOverlay) {
+                    mainOverlay.classList.remove('active');
+                    // Unlock Body Scroll
+                    document.body.classList.remove('modal-open');
+                }
             });
         });
     </script>
