@@ -408,7 +408,7 @@
         /* CHOICE GRID (Step 1) */
         .choice-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr); /* UPDATE: 3 Columns for 3 Buttons */
             gap: 12px;
         }
 
@@ -427,7 +427,7 @@
         }
 
         .choice-btn i { font-size: 24px; margin-bottom: 4px; }
-        .choice-btn span { font-size: 0.9rem; font-weight: 600; }
+        .choice-btn span { font-size: 0.8rem; font-weight: 600; } /* Sedikit diperkecil agar muat */
 
         .choice-btn:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-3px); }
         .choice-btn.primary { background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); color: #38bdf8; }
@@ -583,7 +583,7 @@
     <!-- MAIN OVERLAY -->
     <div class="modal-overlay" id="mainOverlay">
         
-        <!-- MODAL 1: CHOICE (Form vs Dashboard) -->
+        <!-- MODAL 1: CHOICE (Form vs Dashboard vs Migrasi) -->
         <div class="modal-box" id="choiceModal">
             <div class="modal-header-icon" id="choiceIcon"></div>
             <h2 class="modal-title" id="choiceTitle">Judul Penyakit</h2>
@@ -599,6 +599,11 @@
                 <div class="choice-btn" id="btnGoToDash">
                     <i class="fas fa-chart-pie"></i>
                     <span>Dashboard</span>
+                </div>
+                <!-- Tombol Migrasi (NEW) -->
+                <div class="choice-btn" id="btnGoToMigrasi">
+                    <i class="fas fa-file-import"></i>
+                    <span>Migrasi</span>
                 </div>
             </div>
             <button class="action-btn btn-cancel" style="margin-top: 20px; width: 100%; background: transparent;" id="closeChoice">Tutup</button>
@@ -669,6 +674,7 @@
             const choiceTitle = document.getElementById('choiceTitle');
             const btnForm = document.getElementById('btnGoToForm');
             const btnDash = document.getElementById('btnGoToDash');
+            const btnMigrasi = document.getElementById('btnGoToMigrasi'); // NEW BUTTON
 
             // Elements in Confirm Modal
             const confirmIcon = document.getElementById('confirmIcon');
@@ -711,15 +717,22 @@
 
             // 2. Handle Choice Selection
             btnForm.addEventListener('click', () => {
-                // Logic URL BARU: [base].html (Contoh: campak.html)
+                // Logic URL: [base].html (Contoh: campak.html)
                 finalDestinationUrl = `${currentBaseUrl}.html`; 
                 showConfirmation('Buka Formulir?', `Isi laporan kasus ${currentDiseaseName}`);
             });
 
             btnDash.addEventListener('click', () => {
-                // Logic URL BARU: dashboard[base].html (Contoh: dashboardcampak.html)
+                // Logic URL: dashboard[base].html (Contoh: dashboardcampak.html)
                 finalDestinationUrl = `dashboard${currentBaseUrl}.html`; 
                 showConfirmation('Buka Dashboard?', `Lihat data surveilans ${currentDiseaseName}`);
+            });
+
+            // --- LOGIKA TOMBOL MIGRASI (NEW) ---
+            btnMigrasi.addEventListener('click', () => {
+                // Logic URL: migrasi[base].html (Contoh: migrasicampak.html)
+                finalDestinationUrl = `migrasi${currentBaseUrl}.html`; 
+                showConfirmation('Buka Migrasi?', `Kelola data migrasi ${currentDiseaseName}`);
             });
 
             function showConfirmation(title, desc) {
