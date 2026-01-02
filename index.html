@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DIGULIS - Digitalisasi Unit Lapor & Integrasi Surveilans</title>
 
+    <!-- PWA Setup -->
     <meta name="theme-color" content="#0B0C15">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -625,6 +630,29 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // PWA Installation
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                // Stash the event so it can be triggered later.
+                deferredPrompt = e;
+                // Optionally trigger the install prompt automatically if desired
+                // deferredPrompt.prompt();
+                console.log('DIGULIS: Aplikasi siap diinstall');
+            });
+
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js')
+                .then(function(registration) {
+                    console.log('Service Worker Registered');
+                })
+                .catch(function(error) {
+                    console.log('Service Worker Failed', error);
+                });
+            }
+
             // Splash & Reveal
             setTimeout(() => {
                 document.getElementById('splashScreen').classList.add('hide');
@@ -674,7 +702,7 @@
             const choiceTitle = document.getElementById('choiceTitle');
             const btnForm = document.getElementById('btnGoToForm');
             const btnDash = document.getElementById('btnGoToDash');
-            const btnMigrasi = document.getElementById('btnGoToMigrasi'); // NEW BUTTON
+            const btnMigrasi = document.getElementById('btnGoToMigrasi'); 
 
             // Elements in Confirm Modal
             const confirmIcon = document.getElementById('confirmIcon');
