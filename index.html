@@ -217,6 +217,39 @@
             margin: 0 auto;
         }
 
+        /* NEW: Install Button Style */
+        .install-btn-wrapper {
+            margin-top: 16px;
+            display: none; /* Hidden by default */
+            justify-content: center;
+        }
+
+        .install-btn {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            animation: pulseBtn 2s infinite;
+        }
+
+        .install-btn:active { transform: scale(0.95); }
+        .install-btn i { font-size: 1.1rem; }
+
+        @keyframes pulseBtn {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
+
         .search-wrapper {
             max-width: 500px;
             margin: 0 auto 50px;
@@ -496,6 +529,13 @@
             <div class="brand-badge"><i class="fas fa-shield-alt"></i> Sistem Informasi Surveilans</div>
             <h1>Digulis<br>Application</h1>
             <p>Digitalisasi Unit Lapor & Integrasi Surveilans</p>
+
+            <!-- TOMBOL INSTALL (MUNCUL OTOMATIS JIKA BISA DIINSTALL) -->
+            <div class="install-btn-wrapper" id="installContainer">
+                <button class="install-btn" id="installBtn">
+                    <i class="fas fa-download"></i> Install Aplikasi
+                </button>
+            </div>
         </header>
 
         <div class="search-wrapper">
@@ -630,19 +670,45 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // PWA Installation
+            
+            // --- LOGIKA PWA INSTALL BUTTON ---
             let deferredPrompt;
+            const installContainer = document.getElementById('installContainer');
+            const installBtn = document.getElementById('installBtn');
+
+            // 1. Tangkap event 'beforeinstallprompt'
             window.addEventListener('beforeinstallprompt', (e) => {
-                // Prevent the mini-infobar from appearing on mobile
+                // Mencegah mini-infobar default Chrome muncul langsung
                 e.preventDefault();
-                // Stash the event so it can be triggered later.
+                // Simpan event untuk digunakan nanti
                 deferredPrompt = e;
-                // Optionally trigger the install prompt automatically if desired
-                // deferredPrompt.prompt();
-                console.log('DIGULIS: Aplikasi siap diinstall');
+                // Tampilkan tombol install kita sendiri
+                installContainer.style.display = 'flex';
+                console.log('DIGULIS: Tombol Install ditampilkan');
             });
 
-            // Register Service Worker
+            // 2. Handle Klik Tombol Install
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // Tampilkan prompt instalasi asli
+                    deferredPrompt.prompt();
+                    // Tunggu user memilih 'Install' atau 'Cancel'
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response: ${outcome}`);
+                    // Reset variable karena prompt hanya bisa dipakai sekali
+                    deferredPrompt = null;
+                    // Sembunyikan tombol
+                    installContainer.style.display = 'none';
+                }
+            });
+
+            // 3. Sembunyikan tombol jika aplikasi sudah diinstall
+            window.addEventListener('appinstalled', () => {
+                installContainer.style.display = 'none';
+                console.log('DIGULIS: Aplikasi berhasil diinstall');
+            });
+
+            // --- SERVICE WORKER REGISTRATION ---
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('service-worker.js')
                 .then(function(registration) {
@@ -653,7 +719,7 @@
                 });
             }
 
-            // Splash & Reveal
+            // --- LOGIKA SPLASH SCREEN & LAINNYA ---
             setTimeout(() => {
                 document.getElementById('splashScreen').classList.add('hide');
                 initScrollReveal();
