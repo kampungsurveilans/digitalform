@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DIGULIS - Digitalisasi Unit Lapor & Integrasi Surveilans</title>
+
+    <meta name="theme-color" content="#0B0C15">
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. SETUP VARIABLES & RESET (DARK THEME) --- */
+        :root {
+            --bg-dark: #0B0C15;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94A3B8;
+            --accent-color: #38bdf8;
+            
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Effects */
+        .bg-fx {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: floatOrb 10s infinite ease-in-out;
+        }
+        .orb-1 { width: 300px; height: 300px; background: #6366f1; top: -100px; left: -50px; }
+        .orb-2 { width: 400px; height: 400px; background: #0ea5e9; bottom: -100px; right: -100px; animation-delay: -5s; }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 50px); }
+        }
+
+        /* --- 2. SPLASH SCREEN --- */
+        .splash-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .splash-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .splash-icon-box {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.01));
+            /* border: 1px solid var(--border-glass);  <-- DIHAPUS SESUAI PERMINTAAN (Fix Bingkai Putih) */
+            border: none; 
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .splash-icon-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 2s infinite;
+        }
+
+        .splash-icon {
+            font-size: 36px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .splash-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .loading-line {
+            width: 120px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        .loading-bar {
+            width: 50%;
+            height: 100%;
+            background: #38bdf8;
+            border-radius: 4px;
+            animation: loadBar 1.5s infinite ease-in-out;
+        }
+
+        @keyframes loadBar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+        }
+
+        /* --- 3. HEADER & SEARCH --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        header {
+            padding-top: 60px;
+            padding-bottom: 40px;
+            text-align: center;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 100px;
+            color: #38bdf8;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-wrapper {
+            max-width: 500px;
+            margin: 0 auto 50px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .search-box:focus-within {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .search-box i {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-right: 16px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .search-box input::placeholder {
+            color: rgba(148, 163, 184, 0.6);
+        }
+
+        /* --- 4. BENTO GRID LAYOUT --- */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 60px;
+        }
+
+        .health-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .health-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: white;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .health-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .card-content h3 {
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .card-content p {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* GRADIENTS - LENGKAP UNTUK 12 PENYAKIT */
+        .campak { background: linear-gradient(135deg, #f43f5e, #e11d48); } /* Rose */
+        .difteri { background: linear-gradient(135deg, #f59e0b, #d97706); } /* Amber */
+        .afp { background: linear-gradient(135deg, #10b981, #059669); } /* Emerald */
+        .tetanus { background: linear-gradient(135deg, #8b5cf6, #7c3aed); } /* Violet */
+        .pertusis { background: linear-gradient(135deg, #ec4899, #db2777); } /* Pink */
+        .dbd { background: linear-gradient(135deg, #0ea5e9, #0284c7); } /* Sky Blue */
+        .disentri { background: linear-gradient(135deg, #ef4444, #b91c1c); } /* Red */
+        .tifoid { background: linear-gradient(135deg, #eab308, #ca8a04); } /* Yellow/Gold */
+        .rabies { background: linear-gradient(135deg, #6366f1, #4f46e5); } /* Indigo */
+        .tetanus-dewasa { background: linear-gradient(135deg, #14b8a6, #0d9488); } /* Teal */
+        .ili { background: linear-gradient(135deg, #38bdf8, #0ea5e9); } /* Light Blue */
+        .hfmd { background: linear-gradient(135deg, #fb923c, #ea580c); } /* Orange */
+
+        /* --- 5. MODAL SYSTEM (DUAL LAYER) --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Common Modal Style */
+        .modal-box {
+            background: rgba(22, 24, 35, 0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 32px;
+            padding: 32px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            display: none; /* Hidden by default */
+            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-box.show {
+            display: block;
+        }
+
+        @keyframes popUp {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Modal Header Info */
+        .modal-header-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .modal-title { font-size: 1.4rem; color: white; margin-bottom: 8px; font-weight: 700; }
+        .modal-desc { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 24px; }
+
+        /* CHOICE GRID (Step 1) */
+        .choice-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .choice-btn i { font-size: 24px; margin-bottom: 4px; }
+        .choice-btn span { font-size: 0.9rem; font-weight: 600; }
+
+        .choice-btn:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-3px); }
+        .choice-btn.primary { background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); color: #38bdf8; }
+        .choice-btn.primary:hover { background: rgba(56, 189, 248, 0.25); }
+
+        /* CONFIRM ACTIONS (Step 2) */
+        .confirm-actions { display: flex; gap: 12px; }
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 16px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .btn-cancel { background: rgba(255,255,255,0.05); color: #94A3B8; }
+        .btn-confirm { background: white; color: black; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .menu-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
+            .health-card { padding: 32px 24px; }
+        }
+        
+        @media (max-width: 480px) {
+            header h1 { font-size: 2.2rem; }
+            .menu-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .health-card { padding: 20px 16px; border-radius: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-fx">
+        <div class="bg-grid"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-icon-box">
+            <i class="fas fa-wave-square splash-icon"></i>
+        </div>
+        <div class="splash-title">DIGULIS</div>
+        <div style="color: #64748b; font-size: 0.9rem; letter-spacing: 2px;">SYSTEM v2.0</div>
+        <div class="loading-line"><div class="loading-bar"></div></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="brand-badge"><i class="fas fa-shield-alt"></i> Sistem Informasi Surveilans</div>
+            <h1>Digulis<br>Application</h1>
+            <p>Digitalisasi Unit Lapor & Integrasi Surveilans</p>
+        </header>
+
+        <div class="search-wrapper">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari penyakit (contoh: DBD, Rabies)...">
+            </div>
+        </div>
+
+        <!-- 12 PENYAKIT LENGKAP -->
+        <main class="menu-grid" id="menuGrid">
+            
+            <!-- 1. Campak -->
+            <a href="#" class="health-card" data-disease="Campak/Rubella" data-color="campak" data-search="campak rubella measles" data-base="campak">
+                <div class="card-icon campak"><i class="fas fa-virus"></i></div>
+                <div class="card-content"><h3>Campak</h3><p>Infeksi virus dengan ruam merah.</p></div>
+            </a>
+
+            <!-- 2. Difteri -->
+            <a href="#" class="health-card" data-disease="Difteri" data-color="difteri" data-search="difteri diphtheria" data-base="difteri">
+                <div class="card-icon difteri"><i class="fas fa-bacteria"></i></div>
+                <div class="card-content"><h3>Difteri</h3><p>Infeksi bakteri pada tenggorokan.</p></div>
+            </a>
+
+            <!-- 3. AFP (Polio) -->
+            <a href="#" class="health-card" data-disease="AFP (Polio)" data-color="afp" data-search="afp polio lumpuh layu" data-base="afp">
+                <div class="card-icon afp"><i class="fas fa-crutch"></i></div>
+                <div class="card-content"><h3>AFP</h3><p>Kelumpuhan mendadak (Polio).</p></div>
+            </a>
+
+            <!-- 4. Tetanus Neonatorum -->
+            <a href="#" class="health-card" data-disease="Tetanus Bayi" data-color="tetanus" data-search="tetanus neonatorum bayi" data-base="tetanus">
+                <div class="card-icon tetanus"><i class="fas fa-baby"></i></div>
+                <div class="card-content"><h3>Tetanus Bayi</h3><p>Infeksi kejang pada bayi baru lahir.</p></div>
+            </a>
+
+            <!-- 5. Pertusis -->
+            <a href="#" class="health-card" data-disease="Pertusis" data-color="pertusis" data-search="pertusis batuk rejan" data-base="pertusis">
+                <div class="card-icon pertusis"><i class="fas fa-lungs"></i></div>
+                <div class="card-content"><h3>Pertusis</h3><p>Batuk rejan (100 hari).</p></div>
+            </a>
+
+            <!-- 6. DBD -->
+            <a href="#" class="health-card" data-disease="DBD" data-color="dbd" data-search="dbd demam berdarah dengue" data-base="dbd">
+                <div class="card-icon dbd"><i class="fas fa-mosquito"></i></div>
+                <div class="card-content"><h3>DBD</h3><p>Demam berdarah akibat nyamuk.</p></div>
+            </a>
+
+            <!-- 7. Diare Berdarah -->
+            <a href="#" class="health-card" data-disease="Diare Akut" data-color="disentri" data-search="diare berdarah disentri" data-base="diare">
+                <div class="card-icon disentri"><i class="fas fa-toilet"></i></div>
+                <div class="card-content"><h3>Diare Akut</h3><p>Disentri/Feses berdarah.</p></div>
+            </a>
+
+            <!-- 8. Demam Tifoid -->
+            <a href="#" class="health-card" data-disease="Demam Tifoid" data-color="tifoid" data-search="tifoid tipes" data-base="tifoid">
+                <div class="card-icon tifoid"><i class="fas fa-thermometer"></i></div>
+                <div class="card-content"><h3>Demam Tifoid</h3><p>Infeksi bakteri Salmonella (Tipes).</p></div>
+            </a>
+
+            <!-- 9. Rabies -->
+            <a href="#" class="health-card" data-disease="Rabies" data-color="rabies" data-search="rabies anjing gila" data-base="rabies">
+                <div class="card-icon rabies"><i class="fas fa-dog"></i></div>
+                <div class="card-content"><h3>Rabies</h3><p>Akibat gigitan hewan penular.</p></div>
+            </a>
+
+            <!-- 10. Tetanus Dewasa -->
+            <a href="#" class="health-card" data-disease="Tetanus Dewasa" data-color="tetanus-dewasa" data-search="tetanus dewasa luka tusuk" data-base="tetanus_dewasa">
+                <div class="card-icon tetanus-dewasa"><i class="fas fa-syringe"></i></div>
+                <div class="card-content"><h3>Tetanus</h3><p>Infeksi akut pada luka tusuk.</p></div>
+            </a>
+
+            <!-- 11. ILI -->
+            <a href="#" class="health-card" data-disease="ILI (Flu)" data-color="ili" data-search="ili influenza like illness flu" data-base="ili">
+                <div class="card-icon ili"><i class="fas fa-head-side-mask"></i></div>
+                <div class="card-content"><h3>ILI (Flu)</h3><p>Penyakit serupa Influenza.</p></div>
+            </a>
+
+            <!-- 12. Suspek HFMD -->
+            <a href="#" class="health-card" data-disease="Suspek HFMD" data-color="hfmd" data-search="hfmd flu singapura" data-base="hfmd">
+                <div class="card-icon hfmd"><i class="fas fa-child"></i></div>
+                <div class="card-content"><h3>HFMD</h3><p>Flu Singapura (Kaki Tangan Mulut).</p></div>
+            </a>
+
+        </main>
+        
+        <footer><p>UPT Puskesmas Kampung Dalam &copy; 2025</p></footer>
+    </div>
+
+    <!-- MAIN OVERLAY -->
+    <div class="modal-overlay" id="mainOverlay">
+        
+        <!-- MODAL 1: CHOICE (Form vs Dashboard) -->
+        <div class="modal-box" id="choiceModal">
+            <div class="modal-header-icon" id="choiceIcon"></div>
+            <h2 class="modal-title" id="choiceTitle">Judul Penyakit</h2>
+            <p class="modal-desc">Pilih menu yang ingin diakses:</p>
+            
+            <div class="choice-grid">
+                <!-- Tombol Formulir -->
+                <div class="choice-btn primary" id="btnGoToForm">
+                    <i class="fas fa-file-signature"></i>
+                    <span>Formulir</span>
+                </div>
+                <!-- Tombol Dashboard -->
+                <div class="choice-btn" id="btnGoToDash">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+            </div>
+            <button class="action-btn btn-cancel" style="margin-top: 20px; width: 100%; background: transparent;" id="closeChoice">Tutup</button>
+        </div>
+
+        <!-- MODAL 2: CONFIRMATION (Are you sure?) -->
+        <div class="modal-box" id="confirmModal">
+            <div class="modal-header-icon" id="confirmIcon"></div>
+            <h2 class="modal-title" id="confirmTitle">Konfirmasi</h2>
+            <p class="modal-desc" id="confirmDesc">Apakah anda yakin ingin membuka halaman ini?</p>
+            
+            <div class="confirm-actions">
+                <button class="action-btn btn-cancel" id="btnBackToChoice">Kembali</button>
+                <button class="action-btn btn-confirm" id="btnFinalGo">Lanjut</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Splash & Reveal
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('hide');
+                initScrollReveal();
+            }, 2500);
+
+            function initScrollReveal() {
+                const cards = document.querySelectorAll('.health-card');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry, index) => {
+                        if (entry.isIntersecting) {
+                            setTimeout(() => {
+                                entry.target.style.opacity = '1';
+                                entry.target.style.transform = 'translateY(0)';
+                            }, index * 50);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+                cards.forEach(card => observer.observe(card));
+            }
+
+            // Search Logic
+            const searchInput = document.getElementById('searchInput');
+            const cards = document.querySelectorAll('.health-card');
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                cards.forEach(card => {
+                    const searchData = card.getAttribute('data-search');
+                    const title = card.querySelector('h3').innerText.toLowerCase();
+                    if (searchData.includes(term) || title.includes(term)) {
+                        card.style.display = 'flex';
+                        setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 100);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // --- DUAL MODAL LOGIC ---
+            const mainOverlay = document.getElementById('mainOverlay');
+            const choiceModal = document.getElementById('choiceModal');
+            const confirmModal = document.getElementById('confirmModal');
+
+            // Elements in Choice Modal
+            const choiceIcon = document.getElementById('choiceIcon');
+            const choiceTitle = document.getElementById('choiceTitle');
+            const btnForm = document.getElementById('btnGoToForm');
+            const btnDash = document.getElementById('btnGoToDash');
+
+            // Elements in Confirm Modal
+            const confirmIcon = document.getElementById('confirmIcon');
+            const confirmTitle = document.getElementById('confirmTitle');
+            const confirmDesc = document.getElementById('confirmDesc');
+            const btnFinalGo = document.getElementById('btnFinalGo');
+            
+            // State Variables
+            let currentBaseUrl = '';
+            let currentDiseaseName = '';
+            let currentIconHTML = '';
+            let currentColorClass = '';
+            let finalDestinationUrl = '';
+
+            // 1. Open Choice Modal
+            cards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Get Data
+                    currentDiseaseName = card.getAttribute('data-disease');
+                    currentBaseUrl = card.getAttribute('data-base'); // e.g., "dbd" or "campak"
+                    currentColorClass = card.getAttribute('data-color');
+                    currentIconHTML = card.querySelector('.card-icon').innerHTML;
+
+                    // Setup Choice Modal UI
+                    choiceIcon.innerHTML = currentIconHTML;
+                    choiceIcon.className = 'modal-header-icon ' + currentColorClass;
+                    choiceTitle.innerText = currentDiseaseName;
+
+                    // Show Overlay & Choice Box
+                    mainOverlay.classList.add('active');
+                    choiceModal.classList.add('show');
+                    confirmModal.classList.remove('show');
+                });
+            });
+
+            // 2. Handle Choice Selection
+            btnForm.addEventListener('click', () => {
+                // Logic URL BARU: [base].html (Contoh: campak.html)
+                finalDestinationUrl = `${currentBaseUrl}.html`; 
+                showConfirmation('Buka Formulir?', `Isi laporan kasus ${currentDiseaseName}`);
+            });
+
+            btnDash.addEventListener('click', () => {
+                // Logic URL BARU: dashboard[base].html (Contoh: dashboardcampak.html)
+                finalDestinationUrl = `dashboard${currentBaseUrl}.html`; 
+                showConfirmation('Buka Dashboard?', `Lihat data surveilans ${currentDiseaseName}`);
+            });
+
+            function showConfirmation(title, desc) {
+                // Switch Modals
+                choiceModal.classList.remove('show');
+                confirmModal.classList.add('show');
+
+                // Setup Confirm Modal UI
+                confirmIcon.innerHTML = currentIconHTML;
+                confirmIcon.className = 'modal-header-icon ' + currentColorClass;
+                confirmTitle.innerText = title;
+                confirmDesc.innerText = desc;
+            }
+
+            // 3. Final Navigation
+            btnFinalGo.addEventListener('click', () => {
+                btnFinalGo.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                setTimeout(() => {
+                    window.location.href = finalDestinationUrl;
+                }, 500);
+            });
+
+            // 4. Close / Back Logic
+            document.getElementById('closeChoice').addEventListener('click', () => {
+                mainOverlay.classList.remove('active');
+            });
+
+            document.getElementById('btnBackToChoice').addEventListener('click', () => {
+                confirmModal.classList.remove('show');
+                choiceModal.classList.add('show');
+            });
+
+            // Click outside to close
+            mainOverlay.addEventListener('click', (e) => {
+                if(e.target === mainOverlay) mainOverlay.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
