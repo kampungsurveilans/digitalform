@@ -846,21 +846,7 @@ try {
             try {
                 // Konversi data gejala dan komplikasi ke format Firestore
                 const firestoreData = { ...data };
-                
-                // Konversi gejalaLain objek ke format YA/TIDAK
-                if (firestoreData.gejalaLain && typeof firestoreData.gejalaLain === 'object') {
-                    Object.keys(firestoreData.gejalaLain).forEach(key => {
-                        firestoreData[`gejala_${key.replace(/\s+/g, '_')}`] = firestoreData.gejalaLain[key] ? 'Ya' : 'Tidak';
-                    });
-                }
-                
-                // Konversi komplikasi objek ke format YA/TIDAK
-                if (firestoreData.komplikasi && typeof firestoreData.komplikasi === 'object') {
-                    Object.keys(firestoreData.komplikasi).forEach(key => {
-                        firestoreData[`komplikasi_${key.replace(/\s+/g, '_')}`] = firestoreData.komplikasi[key] ? 'Ya' : 'Tidak';
-                    });
-                }
-                
+
                 await dbStore.collection('forms').doc(data.id).set(firestoreData, { merge: true });
                 console.log("Data saved successfully with YA/TIDAK format");
             } catch (e) {
@@ -1051,13 +1037,17 @@ try {
             const getGejalaValue = (gejalaName) => {
                 if (!item.gejalaLain) return 'Tidak';
                 
-                // Jika format baru (objek)
+                // Format baru: objek boolean
                 if (typeof item.gejalaLain === 'object' && !Array.isArray(item.gejalaLain)) {
                     return item.gejalaLain[gejalaName] ? 'Ya' : 'Tidak';
                 }
-                // Jika format lama (array) - untuk kompatibilitas
+                // Format lama: array - untuk kompatibilitas
                 else if (Array.isArray(item.gejalaLain)) {
                     return item.gejalaLain.includes(gejalaName) ? 'Ya' : 'Tidak';
+                }
+                // Format lama: field terpisah - untuk kompatibilitas
+                else if (item[`gejala_${gejalaName.replace(/\s+/g, '_')}`]) {
+                    return item[`gejala_${gejalaName.replace(/\s+/g, '_')}`];
                 }
                 return 'Tidak';
             };
@@ -1065,13 +1055,17 @@ try {
             const getKomplikasiValue = (komplikasiName) => {
                 if (!item.komplikasi) return 'Tidak';
                 
-                // Jika format baru (objek)
+                // Format baru: objek boolean
                 if (typeof item.komplikasi === 'object' && !Array.isArray(item.komplikasi)) {
                     return item.komplikasi[komplikasiName] ? 'Ya' : 'Tidak';
                 }
-                // Jika format lama (array) - untuk kompatibilitas
+                // Format lama: array - untuk kompatibilitas
                 else if (Array.isArray(item.komplikasi)) {
                     return item.komplikasi.includes(komplikasiName) ? 'Ya' : 'Tidak';
+                }
+                // Format lama: field terpisah - untuk kompatibilitas
+                else if (item[`komplikasi_${komplikasiName.replace(/\s+/g, '_')}`]) {
+                    return item[`komplikasi_${komplikasiName.replace(/\s+/g, '_')}`];
                 }
                 return 'Tidak';
             };
