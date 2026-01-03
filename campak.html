@@ -850,14 +850,14 @@ try {
                 // Konversi gejalaLain objek ke format YA/TIDAK
                 if (firestoreData.gejalaLain && typeof firestoreData.gejalaLain === 'object') {
                     Object.keys(firestoreData.gejalaLain).forEach(key => {
-                        firestoreData[`gejala_${key.replace(/\s+/g, '_')}`] = firestoreData.gejalaLain[key] ? 'YA' : 'TIDAK';
+                        firestoreData[`gejala_${key.replace(/\s+/g, '_')}`] = firestoreData.gejalaLain[key] ? 'Ya' : 'Tidak';
                     });
                 }
                 
                 // Konversi komplikasi objek ke format YA/TIDAK
                 if (firestoreData.komplikasi && typeof firestoreData.komplikasi === 'object') {
                     Object.keys(firestoreData.komplikasi).forEach(key => {
-                        firestoreData[`komplikasi_${key.replace(/\s+/g, '_')}`] = firestoreData.komplikasi[key] ? 'YA' : 'TIDAK';
+                        firestoreData[`komplikasi_${key.replace(/\s+/g, '_')}`] = firestoreData.komplikasi[key] ? 'Ya' : 'Tidak';
                     });
                 }
                 
@@ -1049,31 +1049,31 @@ try {
         csvRows = data.map(item => {
             // Fungsi helper untuk mendapatkan nilai gejala/komplikasi
             const getGejalaValue = (gejalaName) => {
-                if (!item.gejalaLain) return 'TIDAK';
+                if (!item.gejalaLain) return 'Tidak';
                 
                 // Jika format baru (objek)
                 if (typeof item.gejalaLain === 'object' && !Array.isArray(item.gejalaLain)) {
-                    return item.gejalaLain[gejalaName] ? 'YA' : 'TIDAK';
+                    return item.gejalaLain[gejalaName] ? 'Ya' : 'Tidak';
                 }
                 // Jika format lama (array) - untuk kompatibilitas
                 else if (Array.isArray(item.gejalaLain)) {
-                    return item.gejalaLain.includes(gejalaName) ? 'YA' : 'TIDAK';
+                    return item.gejalaLain.includes(gejalaName) ? 'Ya' : 'Tidak';
                 }
-                return 'TIDAK';
+                return 'Tidak';
             };
             
             const getKomplikasiValue = (komplikasiName) => {
-                if (!item.komplikasi) return 'TIDAK';
+                if (!item.komplikasi) return 'Tidak';
                 
                 // Jika format baru (objek)
                 if (typeof item.komplikasi === 'object' && !Array.isArray(item.komplikasi)) {
-                    return item.komplikasi[komplikasiName] ? 'YA' : 'TIDAK';
+                    return item.komplikasi[komplikasiName] ? 'Ya' : 'Tidak';
                 }
                 // Jika format lama (array) - untuk kompatibilitas
                 else if (Array.isArray(item.komplikasi)) {
-                    return item.komplikasi.includes(komplikasiName) ? 'YA' : 'TIDAK';
+                    return item.komplikasi.includes(komplikasiName) ? 'Ya' : 'Tidak';
                 }
-                return 'TIDAK';
+                return 'Tidak';
             };
             
             // Fungsi untuk mendapatkan gejalaLainSebutkan (untuk "Lainnya")
@@ -1483,10 +1483,10 @@ try {
             
             <div className="mb-8">
                 <Label>Apakah kasus KLB?</Label>
-                <RadioGroup name="kasusKLB" options={['ya', 'tidak']} value={data.kasusKLB} onChange={onChange} />
+                <RadioGroup name="kasusKLB" options={['Ya', 'Tidak']} value={data.kasusKLB} onChange={onChange} />
             </div>
             
-            {data.kasusKLB === 'ya' && (
+            {data.kasusKLB === 'Ya' && (
                 <div className="bg-orange-50 p-5 rounded-xl border border-orange-100 mb-6 animate-fadeIn">
                     <p className="text-sm font-semibold text-orange-700 mb-3">Detail KLB</p>
                     <div className="grid grid-cols-2 gap-4">
@@ -1860,8 +1860,8 @@ try {
         <div className="animate-fadeIn">
             <div className="mb-8">
                 <Label>Apakah demam?</Label>
-                <RadioGroup name="demam" options={['ya','tidak']} value={data.demam} onChange={onChange}/>
-                {data.demam==='ya' && (
+                <RadioGroup name="demam" options={['Ya','Tidak']} value={data.demam} onChange={onChange}/>
+                {data.demam==='Ya' && (
                     <div className="mt-4">
                         <Input type="date" label="Tanggal Mulai Demam" name="tanggalMulaiDemam" value={data.tanggalMulaiDemam} onChange={onChange}/>
                     </div>
@@ -1870,8 +1870,8 @@ try {
             
             <div className="mb-8">
                 <Label>Apakah ruam?</Label>
-                <RadioGroup name="ruam" options={['ya','tidak']} value={data.ruam} onChange={onChange}/>
-                {data.ruam==='ya' && (
+                <RadioGroup name="ruam" options={['Ya','Tidak']} value={data.ruam} onChange={onChange}/>
+                {data.ruam==='Ya' && (
                     <div className="mt-4">
                         <Input type="date" label="Tanggal Mulai Ruam" name="tanggalMulaiRuam" value={data.tanggalMulaiRuam} onChange={onChange}/>
                     </div>
@@ -1959,8 +1959,8 @@ try {
             
             <div className="bg-slate-50 p-5 rounded-xl border border-slate-100">
                 <Label>Riwayat Rawat Inap</Label>
-                <RadioGroup name="dirawat" options={['ya','tidak']} value={data.dirawat} onChange={onChange}/>
-                {data.dirawat==='ya' && (
+                <RadioGroup name="dirawat" options={['Ya','Tidak']} value={data.dirawat} onChange={onChange}/>
+                {data.dirawat==='Ya' && (
                     <div className="mt-5 space-y-4">
                         <Input label="Nama Rumah Sakit" name="namaRumahSakit" value={data.namaRumahSakit} onChange={onChange} placeholder="Nama rumah sakit"/> 
                         
@@ -6261,8 +6261,8 @@ const ServiceItem = ({ service, selected, onSelect }) => {
                                 {item.demam && (
                                     <div className="bg-red-50 p-4 rounded-lg">
                                         <p className="text-sm text-red-600 mb-1">Demam</p>
-                                        <p className="font-medium text-red-800">{item.demam === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                        {item.demam === 'ya' && item.tanggalMulaiDemam && (
+                                        <p className="font-medium text-red-800">{item.demam === 'Ya' ? 'Ya' : 'Tidak'}</p>
+                                        {item.demam === 'Ya' && item.tanggalMulaiDemam && (
                                             <p className="text-xs text-red-500 mt-1">
                                                 {formatDate(item.tanggalMulaiDemam)}
                                             </p>
@@ -6273,8 +6273,8 @@ const ServiceItem = ({ service, selected, onSelect }) => {
                                 {item.ruam && (
                                     <div className="bg-orange-50 p-4 rounded-lg">
                                         <p className="text-sm text-orange-600 mb-1">Ruam</p>
-                                        <p className="font-medium text-orange-800">{item.ruam === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                        {item.ruam === 'ya' && item.tanggalMulaiRuam && (
+                                        <p className="font-medium text-orange-800">{item.ruam === 'Ya' ? 'Ya' : 'Tidak'}</p>
+                                        {item.ruam === 'Ya' && item.tanggalMulaiRuam && (
                                             <p className="text-xs text-orange-500 mt-1">
                                                 {formatDate(item.tanggalMulaiRuam)}
                                             </p>
@@ -6342,8 +6342,8 @@ const ServiceItem = ({ service, selected, onSelect }) => {
                                 {item.dirawat && (
                                     <div className="bg-purple-50 p-4 rounded-lg col-span-2">
                                         <p className="text-sm text-purple-600 mb-1">Rawat Inap</p>
-                                        <p className="font-medium text-purple-800">{item.dirawat === 'ya' ? 'Ya' : 'Tidak'}</p>
-                                        {item.dirawat === 'ya' && item.namaRumahSakit && (
+                                        <p className="font-medium text-purple-800">{item.dirawat === 'Ya' ? 'Ya' : 'Tidak'}</p>
+                                        {item.dirawat === 'Ya' && item.namaRumahSakit && (
                                             <div className="mt-2 space-y-2">
                                                 <p className="text-sm font-medium">Dirawat di: {item.namaRumahSakit}</p>
                                                 {item.tanggalMasukRawat && (
