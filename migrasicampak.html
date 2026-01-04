@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campak Data Migration | Futuristic Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SheetJS for Excel Parsing -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: "rgba(255, 255, 255, 0.05)",
+                        glassBorder: "rgba(255, 255, 255, 0.1)",
+                        neon: {
+                            cyan: '#06b6d4',
+                            purple: '#8b5cf6',
+                            green: '#10b981',
+                            red: '#f43f5e'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-subtle': 'bounce-subtle 2s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 20px rgba(6, 182, 212, 0.5)' },
+                            '50%': { opacity: .5, boxShadow: '0 0 10px rgba(6, 182, 212, 0.2)' },
+                        },
+                         'bounce-subtle': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #020617; /* Slate 950 */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 25%);
+            overflow-x: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Glassmorphism Card Utility */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #22d3ee, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Scroll Reveal Class */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+        
+        input[type="file"]::file-selector-button {
+            margin-right: 20px;
+            border: none;
+            background: linear-gradient(to right, #06b6d4, #3b82f6);
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: background .2s ease-in-out;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+        }
+        
+        input[type="file"]::file-selector-button:hover {
+            opacity: 0.9;
+        }
+        
+        /* Custom style untuk nav status */
+#user-status img {
+    object-fit: cover;
+}
+
+#user-status button {
+    transition: all 0.2s ease;
+}
+
+#user-status button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+    </style>
+</head>
+<body class="text-slate-200 antialiased min-h-screen flex flex-col">
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-overlay opacity-0 transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-md p-6 rounded-2xl transform scale-95 transition-transform duration-300" id="modal-content">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                    <i class="ph ph-warning-circle text-2xl text-yellow-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white">Konfirmasi Migrasi</h3>
+                    <p class="text-sm text-slate-400">Tindakan ini akan menulis data ke database.</p>
+                </div>
+            </div>
+            
+            <p class="text-slate-300 text-sm mb-6 leading-relaxed">
+                Anda akan mengunggah <strong id="modal-row-count" class="text-white">0</strong> baris data ke koleksi <code class="bg-slate-800 px-2 py-0.5 rounded text-cyan-400">forms</code>. Pastikan format data sudah benar. Lanjutkan?
+            </p>
+
+            <div class="flex items-center justify-end gap-3">
+                <button id="btn-cancel-modal" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium">
+                    Batal
+                </button>
+                <button id="btn-confirm-modal" class="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-cyan-500/25 transition-all text-sm flex items-center gap-2">
+                    <i class="ph ph-check-circle text-lg"></i>
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Glows -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/20 rounded-full blur-[120px] animate-float"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-900/20 rounded-full blur-[120px] animate-float" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="w-full fixed top-0 z-50 border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                        <i class="ph ph-database text-white text-xl"></i>
+                    </div>
+                    <span class="font-display font-bold text-xl tracking-tight text-white">Digulis<span class="text-cyan-400">Migrator</span></span>
+                </div>
+                <div id="user-status" class="hidden md:flex items-center gap-4">
+                    <span class="text-sm text-slate-400">Menunggu Login...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        
+        <!-- Hero Section -->
+        <div class="text-center mb-16 reveal active">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-6 animate-bounce-subtle">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                </span>
+                Digulis Data Migration Tools
+            </div>
+            <h1 class="text-5xl md:text-7xl font-display font-bold mb-6 tracking-tight">
+                Migrasi Data <br />
+                <span class="gradient-text">Campak & Rubella</span>
+            </h1>
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-10">
+                Upload data kasus Campak dari dengan format Microsoft Excel langsung ke koleksi data DIGULIS. 
+                Data akan tersimpan sebagai <span class="text-cyan-400 font-mono bg-cyan-500/10 px-1 rounded">formulir MR-01</span>.
+            </p>
+        </div>
+
+        <!-- Bento Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            
+            <!-- Card 1: Security (Login) -->
+            <div class="glass-panel rounded-3xl p-8 md:col-span-1 flex flex-col justify-between reveal delay-100 relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-slate-800 border border-white/10 flex items-center justify-center mb-4">
+                        <i class="ph ph-shield-check text-2xl text-emerald-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Autentikasi Admin</h3>
+                    <p class="text-slate-400 text-sm">Login diperlukan untuk memverifikasi hak akses tulis ke database.</p>
+                </div>
+                
+                <div id="auth-section" class="mt-8">
+                    <!-- Login Button -->
+                    <button id="btn-login" class="w-full py-3 px-4 rounded-xl bg-white text-slate-900 font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 group/btn relative overflow-hidden">
+                        <span id="btn-login-text" class="flex items-center gap-2">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                            Sign in with Google
+                            <i class="ph ph-arrow-right group-hover/btn:translate-x-1 transition-transform"></i>
+                        </span>
+                        <div id="btn-login-loader" class="hidden absolute inset-0 bg-slate-100 flex items-center justify-center">
+                            <i class="ph ph-spinner animate-spin text-slate-900 text-xl"></i>
+                        </div>
+                    </button>
+                    
+                    <!-- User Info & Logout (Hidden initially) -->
+                    <div id="user-info" class="hidden flex flex-col gap-3">
+                        <div class="flex items-center gap-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                            <img id="user-photo" src="" alt="Profile" class="w-10 h-10 rounded-full border border-emerald-500/50">
+                            <div class="overflow-hidden">
+                                <p id="user-name" class="text-sm font-bold text-emerald-400 truncate"></p>
+                                <p class="text-xs text-emerald-300/70">Access Granted</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Upload Zone (Disabled until Login) -->
+            <div class="glass-panel rounded-3xl p-1 md:col-span-2 reveal delay-200 relative">
+                <div class="h-full bg-slate-900/50 rounded-[22px] border border-white/5 p-8 flex flex-col justify-center items-center text-center relative overflow-hidden">
+                    
+                    <!-- Overlay if locked -->
+                    <div id="upload-lock" class="absolute inset-0 z-10 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center transition-all duration-500">
+                        <i class="ph ph-lock-key text-4xl text-slate-500 mb-3"></i>
+                        <p class="text-slate-400">Silahkan login terlebih dahulu untuk membuka akses upload.</p>
+                    </div>
+
+                    <div class="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4 animate-pulse-glow">
+                        <i class="ph ph-upload-simple text-3xl text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Upload File Excel (.xlsx)</h3>
+                    <p class="text-slate-400 text-sm mb-6 max-w-md">
+                        Pastikan format header sesuai standar EPID Campak. Sistem akan otomatis memvalidasi struktur data.
+                    </p>
+                    
+                    <input type="file" id="excel-file" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 max-w-md mx-auto
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-cyan-500 file:text-white
+                        hover:file:bg-cyan-600
+                    "/>
+                    
+                    <div id="file-info" class="mt-4 text-sm text-cyan-400 font-mono hidden">
+                        <span id="row-count">0</span> baris data terdeteksi
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Status & Console -->
+            <div class="glass-panel rounded-3xl p-6 md:col-span-3 min-h-[300px] reveal delay-300 flex flex-col">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold flex items-center gap-2">
+                        <i class="ph ph-terminal-window text-purple-400"></i>
+                        Migration Console
+                    </h3>
+                    <button id="btn-process" disabled class="px-6 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold opacity-50 cursor-not-allowed transition-all hover:shadow-lg hover:shadow-purple-500/25 disabled:hover:shadow-none">
+                        Mulai Migrasi Data
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-800 rounded-full h-2.5 mb-4 overflow-hidden">
+                    <div id="progress-bar" class="bg-gradient-to-r from-cyan-400 to-purple-500 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+
+                <!-- Log Container -->
+                <div id="console-logs" class="flex-1 bg-slate-950/50 rounded-xl p-4 font-mono text-xs text-slate-300 overflow-y-auto max-h-[200px] border border-white/5 space-y-1">
+                    <div class="text-slate-500">> Menunggu input file...</div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Template Section -->
+        <div id="template-section" class="glass-panel rounded-3xl p-8 reveal delay-400">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                        <i class="ph ph-file-xls text-3xl text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Template Excel</h3>
+                        <p class="text-slate-400 text-sm">Gunakan template resmi untuk menghindari error validasi saat migrasi.</p>
+                    </div>
+                </div>
+                <button id="btn-download-template" class="px-6 py-3 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 font-bold hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-2">
+                    <i class="ph ph-download-simple"></i> Download Template
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-8 bg-slate-950">
+        <div class="text-center text-slate-500 text-sm">
+            &copy; 2025 Campak Surveillance System. Secured by Google Firebase.
+        </div>
+    </footer>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    serverTimestamp,
+    getDocs,
+    query,
+    where 
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        
+
+        // 1. Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX18Jk0pOqXyV3kY0sxgbt3xC6Th1VbWU",
+            authDomain: "campak-e836a.firebaseapp.com",
+            projectId: "campak-e836a",
+            storageBucket: "campak-e836a.firebasestorage.app",
+            messagingSenderId: "451728366574",
+            appId: "1:451728366574:web:87ee770d010ef7dc93ccff",
+            measurementId: "G-F3SYCYF5YS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // DOM Elements
+        const btnLogin = document.getElementById('btn-login');
+        const btnLoginText = document.getElementById('btn-login-text');
+        const btnLoginLoader = document.getElementById('btn-login-loader');
+        
+        const userInfo = document.getElementById('user-info');
+        const userPhoto = document.getElementById('user-photo');
+        const userName = document.getElementById('user-name');
+        const uploadLock = document.getElementById('upload-lock');
+        const navStatus = document.getElementById('user-status');
+        
+        const fileInput = document.getElementById('excel-file');
+        const fileInfo = document.getElementById('file-info');
+        const rowCountSpan = document.getElementById('row-count');
+        const btnProcess = document.getElementById('btn-process');
+        const consoleLogs = document.getElementById('console-logs');
+        const progressBar = document.getElementById('progress-bar');
+
+        // Modal Elements
+        const modal = document.getElementById('confirm-modal');
+        const modalContent = document.getElementById('modal-content');
+        const btnCancelModal = document.getElementById('btn-cancel-modal');
+        const btnConfirmModal = document.getElementById('btn-confirm-modal');
+        const modalRowCount = document.getElementById('modal-row-count');
+
+        let jsonData = []; // Store parsed excel data
+        let currentUser = null;
+        
+        // --- Tambahkan fungsi logout global ---
+window.userSignOut = async function() {
+    try {
+        await signOut(auth);
+        log("Logout berhasil", 'success');
+    } catch (error) {
+        console.error("Logout error:", error);
+        log(`Logout gagal: ${error.message}`, 'error');
+    }
+};
+
+async function checkDuplicate(collectionName, nomorEPID) {
+    if (!nomorEPID) return false;
+    
+    try {
+        const querySnapshot = await getDocs(
+            query(collection(db, collectionName), where("nomorEPID", "==", nomorEPID))
+        );
+        return !querySnapshot.empty;
+    } catch (error) {
+        console.error("Error checking duplicate:", error);
+        return false;
+    }
+}
+
+// =====================================================
+// FUNGSI KONVERSI DATA EXCEL KE FORMAT FIRESTORE (DIPERBAIKI URUTANNYA)
+// =====================================================
+function convertExcelDataToFirestoreFormat(row) {
+    // Buat ID timestamp jika tidak ada di Excel
+    const id = row.id || `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    
+    // Fungsi helper untuk konversi string ke boolean
+    const parseBoolean = (value) => {
+        if (value === undefined || value === null) return false;
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'string') {
+            const lowerVal = value.toLowerCase().trim();
+            return lowerVal === 'ya' || lowerVal === 'true' || lowerVal === '1' || lowerVal === '✓';
+        }
+        return Boolean(value);
+    };
+
+    // Fungsi helper untuk string
+    const parseString = (value) => {
+        if (value === undefined || value === null) return "";
+        return String(value).trim();
+    };
+
+    // Fungsi helper untuk memproses string menjadi array
+    const stringToArray = (value) => {
+        if (!value) return [];
+        if (Array.isArray(value)) return value;
+        if (typeof value === 'string') {
+            return value.split(/[,;\n]/)
+                .map(item => item.trim())
+                .filter(item => item.length > 0);
+        }
+        return [];
+    };
+
+    // Fungsi helper untuk tanggal - format YYYY-MM-DD
+    const parseDate = (value) => {
+        if (!value) return "";
+        
+        // Jika sudah format ISO string
+        if (typeof value === 'string' && value.includes('-') && value.length >= 10) {
+            return value.substring(0, 10);
+        }
+        
+        // Jika Excel date (serial number)
+        if (typeof value === 'number') {
+            const date = new Date((value - 25569) * 86400 * 1000);
+            if (!isNaN(date.getTime())) {
+                return date.toISOString().split('T')[0];
+            }
+        }
+        
+        // Coba parsing sebagai date
+        try {
+            const date = new Date(value);
+            if (!isNaN(date.getTime())) {
+                return date.toISOString().split('T')[0];
+            }
+        } catch (e) {
+            // Jika gagal, return string kosong
+        }
+        
+        return "";
+    };
+
+    // ============================
+    // STRUKTUR DATA YANG DIURUTKAN
+    // ============================
+    const firestoreData = {
+        // === A. IDENTIFIKASI KASUS ===
+        nomorEPID: parseString(row.nomorEPID || row['Nomor EPID']),
+        id: id,
+        sumberLaporan: parseString(row.sumberLaporan || row['Sumber Laporan'] || "Puskesmas"),
+        tanggalTerimaLaporan: parseDate(row.tanggalTerimaLaporan || row['Tanggal Terima Laporan']),
+        
+        // === B. DATA PRIBADI ===
+        namaKasus: parseString(row.namaKasus || row['Nama Kasus']),
+        jenisKelamin: parseString(row.jenisKelamin || row['Jenis Kelamin']),
+        tanggalLahir: parseDate(row.tanggalLahir || row['Tanggal Lahir']),
+        umurKehamilan: parseString(row.umurKehamilan || row['Umur Kehamilan']),
+        namaOrangtua: parseString(row.namaOrangtua || row['Nama Orangtua']),
+        noKontakOrangtua: parseString(row.noKontakOrangtua || row['No Kontak Orangtua']),
+        namaSekolah: parseString(row.namaSekolah || row['Nama Sekolah']),
+        
+        // === C. ALAMAT ===
+        alamat: parseString(row.alamat || row['Alamat']),
+        rt: parseString(row.rt || row['RT']),
+        rw: parseString(row.rw || row['RW']),
+        kelurahan: parseString(row.kelurahan || row['Kelurahan']),
+        kecamatan: parseString(row.kecamatan || row['Kecamatan']),
+        kabupaten: parseString(row.kabupaten || row['Kabupaten']),
+        provinsi: parseString(row.provinsi || row['Provinsi'] || "Kalimantan Barat"),
+        titikLokasi: parseString(row.titikLokasi || row['Titik Lokasi']),
+        
+        // === D. GEJALA KLINIS ===
+        demam: parseString(row.demam || row['Demam']),
+        tanggalMulaiDemam: parseDate(row.tanggalMulaiDemam || row['Tanggal Mulai Demam']),
+        ruam: parseString(row.ruam || row['Ruam']),
+        tanggalMulaiRuam: parseDate(row.tanggalMulaiRuam || row['Tanggal Mulai Ruam']),
+        
+        // Gejala Lain (Map)
+        gejalaLain: {
+            Batuk: parseBoolean(row.Batuk || row['Gejala: Batuk']),
+            Pilek: parseBoolean(row.Pilek || row['Gejala: Pilek']),
+            "Mata Merah": parseBoolean(row["Mata Merah"] || row['Gejala: Mata Merah']),
+            Adenopathy: parseBoolean(row.Adenopathy || row['Gejala: Adenopathy']),
+            lokasiAdenopathy: parseString(row.lokasiAdenopathy || row['Lokasi Adenopathy']),
+            Arthralgia: parseBoolean(row.Arthralgia || row['Gejala: Arthralgia']),
+            bagianSendiArthralgia: parseString(row.bagianSendiArthralgia || row['Bagian Sendi Arthralgia']),
+            Kehamilan: parseBoolean(row.Kehamilan || row['Gejala: Kehamilan']),
+            Lainnya: parseBoolean(row.Lainnya || row['Gejala: Lainnya']),
+            gejalaLainSebutkan: parseString(row.gejalaLainSebutkan || row['Gejala Lain Sebutkan'])
+        },
+        
+        // === E. KOMPLIKASI ===
+        komplikasi: {
+            Pneumonia: parseBoolean(row.Pneumonia || row['Komplikasi: Pneumonia']),
+            Diare: parseBoolean(row.Diare || row['Komplikasi: Diare']),
+            Encephalitis: parseBoolean(row.Encephalitis || row['Komplikasi: Encephalitis']),
+            "Otitis media": parseBoolean(row["Otitis media"] || row['Komplikasi: Otitis media']),
+            "B. Pneumonia": parseBoolean(row["B. Pneumonia"] || row['Komplikasi: B. Pneumonia']),
+            Kebutaan: parseBoolean(row.Kebutaan || row['Komplikasi: Kebutaan']),
+            Malnutrisi: parseBoolean(row.Malnutrisi || row['Komplikasi: Malnutrisi']),
+            "Ulkus mukasa mulut": parseBoolean(row["Ulkus mukasa mulut"] || row['Komplikasi: Ulkus mukasa mulut']),
+            Lainnya: parseBoolean(row.Lainnya || row['Komplikasi: Lainnya']),
+            komplikasiLainnyaSebutkan: parseString(row.komplikasiLainnyaSebutkan || row['Komplikasi Lainnya Sebutkan'])
+        },
+        
+        // === F. PERAWATAN ===
+        dirawat: parseString(row.dirawat || row['Dirawat']),
+        namaRumahSakit: parseString(row.namaRumahSakit || row['Nama Rumah Sakit']),
+        tanggalMasukRawat: parseDate(row.tanggalMasukRawat || row['Tanggal Masuk Rawat']),
+        tanggalKeluarRawat: parseDate(row.tanggalKeluarRawat || row['Tanggal Keluar Rawat']),
+        keadaanSaatIni: parseString(row.keadaanSaatIni || row['Keadaan Saat Ini'] || "Hidup"),
+        nomorRekamMedik: parseString(row.nomorRekamMedik || row['Nomor Rekam Medik']),
+        
+        // === G. IMUNISASI ===
+        imunisasiCampak1: parseString(row.imunisasiCampak1 || row['Imunisasi Campak 1']),
+        sumberCampak1: parseString(row.sumberCampak1 || row['Sumber Campak 1'] || "Ingatan Responden"),
+        imunisasiCampak2: parseString(row.imunisasiCampak2 || row['Imunisasi Campak 2']),
+        sumberCampak2: parseString(row.sumberCampak2 || row['Sumber Campak 2'] || "Ingatan Responden"),
+        imunisasiMMR: parseString(row.imunisasiMMR || row['Imunisasi MMR']),
+        sumberMMR: parseString(row.sumberMMR || row['Sumber MMR'] || "Ingatan Responden"),
+        imunisasiBIAS: parseString(row.imunisasiBIAS || row['Imunisasi BIAS']),
+        sumberBIAS: parseString(row.sumberBIAS || row['Sumber BIAS'] || "Ingatan Responden"),
+        imunisasiTambahan: parseString(row.imunisasiTambahan || row['Imunisasi Tambahan']),
+        sumberTambahan: parseString(row.sumberTambahan || row['Sumber Tambahan'] || "Ingatan Responden"),
+        tanggalImunisasiTerakhir: parseDate(row.tanggalImunisasiTerakhir || row['Tanggal Imunisasi Terakhir']),
+        vitaminA: parseString(row.vitaminA || row['Vitamin A']),
+        
+        // === H. EPIDEMIOLOGI ===
+        adaKontakSakitSama: parseString(row.adaKontakSakitSama || row['Ada Kontak Sakit Sama']),
+        jumlahKontakSakit: parseString(row.jumlahKontakSakit || row['Jumlah Kontak Sakit']),
+        bepergian: parseString(row.bepergian || row['Bepergian']),
+        tanggalPergi: parseDate(row.tanggalPergi || row['Tanggal Pergi']),
+        tanggalKembali: parseDate(row.tanggalKembali || row['Tanggal Kembali']),
+        lokasiBepergian: parseString(row.lokasiBepergian || row['Lokasi Bepergian']),
+        kontakErat: stringToArray(row.kontakErat || row['Kontak Erat']),
+        
+        // === I. KLB ===
+        kasusKLB: parseString(row.kasusKLB || row['Kasus KLB']),
+        nomorKLB: parseString(row.nomorKLB || row['Nomor KLB']),
+        klbKe: parseString(row.klbKe || row['KLB Ke']),
+        pelaksanaInvestigasi: parseString(row.pelaksanaInvestigasi || row['Pelaksana Investigasi']),
+        tanggalPelacakan: parseDate(row.tanggalPelacakan || row['Tanggal Pelacakan']),
+        
+        // === J. SPESIMEN ===
+        spesimenDarah: parseString(row.spesimenDarah || row['Spesimen Darah']),
+        jenisSampleDarah: stringToArray(row.jenisSampleDarah || row['Jenis Sample Darah']),
+        tanggalAmbilDarah: parseDate(row.tanggalAmbilDarah || row['Tanggal Ambil Darah']),
+        tanggalKirimDarah: parseDate(row.tanggalKirimDarah || row['Tanggal Kirim Darah']),
+        spesimenLain: parseString(row.spesimenLain || row['Spesimen Lain']),
+        jenisSampelLain: stringToArray(row.jenisSampelLain || row['Jenis Sampel Lain']),
+        tanggalAmbilLain: parseDate(row.tanggalAmbilLain || row['Tanggal Ambil Lain']),
+        tanggalKirimLain: parseDate(row.tanggalKirimLain || row['Tanggal Kirim Lain']),
+        jenisSampelLainSebutkan: parseString(row.jenisSampelLainSebutkan || row['Jenis Sampel Lain Sebutkan']),
+        
+        // === K. ADMINISTRASI & METADATA ===
+        // Unit Pelapor
+        namaUnitPelapor: parseString(row.namaUnitPelapor || row['Nama Unit Pelapor'] || "Puskesmas Kampung Dalam"),
+        kabupatenUnitPelapor: parseString(row.kabupatenUnitPelapor || row['Kabupaten Unit Pelapor'] || row.kabupaten || ""),
+        
+        // Status & Ownership
+        statusData: parseString(row.statusData || row['Status Data'] || "Final"),
+        createdBy: parseString(row.createdBy || row['Created By'] || currentUser.email),
+        createdUnit: parseString(row.createdUnit || row['Created Unit'] || row.namaUnitPelapor || "Puskesmas Kampung Dalam"),
+        currentOwner: parseString(row.currentOwner || row['Current Owner'] || row.namaUnitPelapor || "Puskesmas Kampung Dalam"),
+        originalUnit: parseString(row.originalUnit || row['Original Unit'] || row.namaUnitPelapor || "Puskesmas Kampung Dalam"),
+        sharedTo: parseString(row.sharedTo || row['Shared To']),
+        transferHistory: stringToArray(row.transferHistory || row['Transfer History']),
+        epidManual: parseBoolean(row.epidManual || row['Epid Manual']),
+        updatedAt: (() => {
+    const val = row.updatedAt || row['Updated At'] || row['updated_at'];
+    
+    if (val) {
+        try {
+            const date = new Date(val);
+            return !isNaN(date.getTime()) ? date.getTime() : Date.now();
+        } catch {
+            return Date.now();
+        }
+    }
+    
+    return Date.now();
+})()
+
+    };
+
+    // Hapus fields yang undefined (tapi jangan hapus yang string kosong)
+    Object.keys(firestoreData).forEach(key => {
+        if (firestoreData[key] === undefined) {
+            delete firestoreData[key];
+        }
+    });
+
+    return firestoreData;
+}
+
+// Fungsi untuk validasi data sebelum upload
+function validateData(data) {
+    const errors = [];
+    const warnings = [];
+    
+    // Validasi required fields minimal
+    const requiredFields = ['namaKasus', 'jenisKelamin'];
+    requiredFields.forEach(field => {
+        if (!data[field] || data[field].toString().trim() === '') {
+            errors.push(`${field} harus diisi`);
+        }
+    });
+    
+    // Validasi jenis kelamin
+    if (data.jenisKelamin && !['laki-laki', 'perempuan'].includes(data.jenisKelamin.toLowerCase())) {
+        warnings.push(`Jenis kelamin '${data.jenisKelamin}' tidak standar`);
+    }
+    
+    // Validasi status data
+    const validStatus = ['Draft', 'Final', 'Verified'];
+    if (data.statusData && !validStatus.includes(data.statusData)) {
+        warnings.push(`Status data '${data.statusData}' tidak valid. Menggunakan 'Draft'`);
+        data.statusData = 'Draft';
+    }
+    
+    return { errors, warnings };
+}
+// =====================================================
+// AKHIR FUNGSI KONVERSI
+// =====================================================
+
+        // --- Helper: Logger ---
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            let color = 'text-slate-300';
+            if(type === 'success') color = 'text-emerald-400';
+            if(type === 'error') color = 'text-red-400';
+            if(type === 'warning') color = 'text-yellow-400';
+            
+            div.className = `${color}`;
+            div.innerHTML = `<span class="opacity-50">[${time}]</span> ${message}`;
+            consoleLogs.appendChild(div);
+            consoleLogs.scrollTop = consoleLogs.scrollHeight;
+        }
+
+        // --- Helper: Modal Control ---
+        function showModal() {
+            modal.classList.remove('hidden');
+            // Small delay for CSS transition to work
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+            modalRowCount.textContent = jsonData.length;
+        }
+
+        function hideModal() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        btnCancelModal.addEventListener('click', hideModal);
+
+        // --- 2. Auth Logic ---
+        console.log("Firebase initialized, setting up listeners..."); 
+
+        btnLogin.addEventListener('click', async () => {
+            btnLoginText.classList.add('invisible');
+            btnLoginLoader.classList.remove('hidden');
+
+            try {
+                const result = await signInWithPopup(auth, provider);
+                log(`Login berhasil: ${result.user.email}`, 'success');
+            } catch (error) {
+                console.error(error);
+                log(`Login error: ${error.message}`, 'error');
+                btnLoginText.classList.remove('invisible');
+                btnLoginLoader.classList.add('hidden');
+                alert(`Gagal login: ${error.message}`);
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    btnLoginText.classList.remove('invisible');
+    btnLoginLoader.classList.add('hidden');
+
+    if (user) {
+        // Logged In State
+        btnLogin.classList.add('hidden');
+        userInfo.classList.remove('hidden');
+        userInfo.classList.add('flex');
+        userPhoto.src = user.photoURL;
+        userName.textContent = user.displayName;
+        
+        // Unlock Upload
+        uploadLock.classList.add('opacity-0', 'pointer-events-none');
+        
+        // Nav Status - PERBAIKI INI
+        navStatus.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 p-2 bg-slate-800/50 rounded-lg border border-white/10">
+                    <img src="${user.photoURL}" alt="Profile" class="w-8 h-8 rounded-full border border-cyan-500/50">
+                    <div class="text-right">
+                        <p class="text-xs font-medium text-white truncate max-w-[120px]">${user.displayName}</p>
+                        <p class="text-xs text-slate-400">${user.email}</p>
+                    </div>
+                </div>
+                <button onclick="window.userSignOut()" class="px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition-colors text-sm font-semibold flex items-center gap-2">
+                    <i class="ph ph-sign-out"></i>
+                    Logout
+                </button>
+            </div>`;
+        
+        log(`Session active for ${user.email}`);
+    } else {
+        // Logged Out State
+        btnLogin.classList.remove('hidden');
+        userInfo.classList.add('hidden');
+        userInfo.classList.remove('flex');
+        
+        // Lock Upload
+        uploadLock.classList.remove('opacity-0', 'pointer-events-none');
+        
+        // Reset Nav Status
+        navStatus.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-slate-500 animate-pulse"></span>
+                    <span class="text-sm text-slate-400">Menunggu Login...</span>
+                </div>
+            </div>`;
+        
+        // Reset Data
+        jsonData = [];
+        btnProcess.disabled = true;
+        btnProcess.classList.add('opacity-50', 'cursor-not-allowed');
+        fileInput.value = '';
+        fileInfo.classList.add('hidden');
+    }
+});
+
+        // --- 3. Excel Parsing Logic ---
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            log(`Membaca file: ${file.name}...`);
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                const rawData = XLSX.utils.sheet_to_json(worksheet, { defval: "" }); 
+                
+                if (rawData.length > 0) {
+                    jsonData = rawData;
+                    log(`Berhasil memparsing ${rawData.length} baris data.`, 'success');
+                    
+                    fileInfo.classList.remove('hidden');
+                    rowCountSpan.textContent = rawData.length;
+                    
+                    btnProcess.disabled = false;
+                    btnProcess.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    log('File Excel kosong atau format tidak dikenali.', 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // --- 4. Migration Process Trigger ---
+        btnProcess.addEventListener('click', () => {
+            if (!currentUser) return alert("Sesi habis, silahkan login ulang.");
+            if (jsonData.length === 0) return;
+            
+            // Show Confirmation Modal first
+            showModal();
+        });
+
+        // --- 4. Migration Process Trigger ---
+btnProcess.addEventListener('click', () => {
+    if (!currentUser) return alert("Sesi habis, silahkan login ulang.");
+    if (jsonData.length === 0) return;
+    
+    // Show Confirmation Modal first
+    showModal();
+});
+
+// Actual Migration Logic triggered by Modal
+// =====================================================
+// GANTI KODE INI YANG LAMA DENGAN YANG BARU DI BAWAH:
+// =====================================================
+btnConfirmModal.addEventListener('click', async () => {
+    hideModal();
+    
+    const collectionName = "forms";
+    let successCount = 0;
+    let errorCount = 0;
+    let validationErrors = [];
+    let duplicateCount = 0;
+
+    btnProcess.disabled = true;
+    btnProcess.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Processing...`;
+
+    log(`Memulai migrasi ${jsonData.length} data ke koleksi '${collectionName}'...`, 'warning');
+
+    for (let i = 0; i < jsonData.length; i++) {
+        const row = jsonData[i];
+        
+        try {
+            // Konversi data Excel ke format Firestore
+            const cleanData = convertExcelDataToFirestoreFormat(row);
+            
+            // Cek duplikasi berdasarkan nomorEPID
+            if (cleanData.nomorEPID) {
+                const isDuplicate = await checkDuplicate(collectionName, cleanData.nomorEPID);
+                if (isDuplicate) {
+                    duplicateCount++;
+                    log(`Row ${i + 1}: Data dengan nomorEPID ${cleanData.nomorEPID} sudah ada. Dilewati.`, 'warning');
+                    continue;
+                }
+            }
+            
+            // Validasi data
+            const validation = validateData(cleanData);
+            
+            if (validation.errors.length > 0) {
+                validationErrors.push({
+                    row: i + 1,
+                    namaKasus: cleanData.namaKasus || 'Tanpa Nama',
+                    errors: validation.errors
+                });
+                errorCount++;
+                log(`Row ${i + 1}: Validation failed - ${validation.errors.join(', ')}`, 'error');
+                continue;
+            }
+            
+            // Log data untuk debugging
+            console.log(`Data ${i + 1}:`, cleanData);
+            
+            // Simpan ke Firestore
+            await addDoc(collection(db, collectionName), cleanData);
+            successCount++;
+            
+        } catch (error) {
+            console.error(`Error pada baris ${i + 1}:`, error, row);
+            errorCount++;
+            log(`Row ${i + 1}: ${error.message}`, 'error');
+        }
+
+        const percent = Math.round(((i + 1) / jsonData.length) * 100);
+        progressBar.style.width = `${percent}%`;
+    }
+
+    // Tampilkan ringkasan
+    log(`MIGRATION COMPLETE. Success: ${successCount}, Failed: ${errorCount}, Duplicates: ${duplicateCount}`, 
+        errorCount === 0 ? 'success' : 'warning');
+    
+    if (validationErrors.length > 0) {
+        log(`VALIDATION ERRORS (${validationErrors.length} rows):`, 'warning');
+        validationErrors.slice(0, 5).forEach(err => {
+            log(`Row ${err.row} (${err.namaKasus}): ${err.errors.join(', ')}`, 'error');
+        });
+    }
+    
+    btnProcess.disabled = false;
+    btnProcess.innerHTML = "Mulai Migrasi Data";
+    
+    alert(`Proses selesai!\nBerhasil: ${successCount}\nGagal: ${errorCount}\nDuplikat dilewati: ${duplicateCount}`);
+});
+// =====================================================
+// AKHIR PERUBAHAN
+// =====================================================
+
+        // --- 5. Scroll Animation Script ---
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    </script>
+    
+    <script>
+// --- Template Download Logic ---
+// --- Template Download Logic dengan Urutan yang Diperbaiki ---
+document.getElementById('btn-download-template').addEventListener('click', () => {
+    // Header dalam urutan yang benar sesuai form MR-01
+    const headers = [
+        // === A. IDENTIFIKASI KASUS ===
+        "Nomor EPID",
+        "Sumber Laporan", 
+        "Tanggal Terima Laporan",
+        
+        // === B. DATA PRIBADI ===
+        "Nama Kasus",
+        "Jenis Kelamin",
+        "Tanggal Lahir",
+        "Umur Kehamilan",
+        "Nama Orangtua",
+        "No Kontak Orangtua",
+        "Nama Sekolah",
+        
+        // === C. ALAMAT ===
+        "Alamat",
+        "RT",
+        "RW", 
+        "Kelurahan",
+        "Kecamatan",
+        "Kabupaten",
+        "Provinsi",
+        "Titik Lokasi",
+        
+        // === D. GEJALA KLINIS ===
+        "Demam",
+        "Tanggal Mulai Demam",
+        "Ruam",
+        "Tanggal Mulai Ruam",
+        "Gejala: Batuk",
+        "Gejala: Pilek",
+        "Gejala: Mata Merah",
+        "Gejala: Adenopathy",
+        "Lokasi Adenopathy",
+        "Gejala: Arthralgia",
+        "Bagian Sendi Arthralgia",
+        "Gejala: Kehamilan",
+        "Gejala: Lainnya",
+        "Gejala Lain Sebutkan",
+        
+        // === E. KOMPLIKASI ===
+        "Komplikasi: Pneumonia",
+        "Komplikasi: Diare",
+        "Komplikasi: Encephalitis",
+        "Komplikasi: Otitis media",
+        "Komplikasi: B. Pneumonia",
+        "Komplikasi: Kebutaan",
+        "Komplikasi: Malnutrisi",
+        "Komplikasi: Ulkus mukasa mulut",
+        "Komplikasi: Lainnya",
+        "Komplikasi Lainnya Sebutkan",
+        
+        // === F. PERAWATAN ===
+        "Dirawat",
+        "Nama Rumah Sakit",
+        "Tanggal Masuk Rawat",
+        "Tanggal Keluar Rawat",
+        "Keadaan Saat Ini",
+        "Nomor Rekam Medik",
+        
+        // === G. IMUNISASI ===
+        "Imunisasi Campak 1",
+        "Sumber Campak 1",
+        "Imunisasi Campak 2", 
+        "Sumber Campak 2",
+        "Imunisasi MMR",
+        "Sumber MMR",
+        "Imunisasi BIAS",
+        "Sumber BIAS",
+        "Imunisasi Tambahan",
+        "Sumber Tambahan",
+        "Tanggal Imunisasi Terakhir",
+        "Vitamin A",
+        
+        // === H. EPIDEMIOLOGI ===
+        "Ada Kontak Sakit Sama",
+        "Jumlah Kontak Sakit",
+        "Bepergian",
+        "Tanggal Pergi",
+        "Tanggal Kembali",
+        "Lokasi Bepergian",
+        "Kontak Erat",
+        
+        // === I. KLB ===
+        "Kasus KLB",
+        "Nomor KLB",
+        "KLB Ke",
+        "Pelaksana Investigasi",
+        "Tanggal Pelacakan",
+        
+        // === J. SPESIMEN ===
+        "Spesimen Darah",
+        "Jenis Sample Darah",
+        "Tanggal Ambil Darah",
+        "Tanggal Kirim Darah",
+        "Spesimen Lain",
+        "Jenis Sampel Lain",
+        "Tanggal Ambil Lain",
+        "Tanggal Kirim Lain",
+        "Jenis Sampel Lain Sebutkan",
+        
+        // === K. ADMINISTRASI & METADATA ===
+        "Nama Unit Pelapor",
+        "Kabupaten Unit Pelapor",
+        "Status Data",
+        "Created By",
+        "Created Unit",
+        "Current Owner",
+        "Original Unit",
+        "Shared To",
+        "Transfer History",
+        "Epid Manual"
+    ];
+    
+    // Data contoh dengan urutan yang sesuai
+    const templateData = [{
+        // A. IDENTIFIKASI KASUS
+        "Nomor EPID": "C-1401251",
+        "Sumber Laporan": "Puskesmas",
+        "Tanggal Terima Laporan": "2026-01-03",
+        
+        // B. DATA PRIBADI
+        "Nama Kasus": "RUDI ANSHARI",
+        "Jenis Kelamin": "laki-laki",
+        "Tanggal Lahir": "2022-10-10",
+        "Umur Kehamilan": "",
+        "Nama Orangtua": "AHMAD",
+        "No Kontak Orangtua": "082255954902",
+        "Nama Sekolah": "",
+        
+        // C. ALAMAT
+        "Alamat": "KELURAHAN DALAM BUGIS",
+        "RT": "1",
+        "RW": "8",
+        "Kelurahan": "Dalam Bugis",
+        "Kecamatan": "Pontianak Timur",
+        "Kabupaten": "Kota Pontianak",
+        "Provinsi": "Kalimantan Barat",
+        "Titik Lokasi": "-0.06685174319266886, 109.341364028101",
+        
+        // D. GEJALA KLINIS
+        "Demam": "Ya",
+        "Tanggal Mulai Demam": "2025-12-31",
+        "Ruam": "Ya",
+        "Tanggal Mulai Ruam": "2025-12-31",
+        "Gejala: Batuk": "Ya",
+        "Gejala: Pilek": "Ya",
+        "Gejala: Mata Merah": "Tidak",
+        "Gejala: Adenopathy": "Ya",
+        "Lokasi Adenopathy": "LEHER",
+        "Gejala: Arthralgia": "Ya",
+        "Bagian Sendi Arthralgia": "LUTUT",
+        "Gejala: Kehamilan": "Tidak",
+        "Gejala: Lainnya": "Ya",
+        "Gejala Lain Sebutkan": "Muntah-muntah",
+        
+        // E. KOMPLIKASI
+        "Komplikasi: Pneumonia": "Ya",
+        "Komplikasi: Diare": "Ya",
+        "Komplikasi: Encephalitis": "Tidak",
+        "Komplikasi: Otitis media": "Ya",
+        "Komplikasi: B. Pneumonia": "Ya",
+        "Komplikasi: Kebutaan": "Ya",
+        "Komplikasi: Malnutrisi": "Tidak",
+        "Komplikasi: Ulkus mukasa mulut": "Tidak",
+        "Komplikasi: Lainnya": "Tidak",
+        "Komplikasi Lainnya Sebutkan": "",
+        
+        // F. PERAWATAN
+        "Dirawat": "Ya",
+        "Nama Rumah Sakit": "RSU Yarsi Pontianak",
+        "Tanggal Masuk Rawat": "2025-12-31",
+        "Tanggal Keluar Rawat": "2026-01-02",
+        "Keadaan Saat Ini": "Hidup",
+        "Nomor Rekam Medik": "12345",
+        
+        // G. IMUNISASI
+        "Imunisasi Campak 1": "Tidak",
+        "Sumber Campak 1": "Ingatan Responden",
+        "Imunisasi Campak 2": "Tidak",
+        "Sumber Campak 2": "Ingatan Responden",
+        "Imunisasi MMR": "Tidak",
+        "Sumber MMR": "Ingatan Responden",
+        "Imunisasi BIAS": "Tidak",
+        "Sumber BIAS": "Ingatan Responden",
+        "Imunisasi Tambahan": "Tidak",
+        "Sumber Tambahan": "Ingatan Responden",
+        "Tanggal Imunisasi Terakhir": "",
+        "Vitamin A": "",
+        
+        // H. EPIDEMIOLOGI
+        "Ada Kontak Sakit Sama": "Tidak",
+        "Jumlah Kontak Sakit": "",
+        "Bepergian": "Tidak",
+        "Tanggal Pergi": "",
+        "Tanggal Kembali": "",
+        "Lokasi Bepergian": "",
+        "Kontak Erat": "",
+        
+        // I. KLB
+        "Kasus KLB": "Tidak",
+        "Nomor KLB": "",
+        "KLB Ke": "",
+        "Pelaksana Investigasi": "",
+        "Tanggal Pelacakan": "2026-01-03",
+        
+        // J. SPESIMEN
+        "Spesimen Darah": "Tidak",
+        "Jenis Sample Darah": "",
+        "Tanggal Ambil Darah": "",
+        "Tanggal Kirim Darah": "",
+        "Spesimen Lain": "Tidak",
+        "Jenis Sampel Lain": "",
+        "Tanggal Ambil Lain": "",
+        "Tanggal Kirim Lain": "",
+        "Jenis Sampel Lain Sebutkan": "",
+        
+        // K. ADMINISTRASI & METADATA
+        "Nama Unit Pelapor": "Puskesmas Kampung Dalam",
+        "Kabupaten Unit Pelapor": "Kota Pontianak",
+        "Status Data": "Final",
+        "Created By": "",
+        "Created Unit": "",
+        "Current Owner": "",
+        "Original Unit": "",
+        "Shared To": "",
+        "Transfer History": "",
+        "Epid Manual": "false"
+    }];
+    
+    // Buat worksheet dengan header yang diurutkan
+    const ws = XLSX.utils.json_to_sheet(templateData, {
+        header: headers
+    });
+    
+    // Atur lebar kolom agar lebih rapi
+    const wscols = headers.map(() => ({ width: 20 }));
+    ws['!cols'] = wscols;
+    
+    // Tambahkan judul
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    const titleRow = 0;
+    
+    // Buat workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Template Campak");
+    
+    // Tambahkan sheet petunjuk
+    const instructions = [
+        ["PETUNJUK PENGISIAN TEMPLATE FORM MR-01 CAMPAK"],
+        [""],
+        ["A. IDENTIFIKASI KASUS: Data administrasi kasus"],
+        ["B. DATA PRIBADI: Data pasien dan orangtua"],
+        ["C. ALAMAT: Lokasi tempat tinggal pasien"],
+        ["D. GEJALA KLINIS: Gejala yang dialami pasien"],
+        ["E. KOMPLIKASI: Komplikasi yang muncul"],
+        ["F. PERAWATAN: Riwayat perawatan"],
+        ["G. IMUNISASI: Status imunisasi"],
+        ["H. EPIDEMIOLOGI: Penularan dan riwayat bepergian"],
+        ["I. KLB: Data Kejadian Luar Biasa"],
+        ["J. SPESIMEN: Pengambilan sampel"],
+        ["K. ADMINISTRASI: Data pelapor"],
+        [""],
+        ["CATATAN:"],
+        ["1. Untuk field Yes/No: gunakan 'Ya' atau 'Tidak'"],
+        ["2. Format tanggal: YYYY-MM-DD (contoh: 2025-12-31)"],
+        ["3. Koordinat titik lokasi: longitude,latitude"],
+        ["4. Field array: pisahkan dengan koma (contoh: item1, item2, item3)"]
+    ];
+    
+    const ws2 = XLSX.utils.aoa_to_sheet(instructions);
+    XLSX.utils.book_append_sheet(wb, ws2, "Petunjuk");
+    
+    // Download
+    XLSX.writeFile(wb, "Template_Form_MR01_Campak.xlsx");
+    
+    log("Template berhasil didownload dengan urutan yang sesuai", "success");
+});
+</script>
+</body>
+</html>
