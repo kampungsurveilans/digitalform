@@ -894,33 +894,61 @@ try {
             }
         };
         
-        // PERBAIKAN POINT 3: Fungsi untuk menghitung usia dalam format tahun bulan hari
-        const calculateAge = (tanggalLahir) => {
-            if (!tanggalLahir) return '';
-            try {
-                const birthDate = new Date(tanggalLahir);
-                const today = new Date();
-                
-                let years = today.getFullYear() - birthDate.getFullYear();
-                let months = today.getMonth() - birthDate.getMonth();
-                let days = today.getDate() - birthDate.getDate();
-                
-                if (days < 0) {
-                    months--;
-                    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                    days += lastMonth.getDate();
-                }
-                
-                if (months < 0) {
-                    years--;
-                    months += 12;
-                }
-                
-                return `${years} tahun ${months} bulan ${days} hari`;
-            } catch (e) {
-                return '';
-            }
-        };
+// Fungsi baru untuk menghitung usia saat tanggal mulai ruam
+const calculateAgeAtRash = (tanggalLahir, tanggalMulaiRuam) => {
+    if (!tanggalLahir || !tanggalMulaiRuam) return '';
+    try {
+        const birthDate = new Date(tanggalLahir);
+        const rashDate = new Date(tanggalMulaiRuam);
+        
+        let years = rashDate.getFullYear() - birthDate.getFullYear();
+        let months = rashDate.getMonth() - birthDate.getMonth();
+        let days = rashDate.getDate() - birthDate.getDate();
+        
+        if (days < 0) {
+            months--;
+            const lastMonth = new Date(rashDate.getFullYear(), rashDate.getMonth(), 0);
+            days += lastMonth.getDate();
+        }
+        
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        
+        return `${years} tahun ${months} bulan ${days} hari`;
+    } catch (e) {
+        return '';
+    }
+};
+
+// Fungsi calculateAge tetap dipertahankan untuk keperluan lain jika diperlukan
+const calculateAge = (tanggalLahir) => {
+    if (!tanggalLahir) return '';
+    try {
+        const birthDate = new Date(tanggalLahir);
+        const today = new Date();
+        
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+        
+        if (days < 0) {
+            months--;
+            const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += lastMonth.getDate();
+        }
+        
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        
+        return `${years} tahun ${months} bulan ${days} hari`;
+    } catch (e) {
+        return '';
+    }
+};
         
         // Fungsi untuk menentukan current owner dengan logika yang benar
         const determineCurrentOwner = (formData) => {
@@ -983,6 +1011,34 @@ try {
     // Definisikan daftar gejala dan komplikasi
     const gejalaOptions = ['Batuk', 'Pilek', 'Mata Merah', 'Adenopathy', 'Arthralgia', 'Kehamilan', 'Lainnya'];
     const komplikasiOptions = DATA_KOMPLIKASI; // ['Diare', 'B. Pneumonia', 'Kebutaan', ...]
+    
+        // TAMBAHKAN FUNGSI calculateAgeAtRash DI DALAM exportToCSV ATAU PASTIKAN TERSEDIA DI SCOOPE
+    const calculateAgeAtRash = (tanggalLahir, tanggalMulaiRuam) => {
+        if (!tanggalLahir || !tanggalMulaiRuam) return '';
+        try {
+            const birthDate = new Date(tanggalLahir);
+            const rashDate = new Date(tanggalMulaiRuam);
+            
+            let years = rashDate.getFullYear() - birthDate.getFullYear();
+            let months = rashDate.getMonth() - birthDate.getMonth();
+            let days = rashDate.getDate() - birthDate.getDate();
+            
+            if (days < 0) {
+                months--;
+                const lastMonth = new Date(rashDate.getFullYear(), rashDate.getMonth(), 0);
+                days += lastMonth.getDate();
+            }
+            
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            
+            return `${years} tahun ${months} bulan ${days} hari`;
+        } catch (e) {
+            return '';
+        }
+    };
     
     if (isRaw) {
         headers = Object.keys(data[0]);
@@ -1082,7 +1138,7 @@ try {
             };
             
             const baseRow = [
-                `"${item.nomorEPID||''}"`, `"${item.statusData||''}"`, `"${item.namaKasus||''}"`, `"${item.jenisKelamin||''}"`, `"${item.tanggalLahir||''}"`, `"${calculateAge(item.tanggalLahir)}"`,
+                `"${item.nomorEPID||''}"`, `"${item.statusData||''}"`, `"${item.namaKasus||''}"`, `"${item.jenisKelamin||''}"`, `"${item.tanggalLahir||''}"`, `"${calculateAgeAtRash(item.tanggalLahir, item.tanggalMulaiRuam)}"`,
                 `"${(item.alamat||'').replace(/"/g, '""')}"`, `"${item.provinsi||'Kalimantan Barat'}"`, `"${item.kabupaten||'Kota Pontianak'}"`, `"${item.kecamatan||''}"`, `"${item.kelurahan||''}"`, 
                 `"${item.rt||''}"`, `"${item.rw||''}"`, `"${item.namaOrangtua||''}"`, `"${item.noKontakOrangtua||''}"`, `"${item.sumberLaporan||''}"`, 
                 `"${item.namaUnitPelapor||''}"`, `"${item.tanggalTerimaLaporan||''}"`, `"${item.tanggalPelacakan||''}"`, `"${item.demam||''}"`, 
@@ -5640,7 +5696,7 @@ const ServiceItem = ({ service, selected, onSelect }) => {
                                                     <th className="px-4 py-3">Nama Kasus</th>
                                                     <th className="px-4 py-3">Usia</th>
                                                     <th className="px-4 py-3">Current Owner</th>
-                                                    <th className="px-4 py-3">Tgl Update</th>
+                                                    <th className="px-4 py-3">Tanggal Mulai Ruam</th>
                                                     <th className="px-4 py-3">Aksi</th>
                                                 </tr>
                                             </thead>
@@ -5657,15 +5713,17 @@ const ServiceItem = ({ service, selected, onSelect }) => {
                                                             <div className="font-semibold text-slate-800">{form.namaKasus || 'Tanpa Nama'}</div>
                                                             <div className="text-[10px] text-slate-400 mt-0.5">{form.jenisKelamin}</div>
                                                         </td>
-                                                        <td className="px-4 py-3 font-medium text-slate-600">{calculateAge(form.tanggalLahir)}</td>
+                                                        <td className="px-4 py-3 font-medium text-slate-600">
+                                                              {form.tanggalLahir && form.tanggalMulaiRuam ? calculateAgeAtRash(form.tanggalLahir, form.tanggalMulaiRuam) : '-'}
+                                                          </td>
                                                         <td className="px-4 py-3">
                                                             <span className="text-slate-700 text-xs font-medium">
                                                                 {form.currentOwner || determineCurrentOwner(form)}
                                                             </span>
                                                         </td>
                                                         <td className="px-4 py-3 text-slate-500">
-                                                            {new Date(form.updatedAt).toLocaleDateString()}
-                                                        </td>
+                                                            {form.tanggalMulaiRuam ? new Date(form.tanggalMulaiRuam).toLocaleDateString('id-ID') : '-'}
+                                                                </td>
                                                         <td className="px-4 py-3">
                                                             <div className="flex gap-1">
                                                                 <button 
@@ -6058,25 +6116,6 @@ const ServiceItem = ({ service, selected, onSelect }) => {
         }
     };
     
-    const calculateAgeFromDOB = (dob) => {
-        if (!dob) return '';
-        try {
-            const birthDate = new Date(dob);
-            const today = new Date();
-            
-            let years = today.getFullYear() - birthDate.getFullYear();
-            let months = today.getMonth() - birthDate.getMonth();
-            
-            if (months < 0) {
-                years--;
-                months += 12;
-            }
-            
-            return `${years} tahun, ${months} bulan`;
-        } catch (e) {
-            return dob;
-        }
-    };
     
     const getStatusBadge = (status) => {
         const statusColors = {
@@ -6260,8 +6299,8 @@ const ServiceItem = ({ service, selected, onSelect }) => {
                                 <p className="text-sm text-slate-500 mb-1">Tanggal Lahir / Usia</p>
                                 <p className="font-medium text-slate-800">
                                     {formatDate(item.tanggalLahir)} 
-                                    {item.tanggalLahir && (
-                                        <span className="ml-2 text-blue-600">({calculateAgeFromDOB(item.tanggalLahir)})</span>
+                                    {item.tanggalLahir && item.tanggalMulaiRuam && (
+                                        <span className="ml-2 text-blue-600">({calculateAgeAtRash(item.tanggalLahir, item.tanggalMulaiRuam)})</span>
                                     )}
                                 </p>
                             </div>
