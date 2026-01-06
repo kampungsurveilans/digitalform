@@ -2492,20 +2492,26 @@ try {
                 }
             };
 
-            const checkNewReceived = async () => {
-                if (!currentUser) return;
-                try {
-                    const all = await mockDB.getAllForms();
-                    const received = all.filter(i => 
-                        i.sharedTo === currentUser.unitName && 
-                        i.statusData === 'Proses' &&
-                        i.createdUnit !== currentUser.unitName
-                    );
-                    setHasNewReceived(received.length > 0);
-                } catch (e) {
-                    console.error("Error checking new received:", e);
-                }
-            };
+const checkNewReceived = async () => {
+    if (!currentUser || !dbStore) return;
+    try {
+        // Query spesifik untuk inbox baru
+        const inboxSnapshot = await dbStore.collection('forms')
+            .where('sharedTo', '==', currentUser.unitName)
+            .where('statusData', '==', 'Proses')
+            .get();
+        
+        const receivedAll = inboxSnapshot.docs.map(d => d.data());
+        const received = receivedAll.filter(i => {
+            const currentOwner = determineCurrentOwner(i);
+            return currentOwner !== currentUser.unitName;
+        });
+        
+        setHasNewReceived(received.length > 0);
+    } catch (e) {
+        console.error("Error checking new received:", e);
+    }
+};
 
             useEffect(() => { 
                 const init = async () => { 
@@ -2539,108 +2545,154 @@ try {
                 }
             }, [step, view]);
 
-            const loadDataForView = async () => {
-                if (!currentUser) return;
-                
-                console.log(`Loading data for user: ${currentUser.email}, unit: ${currentUser.unitName}`);
-                showLoading(true);
-                try {
-                    const allForms = await mockDB.getAllForms();
-                    console.log(`Total forms loaded: ${allForms.length}`);
-                    
-                    // 1. Drafts
-                    const drafts = allForms.filter(d => 
-                        d.createdBy === currentUser.email && 
-                        d.statusData === 'Draft'
-                    );
-                    console.log(`Drafts found: ${drafts.length}`);
-                    setDraftsList(drafts);
-                    
-                    // 2. Pending Form
-                    const pending = allForms.filter(i => {
-                        const currentOwner = determineCurrentOwner(i);
-                        const isPendingStatus = i.statusData === 'Pending';
-                        const isOwnedByMe = currentOwner === currentUser.unitName;
-                        return isPendingStatus && isOwnedByMe;
-                    });
-                    console.log(`Pending forms: ${pending.length}`);
-                    setPendingList(pending);
-                    
-                    // 3. Form Final
-                    const formFinal = allForms.filter(i => {
-                        const currentOwner = determineCurrentOwner(i);
-                        const isFinalStatus = i.statusData === 'Final';
-                        const isOwnedByMe = currentOwner === currentUser.unitName;
-                        return isFinalStatus && isOwnedByMe;
-                    });
-                    console.log(`Form Final: ${formFinal.length}`);
-                    setFormFinalList(formFinal);
-                    
-                    // 4. Formulir Keluar
-                    // 4. Formulir Keluar - PERBAIKAN DI SINI
-const outgoing = allForms.filter(i => {
-    // Kriteria 1: Dibuat oleh user yang sedang login
-    const isCreatedByMe = i.createdBy === currentUser.email;
+const loadDataForView = async () => {
+    if (!currentUser || !dbStore) return;
     
-    // Kriteria 2: Status adalah 'Proses' atau 'Ditolak'
-    const isInProcessOrRejected = i.statusData === 'Proses' || i.statusData === 'Ditolak';
-    
-    // Kriteria 3: Dikirim ke unit lain (bukan ke diri sendiri)
-    const isSharedToOtherUnit = i.sharedTo && i.sharedTo !== '' && i.sharedTo !== currentUser.unitName;
-    
-    // Kriteria 4: Unit pembuat adalah unit user saat ini
-    const isFromMyUnit = i.createdUnit === currentUser.unitName;
-    
-    // Formulir masuk ke Formulir Keluar jika:
-    // 1. Dibuat oleh saya, DAN
-    // 2. Status Proses/Ditolak, DAN  
-    // 3. Dikirim ke unit lain, DAN
-    // 4. Dari unit saya
-    if (isCreatedByMe && isInProcessOrRejected && isSharedToOtherUnit && isFromMyUnit) {
-        return true;
+    console.log(`Loading data for user: ${currentUser.email}, unit: ${currentUser.unitName}`);
+    showLoading(true);
+    try {
+        // Gunakan Promise.all untuk menjalankan query paralel
+        const [
+            draftsSnapshot,
+            pendingSnapshot,
+            formFinalSnapshot,
+            outgoingSnapshot,
+            inboxSnapshot,
+            rejectedSnapshot
+        ] = await Promise.all([
+            // 1. Drafts
+            dbStore.collection('forms')
+                .where('createdBy', '==', currentUser.email)
+                .where('statusData', '==', 'Draft')
+                .orderBy('updatedAt', 'desc')
+                .get(),
+            
+            // 2. Pending Form - PERBAIKAN: Gunakan currentOwner untuk query
+            dbStore.collection('forms')
+                .where('statusData', '==', 'Pending')
+                .where('currentOwner', '==', currentUser.unitName)
+                .orderBy('updatedAt', 'desc')
+                .get(),
+            
+            // 3. Form Final - PERBAIKAN: Gunakan currentOwner untuk query
+            dbStore.collection('forms')
+                .where('statusData', '==', 'Final')
+                .where('currentOwner', '==', currentUser.unitName)
+                .orderBy('updatedAt', 'desc')
+                .get(),
+            
+            // 4. Formulir Keluar - Query spesifik
+            dbStore.collection('forms')
+                .where('createdBy', '==', currentUser.email)
+                .where('statusData', 'in', ['Proses', 'Ditolak'])
+                .where('createdUnit', '==', currentUser.unitName)
+                .orderBy('updatedAt', 'desc')
+                .get(),
+            
+            // 5. Inbox - Query spesifik
+            dbStore.collection('forms')
+                .where('sharedTo', '==', currentUser.unitName)
+                .where('statusData', '==', 'Proses')
+                .orderBy('updatedAt', 'desc')
+                .get(),
+            
+            // 6. Form Ditolak - PERBAIKAN: Gunakan currentOwner untuk query
+            dbStore.collection('forms')
+                .where('statusData', '==', 'Ditolak')
+                .where('currentOwner', '==', currentUser.unitName)
+                .orderBy('updatedAt', 'desc')
+                .get()
+        ]);
+        
+        // Proses hasil query
+        const drafts = draftsSnapshot.docs.map(d => d.data());
+        const pending = pendingSnapshot.docs.map(d => d.data());
+        const formFinal = formFinalSnapshot.docs.map(d => d.data());
+        
+        // Filter outgoing di sisi klien (karena kompleks)
+        const outgoingAll = outgoingSnapshot.docs.map(d => d.data());
+        const outgoing = outgoingAll.filter(i => {
+            const isSharedToOtherUnit = i.sharedTo && i.sharedTo !== '' && i.sharedTo !== currentUser.unitName;
+            return isSharedToOtherUnit;
+        });
+        
+        // Filter inbox di sisi klien (untuk currentOwner check)
+        const receivedAll = inboxSnapshot.docs.map(d => d.data());
+        const received = receivedAll.filter(i => {
+            const currentOwner = determineCurrentOwner(i);
+            return currentOwner !== currentUser.unitName;
+        });
+        
+        const rejected = rejectedSnapshot.docs.map(d => d.data());
+        
+        // Set state
+        setDraftsList(drafts);
+        setPendingList(pending);
+        setFormFinalList(formFinal);
+        setOutgoingList(outgoing);
+        setReceivedList(received);
+        setRejectedList(rejected);
+        setHasNewReceived(received.length > 0);
+        
+        console.log(`Data loaded: Drafts(${drafts.length}), Pending(${pending.length}), Final(${formFinal.length}), Outgoing(${outgoing.length}), Inbox(${received.length}), Rejected(${rejected.length})`);
+        
+    } catch (e) {
+        console.error("Error loading data:", e);
+        // Fallback ke metode lama jika ada error
+        try {
+            const allForms = await mockDB.getAllForms();
+            console.log(`Fallback: Total forms loaded: ${allForms.length}`);
+            
+            const drafts = allForms.filter(d => 
+                d.createdBy === currentUser.email && 
+                d.statusData === 'Draft'
+            );
+            const pending = allForms.filter(i => {
+                const currentOwner = determineCurrentOwner(i);
+                const isPendingStatus = i.statusData === 'Pending';
+                const isOwnedByMe = currentOwner === currentUser.unitName;
+                return isPendingStatus && isOwnedByMe;
+            });
+            const formFinal = allForms.filter(i => {
+                const currentOwner = determineCurrentOwner(i);
+                const isFinalStatus = i.statusData === 'Final';
+                const isOwnedByMe = currentOwner === currentUser.unitName;
+                return isFinalStatus && isOwnedByMe;
+            });
+            const outgoing = allForms.filter(i => {
+                const isCreatedByMe = i.createdBy === currentUser.email;
+                const isInProcessOrRejected = i.statusData === 'Proses' || i.statusData === 'Ditolak';
+                const isSharedToOtherUnit = i.sharedTo && i.sharedTo !== '' && i.sharedTo !== currentUser.unitName;
+                const isFromMyUnit = i.createdUnit === currentUser.unitName;
+                return isCreatedByMe && isInProcessOrRejected && isSharedToOtherUnit && isFromMyUnit;
+            });
+            const received = allForms.filter(i => {
+                const isSharedToMe = i.sharedTo === currentUser.unitName;
+                const isInProcess = i.statusData === 'Proses';
+                const currentOwner = determineCurrentOwner(i);
+                return isSharedToMe && isInProcess && currentOwner !== currentUser.unitName;
+            });
+            const rejected = allForms.filter(i => {
+                const currentOwner = determineCurrentOwner(i);
+                const isRejected = i.statusData === 'Ditolak';
+                const isOwnedByMe = currentOwner === currentUser.unitName;
+                return isRejected && isOwnedByMe;
+            });
+            
+            setDraftsList(drafts);
+            setPendingList(pending);
+            setFormFinalList(formFinal);
+            setOutgoingList(outgoing);
+            setReceivedList(received);
+            setRejectedList(rejected);
+            setHasNewReceived(received.length > 0);
+        } catch (fallbackError) {
+            showNotification('Error memuat data: ' + e.message, 'error');
+        }
+    } finally {
+        showLoading(false);
     }
-    
-    return false;
-});
-                    console.log(`Outgoing forms: ${outgoing.length}`);
-                    setOutgoingList(outgoing);
-                    
-                    // 5. Inbox
-                    const received = allForms.filter(i => {
-                        const isSharedToMe = i.sharedTo === currentUser.unitName;
-                        const isInProcess = i.statusData === 'Proses';
-                        const currentOwner = determineCurrentOwner(i);
-                        
-                        if (isSharedToMe && isInProcess && currentOwner !== currentUser.unitName) {
-                            return true;
-                        }
-                        
-                        return false;
-                    });
-                    console.log(`Inbox forms: ${received.length}`);
-                    setReceivedList(received);
-                    
-                    // 6. Form Ditolak
-                    const rejected = allForms.filter(i => {
-                        const currentOwner = determineCurrentOwner(i);
-                        const isRejected = i.statusData === 'Ditolak';
-                        const isOwnedByMe = currentOwner === currentUser.unitName;
-                        
-                        return isRejected && isOwnedByMe;
-                    });
-                    console.log(`Rejected forms: ${rejected.length}`);
-                    setRejectedList(rejected);
-                    
-                    setHasNewReceived(received.length > 0);
-                    
-                } catch (e) {
-                    console.error("Error loading data:", e);
-                    showNotification('Error memuat data: ' + e.message, 'error');
-                } finally {
-                    showLoading(false);
-                }
-            };
-
+};
             useEffect(() => { 
                 if(view === 'form') window.scrollTo({ top: 0, behavior: 'smooth' }); 
             }, [step, view]);
